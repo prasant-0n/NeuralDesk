@@ -11,6 +11,13 @@ import {
   Check,
   CheckCircle2,
   AlertCircle,
+  Cloud,
+  Loader2,
+  Radio,
+  Server,
+  Sparkles,
+  Zap,
+  ChevronDown,
 } from "lucide-react";
 import { WorkflowCanvas } from "../canvas/WorkflowCanvas";
 import { NodePalette } from "../canvas/NodePalette";
@@ -19,12 +26,49 @@ import { useWorkflowStore } from "../../store/workflowStore";
 import { useSettingsStore } from "../../store/settingsStore";
 import { cn } from "../../lib/utils";
 
+export type ExecutionTargetMode = "mock" | "live" | "client_mock";
+
+interface ModeOption {
+  id: ExecutionTargetMode;
+  label: string;
+  badge: string;
+  description: string;
+  icon: React.FC<{ className?: string }>;
+}
+
+const MODE_OPTIONS: ModeOption[] = [
+  {
+    id: "mock",
+    label: "Backend SSE (Simulation)",
+    badge: "Backend SSE",
+    description: "Real-time SSE event stream via Hono backend with synthetic LLM latencies",
+    icon: Server,
+  },
+  {
+    id: "live",
+    label: "Backend SSE (Live Gemini)",
+    badge: "Live Gemini",
+    description: "Production Google GenAI streaming with BYOK credential verification",
+    icon: Sparkles,
+  },
+  {
+    id: "client_mock",
+    label: "Client Mock (Offline)",
+    badge: "Offline",
+    description: "In-browser pure topological DAG engine (no backend connection required)",
+    icon: Zap,
+  },
+];
+
 export const CanvasView: React.FC = () => {
   const workflowTitle = useWorkflowStore((state) => state.workflowTitle);
   const setWorkflowTitle = useWorkflowStore((state) => state.setWorkflowTitle);
   const executionStatus = useWorkflowStore((state) => state.executionStatus);
+  const isSaving = useWorkflowStore((state) => state.isSaving);
+  const isStreaming = useWorkflowStore((state) => state.isStreaming);
   const runExecution = useWorkflowStore((state) => state.runExecution);
   const cancelExecution = useWorkflowStore((state) => state.cancelExecution);
+  const saveWorkflowToApi = useWorkflowStore((state) => state.saveWorkflowToApi);
   const undo = useWorkflowStore((state) => state.undo);
   const redo = useWorkflowStore((state) => state.redo);
   const canUndo = useWorkflowStore((state) => state.canUndo);
@@ -34,20 +78,33 @@ export const CanvasView: React.FC = () => {
   const exportWorkflowJson = useWorkflowStore((state) => state.exportWorkflowJson);
   const importWorkflowJson = useWorkflowStore((state) => state.importWorkflowJson);
 
-  const executionMode = useSettingsStore((state) => state.executionMode);
   const geminiApiKey = useSettingsStore((state) => state.geminiApiKey);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [templateDropdownOpen, setTemplateDropdownOpen] = useState(false);
+  const [modeDropdownOpen, setModeDropdownOpen] = useState(false);
+  const [selectedMode, setSelectedMode] = useState<ExecutionTargetMode>("mock");
   const [exportSuccess, setExportSuccess] = useState(false);
+  const [saveSuccess, setSaveSuccess] = useState(false);
 
   const isRunning = executionStatus === "running";
+  const activeModeOption = MODE_OPTIONS.find((m) => m.id === selectedMode) || MODE_OPTIONS[0];
+  const ActiveModeIcon = activeModeOption.icon;
 
   const handleRun = () => {
     if (isRunning) {
       cancelExecution();
     } else {
-      runExecution(executionMode, geminiApiKey);
+      runExecution(selectedMode, geminiApiKey);
+    }
+  };
+
+  const handleSaveToApi = async () => {
+    if (isSaving) return;
+    const ok = await saveWorkflowToApi();
+    if (ok) {
+      setSaveSuccess(true);
+      setTimeout(() => setSaveSuccess(false), 2500);
     }
   };
 
@@ -82,13 +139,13 @@ export const CanvasView: React.FC = () => {
     <div className="flex-1 flex flex-col h-full overflow-hidden relative">
       {/* Top Workflow Control Bar */}
       <div className="h-13 bg-white dark:bg-charcoal-900 border-b border-slate-200 dark:border-charcoal-800 px-4 py-2 flex items-center justify-between z-20 select-none transition-colors duration-150">
-        {/* Title & Status */}
+        {/* Title & Status Badges */}
         <div className="flex items-center gap-3">
           <input
             type="text"
             value={workflowTitle}
             onChange={(e) => setWorkflowTitle(e.target.value)}
-            className="bg-transparent text-sm font-bold text-slate-900 dark:text-white hover:bg-slate-100 dark:hover:bg-charcoal-800/60 focus:bg-white dark:focus:bg-charcoal-950 px-2 py-1 rounded-lg border border-transparent focus:border-indigo-500 focus:outline-none transition-colors max-w-sm truncate"
+            className="bg-transparent text-sm font-bold text-slate-900 dark:text-white hover:bg-slate-100 dark:hover:bg-charcoal-800/60 focus:bg-white dark:focus:bg-charcoal-950 px-2 py-1 rounded-lg border border-transparent focus:border-indigo-500 focus:outline-none transition-colors max-w-xs sm:max-w-sm truncate"
             title="Click to edit workflow name"
           />
 
@@ -96,14 +153,22 @@ export const CanvasView: React.FC = () => {
             DRAFT
           </span>
 
-          {executionStatus === "completed" && (
-            <span className="hidden sm:flex items-center gap-1 text-[11px] text-emerald-600 dark:text-emerald-400 font-mono">
+          {/* SSE Live Streaming Pulse Badge */}
+          {isStreaming && (
+            <span className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-indigo-50 text-indigo-700 border border-indigo-200 dark:bg-indigo-500/10 dark:text-indigo-400 dark:border-indigo-500/20 animate-pulse">
+              <Radio className="w-3 h-3 text-indigo-600 dark:text-indigo-400 animate-spin" />
+              <span>SSE Stream Live</span>
+            </span>
+          )}
+
+          {executionStatus === "completed" && !isStreaming && (
+            <span className="hidden sm:inline-flex items-center gap-1 text-[11px] text-emerald-600 dark:text-emerald-400 font-mono">
               <CheckCircle2 className="w-3.5 h-3.5" />
               <span>Executed</span>
             </span>
           )}
-          {executionStatus === "failed" && (
-            <span className="hidden sm:flex items-center gap-1 text-[11px] text-rose-600 dark:text-rose-400 font-mono">
+          {executionStatus === "failed" && !isStreaming && (
+            <span className="hidden sm:inline-flex items-center gap-1 text-[11px] text-rose-600 dark:text-rose-400 font-mono">
               <AlertCircle className="w-3.5 h-3.5" />
               <span>Failed</span>
             </span>
@@ -175,6 +240,36 @@ export const CanvasView: React.FC = () => {
             )}
           </div>
 
+          {/* Save to Backend API Button */}
+          <button
+            onClick={handleSaveToApi}
+            disabled={isSaving}
+            className={cn(
+              "flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border text-xs font-medium transition-all shadow-sm",
+              saveSuccess
+                ? "bg-emerald-50 text-emerald-700 border-emerald-300 dark:bg-emerald-950/40 dark:text-emerald-400 dark:border-emerald-700/50"
+                : "bg-slate-100/90 hover:bg-slate-200 dark:bg-charcoal-950/80 dark:hover:bg-charcoal-800 border-slate-200 dark:border-charcoal-800 text-slate-700 dark:text-charcoal-300 hover:text-slate-900 dark:hover:text-white"
+            )}
+            title="Persist current canvas workflow definition to backend database"
+          >
+            {isSaving ? (
+              <>
+                <Loader2 className="w-3.5 h-3.5 animate-spin text-indigo-600 dark:text-indigo-400" />
+                <span className="hidden sm:inline">Saving...</span>
+              </>
+            ) : saveSuccess ? (
+              <>
+                <Check className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+                <span className="hidden sm:inline">Saved</span>
+              </>
+            ) : (
+              <>
+                <Cloud className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
+                <span className="hidden sm:inline">Save API</span>
+              </>
+            )}
+          </button>
+
           {/* Import / Export JSON */}
           <input
             type="file"
@@ -210,6 +305,67 @@ export const CanvasView: React.FC = () => {
           >
             <Trash2 className="w-3.5 h-3.5" />
           </button>
+
+          {/* Execution Mode Selector Dropdown */}
+          <div className="relative">
+            <button
+              onClick={() => setModeDropdownOpen(!modeDropdownOpen)}
+              disabled={isRunning}
+              className={cn(
+                "flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border text-xs font-semibold transition-all shadow-sm",
+                "bg-slate-100/90 hover:bg-slate-200 dark:bg-charcoal-950/80 dark:hover:bg-charcoal-800 border-slate-200 dark:border-charcoal-800 text-slate-800 dark:text-charcoal-200",
+                isRunning && "opacity-50 cursor-not-allowed"
+              )}
+              title="Select DAG Execution Runtime & Telemetry Target"
+            >
+              <ActiveModeIcon className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
+              <span className="hidden md:inline">{activeModeOption.label}</span>
+              <span className="md:hidden">{activeModeOption.badge}</span>
+              <ChevronDown className="w-3 h-3 text-slate-400 dark:text-charcoal-500" />
+            </button>
+
+            {modeDropdownOpen && (
+              <div
+                className="absolute right-0 mt-2 w-72 bg-white dark:bg-charcoal-900 border border-slate-200 dark:border-charcoal-800 rounded-xl shadow-2xl py-1 z-50 text-xs select-none"
+                onClick={() => setModeDropdownOpen(false)}
+              >
+                <div className="px-3 py-1.5 text-[10px] uppercase font-bold tracking-wider text-slate-400 dark:text-charcoal-400 border-b border-slate-100 dark:border-charcoal-800">
+                  Execution Runtime Engine
+                </div>
+                {MODE_OPTIONS.map((opt) => {
+                  const Icon = opt.icon;
+                  const isSelected = selectedMode === opt.id;
+                  return (
+                    <button
+                      key={opt.id}
+                      onClick={() => setSelectedMode(opt.id)}
+                      className={cn(
+                        "w-full text-left px-3 py-2.5 hover:bg-slate-100 dark:hover:bg-charcoal-800 transition-colors flex items-start gap-2.5",
+                        isSelected && "bg-indigo-50/70 dark:bg-indigo-950/30"
+                      )}
+                    >
+                      <div className="p-1 rounded-md bg-slate-100 dark:bg-charcoal-800 border border-slate-200 dark:border-charcoal-700 shrink-0 mt-0.5">
+                        <Icon className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center justify-between">
+                          <span className="font-semibold text-slate-900 dark:text-white truncate">
+                            {opt.label}
+                          </span>
+                          {isSelected && (
+                            <Check className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400 shrink-0" />
+                          )}
+                        </div>
+                        <p className="text-[10px] text-slate-500 dark:text-charcoal-400 mt-0.5 leading-relaxed">
+                          {opt.description}
+                        </p>
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            )}
+          </div>
 
           {/* Run / Stop Workflow Action */}
           <button

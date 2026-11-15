@@ -26,6 +26,7 @@ import { getNodeHandler } from "./handlers/index.js";
 import {
   inMemoryExecutions,
   inMemoryNodeRuns,
+  inMemoryWorkflows,
   type StoredNodeRun,
 } from "./store.js";
 
@@ -489,7 +490,25 @@ export class ExecutionOrchestrator {
     customDefinition?: { nodes: WorkflowNode[]; edges: WorkflowEdge[] }
   ): { nodes: WorkflowNode[]; edges: WorkflowEdge[] } {
     if (customDefinition && customDefinition.nodes && customDefinition.nodes.length > 0) {
-      return customDefinition;
+      const normalizedNodes = customDefinition.nodes.map((node: any) => ({
+        ...node,
+        type: node.type || node.data?.kind || "prompt",
+      }));
+      return {
+        nodes: normalizedNodes,
+        edges: customDefinition.edges || [],
+      };
+    }
+
+    // Check in-memory workflows
+    const memWf = inMemoryWorkflows.get(workflowId);
+    if (memWf && memWf.versions && memWf.versions.length > 0) {
+      const activeVersion =
+        memWf.versions.find((v) => v.versionNumber === memWf.activeVersionNumber) ||
+        memWf.versions[0];
+      if (activeVersion?.definition?.nodes && activeVersion.definition.nodes.length > 0) {
+        return activeVersion.definition;
+      }
     }
 
     if (workflowId === SEED_IDS.WF_SUPPORT) {

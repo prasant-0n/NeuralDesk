@@ -87,11 +87,17 @@ export interface WorkflowStoreState {
   redo: () => void;
 
   // Execution Actions
+  isSaving: boolean;
+  isStreaming: boolean;
   setExecutionStatus: (status: "idle" | "running" | "completed" | "failed") => void;
   updateNodeTelemetry: (nodeId: string, telemetry: Partial<NodeTelemetry>) => void;
   appendStreamChunk: (nodeId: string, chunk: string) => void;
   resetTelemetry: () => void;
-  runExecution: (mode?: "live" | "mock", apiKey?: string) => Promise<void>;
+  runExecution: (mode?: "live" | "mock" | "client_mock", apiKey?: string) => Promise<void>;
+  executeWorkflowViaApi: (mode?: "live" | "mock", apiKey?: string) => Promise<void>;
+  runClientSimulation: () => Promise<void>;
+  saveWorkflowToApi: () => Promise<boolean>;
+  fetchExecutionsFromApi: () => Promise<void>;
   cancelExecution: () => void;
 
   // Import / Export & Templates
@@ -310,12 +316,15 @@ const DEFAULT_EDGES: Edge[] = [
 ];
 
 let executionAbortController: AbortController | null = null;
+let activeEventSource: EventSource | null = null;
 
 export const useWorkflowStore = create<WorkflowStoreState>((set, get) => ({
   workflowId: "wf_prod_support_triage",
   workflowTitle: "Customer Support Triage & Auto-Escalation",
   workflowDescription: "Classifies incoming customer complaints, isolates negative sentiment, and pages on-call engineer.",
   isDirty: false,
+  isSaving: false,
+  isStreaming: false,
   nodes: DEFAULT_NODES,
   edges: DEFAULT_EDGES,
   selectedNodeId: null,
@@ -615,10 +624,201 @@ export const useWorkflowStore = create<WorkflowStoreState>((set, get) => ({
       executionAbortController.abort();
       executionAbortController = null;
     }
-    set({ executionStatus: "idle" });
+    if (activeEventSource) {
+      activeEventSource.close();
+      activeEventSource = null;
+    }
+    set({ executionStatus: "idle", isStreaming: false });
   },
 
-  runExecution: async (_mode = "mock", _apiKey = "") => {
+  executeWorkflowViaApi: async (mode = "mock", apiKey = "") => {
+    const { nodes, edges, workflowId } = get();
+    if (nodes.length === 0) return;
+
+    if (executionAbortController) {
+      executionAbortController.abort();
+    }
+    if (activeEventSource) {
+      activeEventSource.close();
+      activeEventSource = null;
+    }
+    executionAbortController = new AbortController();
+
+    // 1. Validate DAG locally with Kahn's algorithm
+    const validation = topologicalSortKahn(
+      nodes.map((n) => n.id),
+      edges.map((e) => ({ source: e.source, target: e.target }))
+    );
+
+    if (!validation.isValid || !validation.sortedOrder) {
+      set({ executionStatus: "failed" });
+      alert(`DAG Validation Error: ${validation.error || "Cycle detected in workflow DAG"}`);
+      return;
+    }
+
+    set({
+      executionStatus: "running",
+      isStreaming: true,
+      nodeTelemetry: {},
+    });
+
+    const executionStart = Date.now();
+    let totalPromptTokens = 0;
+    let totalCompletionTokens = 0;
+    let totalCostUsd = 0;
+    const nodeOutputsMap: Record<string, unknown> = {};
+
+    try {
+      const response = await fetch(`/api/v1/workflows/${workflowId}/execute`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          mode: mode === "live" ? "real" : "simulation",
+          workflowDefinition: { nodes, edges },
+          apiKey: apiKey || undefined,
+          inputs: {},
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.detail || errorData.title || `API execution rejected (${response.status})`);
+      }
+
+      const { execution_id, stream_url } = await response.json();
+      set({ activeExecutionId: execution_id });
+
+      const sseUrl = stream_url || `/api/v1/executions/${execution_id}/stream`;
+      const eventSource = new EventSource(sseUrl);
+      activeEventSource = eventSource;
+
+      eventSource.addEventListener("execution:start", () => {
+        set({ executionStatus: "running" });
+      });
+
+      eventSource.addEventListener("node:start", (event: MessageEvent) => {
+        try {
+          const data = JSON.parse(event.data);
+          get().updateNodeTelemetry(data.node_key, {
+            status: "running",
+            startedAt: data.started_at || new Date().toISOString(),
+            streamText: "",
+          });
+        } catch {}
+      });
+
+      eventSource.addEventListener("node:stream:chunk", (event: MessageEvent) => {
+        try {
+          const data = JSON.parse(event.data);
+          if (data.chunk) {
+            get().appendStreamChunk(data.node_key, data.chunk);
+          }
+        } catch {}
+      });
+
+      eventSource.addEventListener("node:complete", (event: MessageEvent) => {
+        try {
+          const data = JSON.parse(event.data);
+          const promptTokens = data.prompt_tokens || 0;
+          const completionTokens = data.completion_tokens || 0;
+          const cost = data.cost_usd || 0;
+          totalPromptTokens += promptTokens;
+          totalCompletionTokens += completionTokens;
+          totalCostUsd += cost;
+
+          if (data.outputs) {
+            nodeOutputsMap[data.node_key] = data.outputs;
+          }
+
+          get().updateNodeTelemetry(data.node_key, {
+            status: "completed",
+            finishedAt: new Date().toISOString(),
+            durationMs: data.duration_ms,
+            promptTokens,
+            completionTokens,
+            costUsd: cost,
+            outputData: data.outputs,
+          });
+        } catch {}
+      });
+
+      eventSource.addEventListener("node:skip", (event: MessageEvent) => {
+        try {
+          const data = JSON.parse(event.data);
+          get().updateNodeTelemetry(data.node_key, {
+            status: "skipped",
+          });
+        } catch {}
+      });
+
+      eventSource.addEventListener("node:error", (event: MessageEvent) => {
+        try {
+          const data = JSON.parse(event.data);
+          get().updateNodeTelemetry(data.node_key, {
+            status: "failed",
+            error: data.error_message || "Node execution failed",
+          });
+        } catch {}
+      });
+
+      eventSource.addEventListener("execution:complete", (event: MessageEvent) => {
+        try {
+          const data = JSON.parse(event.data);
+          const totalDurationMs = data.duration_ms || (Date.now() - executionStart);
+          const finalCost = data.total_cost_usd !== undefined ? data.total_cost_usd : totalCostUsd;
+          const finalTokens = data.total_tokens !== undefined ? data.total_tokens : (totalPromptTokens + totalCompletionTokens);
+
+          set({ executionStatus: "completed", isStreaming: false });
+
+          const newRecord: ExecutionRecord = {
+            id: execution_id,
+            workflowId: get().workflowId,
+            status: "completed",
+            triggerSource: "manual",
+            startedAt: new Date(executionStart).toISOString(),
+            durationMs: totalDurationMs,
+            totalTokens: finalTokens,
+            costUsd: finalCost,
+            nodeStatuses: Object.fromEntries(
+              Object.entries(get().nodeTelemetry).map(([k, v]) => [k, v.status])
+            ),
+            nodeOutputs: data.final_outputs || nodeOutputsMap,
+          };
+
+          set({
+            executionHistory: [newRecord, ...get().executionHistory],
+          });
+        } finally {
+          eventSource.close();
+          activeEventSource = null;
+        }
+      });
+
+      eventSource.addEventListener("execution:error", (event: MessageEvent) => {
+        try {
+          const data = JSON.parse(event.data);
+          set({ executionStatus: "failed", isStreaming: false });
+          alert(`Execution Failed: ${data.error_message || "Internal DAG error"}`);
+        } finally {
+          eventSource.close();
+          activeEventSource = null;
+        }
+      });
+
+      eventSource.onerror = () => {
+        if (get().executionStatus !== "running") {
+          eventSource.close();
+          activeEventSource = null;
+        }
+      };
+    } catch (err: any) {
+      console.error("Execute via API error:", err);
+      set({ executionStatus: "failed", isStreaming: false });
+      alert(`API Execution Error: ${err.message || "Failed to contact backend API"}`);
+    }
+  },
+
+  runClientSimulation: async () => {
     const { nodes, edges } = get();
     if (nodes.length === 0) return;
 
@@ -817,6 +1017,74 @@ export const useWorkflowStore = create<WorkflowStoreState>((set, get) => ({
     } catch (err: unknown) {
       console.error("Execution failed:", err);
       set({ executionStatus: "failed" });
+    }
+  },
+
+  runExecution: async (mode = "mock", apiKey = "") => {
+    // Check if in browser environment with native EventSource support
+    const hasEventSource = typeof window !== "undefined" && typeof (window as any).EventSource !== "undefined";
+    if (hasEventSource && mode !== "client_mock") {
+      try {
+        await get().executeWorkflowViaApi(mode, apiKey);
+        return;
+      } catch (err) {
+        console.warn("Backend execution encountered error, falling back to local simulation:", err);
+      }
+    }
+    await get().runClientSimulation();
+  },
+
+  saveWorkflowToApi: async () => {
+    const { workflowTitle, workflowDescription, nodes, edges } = get();
+    set({ isSaving: true });
+    try {
+      const res = await fetch(`/api/v1/workflows`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: workflowTitle,
+          description: workflowDescription || undefined,
+          category: "general",
+          initialDefinition: { nodes, edges, viewport: { x: 0, y: 0, zoom: 1 } },
+        }),
+      });
+      if (!res.ok) {
+        throw new Error("Failed to persist workflow to API");
+      }
+      set({ isDirty: false, isSaving: false });
+      return true;
+    } catch (err) {
+      console.error("Save workflow error:", err);
+      set({ isSaving: false });
+      return false;
+    }
+  },
+
+  fetchExecutionsFromApi: async () => {
+    try {
+      const res = await fetch("/api/v1/executions?limit=50");
+      if (!res.ok) return;
+      const json = await res.json();
+      if (json.data && Array.isArray(json.data)) {
+        const records: ExecutionRecord[] = json.data.map((item: any) => ({
+          id: item.id,
+          workflowId: item.workflowId,
+          status: item.status === "completed" ? "completed" : item.status === "failed" ? "failed" : "running",
+          triggerSource: item.triggerType || "manual",
+          startedAt: item.startedAt,
+          durationMs: item.durationMs || 0,
+          totalTokens: item.totalTokens || 0,
+          costUsd: item.totalCostUsd || 0,
+          nodeStatuses: {},
+          nodeOutputs: item.finalOutputs || {},
+        }));
+        // Merge with existing
+        const existingIds = new Set(records.map((r) => r.id));
+        const unmerged = get().executionHistory.filter((h) => !existingIds.has(h.id));
+        set({ executionHistory: [...records, ...unmerged] });
+      }
+    } catch (err) {
+      console.warn("Could not fetch server execution history:", err);
     }
   },
 

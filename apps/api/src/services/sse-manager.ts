@@ -33,6 +33,10 @@ export class SSEManager {
   // Maximum events to retain in replay buffer per execution
   private readonly maxBufferSize = 500;
 
+  // Terminal lifecycle tracking
+  private terminalListeners: Map<string, Set<() => void>> = new Map();
+  private terminatedExecutions: Set<string> = new Set();
+
   /**
    * Broadcasts an event to all subscribers of an execution.
    */
@@ -76,11 +80,48 @@ export class SSEManager {
           });
       }
     }
+
+    // 3. Handle terminal events
+    if (event === "execution:complete" || event === "execution:error") {
+      this.terminatedExecutions.add(executionId);
+      const listeners = this.terminalListeners.get(executionId);
+      if (listeners && listeners.size > 0) {
+        for (const listener of listeners) {
+          try {
+            listener();
+          } catch {
+            // Ignore listener errors
+          }
+        }
+      }
+    }
+  }
+
+  /**
+   * Checks whether an execution has already fired a terminal event.
+   */
+  public isTerminated(executionId: string): boolean {
+    return this.terminatedExecutions.has(executionId);
+  }
+
+  /**
+   * Registers a callback triggered when the execution completes or errors.
+   */
+  public onTerminal(executionId: string, callback: () => void): () => void {
+    let listeners = this.terminalListeners.get(executionId);
+    if (!listeners) {
+      listeners = new Set();
+      this.terminalListeners.set(executionId, listeners);
+    }
+    listeners.add(callback);
+    return () => {
+      listeners?.delete(callback);
+    };
   }
 
   /**
    * Registers a new subscriber stream for a specific execution.
-   * Immediately replays any missed events if `lastEventId` is provided.
+   * Immediately replays any missed events (or full buffer if no lastEventId provided).
    */
   public async subscribe(
     executionId: string,
@@ -97,11 +138,16 @@ export class SSEManager {
     // Start heartbeat if not already running for this execution
     this.ensureHeartbeat(executionId);
 
-    // Replay buffer catch-up if Last-Event-ID provided
-    if (lastEventId) {
-      const buffer = this.eventBuffers.get(executionId) || [];
-      const lastIndex = buffer.findIndex((e) => e.id === lastEventId);
-      const missedEvents = lastIndex !== -1 ? buffer.slice(lastIndex + 1) : buffer;
+    // Replay buffer catch-up: if lastEventId is provided, replay from after it;
+    // if lastEventId is null/undefined, replay all events in the buffer
+    const buffer = this.eventBuffers.get(executionId) || [];
+    if (buffer.length > 0) {
+      const missedEvents = lastEventId
+        ? (() => {
+            const lastIndex = buffer.findIndex((e) => e.id === lastEventId);
+            return lastIndex !== -1 ? buffer.slice(lastIndex + 1) : buffer;
+          })()
+        : buffer;
 
       for (const missed of missedEvents) {
         const payloadString =
@@ -227,6 +273,8 @@ export class SSEManager {
     this.subscribers.clear();
     this.eventBuffers.clear();
     this.counters.clear();
+    this.terminalListeners.clear();
+    this.terminatedExecutions.clear();
   }
 }
 

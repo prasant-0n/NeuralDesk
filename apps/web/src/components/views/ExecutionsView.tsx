@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   History,
   CheckCircle2,
@@ -6,17 +6,33 @@ import {
   ChevronRight,
   X,
   Layers,
+  RefreshCw,
 } from "lucide-react";
 import { useWorkflowStore, type ExecutionRecord } from "../../store/workflowStore";
-import { formatDuration, formatCost, formatTokens } from "../../lib/utils";
+import { formatDuration, formatCost, formatTokens, cn } from "../../lib/utils";
 
 export const ExecutionsView: React.FC = () => {
   const executionHistory = useWorkflowStore((state) => state.executionHistory);
+  const fetchExecutionsFromApi = useWorkflowStore((state) => state.fetchExecutionsFromApi);
   const [selectedExec, setSelectedExec] = useState<ExecutionRecord | null>(null);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+
+  useEffect(() => {
+    fetchExecutionsFromApi();
+  }, [fetchExecutionsFromApi]);
+
+  const handleRefresh = async () => {
+    setIsRefreshing(true);
+    try {
+      await fetchExecutionsFromApi();
+    } finally {
+      setTimeout(() => setIsRefreshing(false), 400);
+    }
+  };
 
   return (
     <div className="flex-1 overflow-y-auto p-6 space-y-6 bg-slate-50 dark:bg-charcoal-950 flex flex-col select-none transition-colors duration-150">
-      {/* Title */}
+      {/* Title & Refresh Control */}
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-xl font-extrabold text-slate-900 dark:text-white tracking-tight">
@@ -26,9 +42,21 @@ export const ExecutionsView: React.FC = () => {
             Immutable audit trail of past DAG runs, latency, and token ledger
           </p>
         </div>
-        <div className="flex items-center gap-2 text-xs font-mono text-slate-500 dark:text-charcoal-400">
-          <History className="w-4 h-4 text-indigo-500 dark:text-indigo-400" />
-          <span>{executionHistory.length} Recorded Runs</span>
+        <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 text-xs font-mono text-slate-500 dark:text-charcoal-400">
+            <History className="w-4 h-4 text-indigo-500 dark:text-indigo-400" />
+            <span>{executionHistory.length} Recorded Runs</span>
+          </div>
+
+          <button
+            onClick={handleRefresh}
+            disabled={isRefreshing}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-200 dark:border-charcoal-800 bg-white dark:bg-charcoal-900 hover:bg-slate-100 dark:hover:bg-charcoal-800 text-slate-700 dark:text-charcoal-300 hover:text-slate-900 dark:hover:text-white text-xs font-medium transition-colors shadow-sm disabled:opacity-50"
+            title="Refresh execution records from backend"
+          >
+            <RefreshCw className={cn("w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400", isRefreshing && "animate-spin")} />
+            <span>Refresh</span>
+          </button>
         </div>
       </div>
 

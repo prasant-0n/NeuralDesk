@@ -30,6 +30,10 @@ const TriggerExecutionSchema = z.object({
   inputs: z.record(z.unknown()).default({}),
   version_number: z.number().int().min(1).optional(),
   versionNumber: z.number().int().min(1).optional(),
+  workflow_definition: z.any().optional(),
+  workflowDefinition: z.any().optional(),
+  api_key: z.string().optional(),
+  apiKey: z.string().optional(),
 });
 
 // 1. POST /api/v1/workflows/:id/execute - Trigger execution
@@ -80,14 +84,19 @@ executionsRoutes.post("/workflows/:id/execute", async (c) => {
   }
 
   // Initiate background DAG execution asynchronously via orchestrator concurrency queue
+  const customDefinition = body.workflow_definition || body.workflowDefinition;
+  const passedApiKey = body.api_key || body.apiKey;
+
   orchestrator
     .enqueueExecution({
       executionId,
       workflowId,
+      workflowDefinition: customDefinition,
       inputs: body.inputs,
       mode,
       versionNumber,
       triggerSource: triggerSource as any,
+      apiKey: passedApiKey,
       dbExecutionId,
     })
     .catch((err) => {
@@ -204,16 +213,29 @@ executionsRoutes.get("/executions/:id/stream", async (c) => {
     // Subscribe to real-time events and catch-up buffer
     const unsubscribe = await sseManager.subscribe(executionId, stream, lastEventId);
 
-    // Keep stream open until client disconnects or execution terminates
-    stream.onAbort(() => {
-      unsubscribe();
-    });
+    // Keep stream open until client disconnects or execution completes/errors
+    await new Promise<void>((resolve) => {
+      let isDone = false;
+      const finish = () => {
+        if (!isDone) {
+          isDone = true;
+          unsubscribe();
+          resolve();
+        }
+      };
 
-    // Check if execution is already finished; stream stays open for subscriber catch-up
-    const existing = inMemoryExecutions.get(executionId);
-    if (existing && (existing.status === "completed" || existing.status === "failed")) {
-      // Keep alive for replay
-    }
+      stream.onAbort(finish);
+
+      sseManager.onTerminal(executionId, () => {
+        // Allow time for final completion chunk to flush
+        setTimeout(finish, 800);
+      });
+
+      // If already terminated prior to connecting:
+      if (sseManager.isTerminated(executionId)) {
+        setTimeout(finish, 600);
+      }
+    });
   });
 });
 
