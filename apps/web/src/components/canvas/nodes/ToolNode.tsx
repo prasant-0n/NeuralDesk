@@ -33,21 +33,21 @@ export const ToolNode: React.FC<NodeProps> = ({ id, data, selected }) => {
       outputs={outputs}
     >
       <div className="space-y-2">
-        <div className="flex items-center gap-2 p-2 bg-charcoal-950/70 border border-charcoal-800/80 rounded-lg text-[11px] font-mono text-purple-200">
-          <Globe className="w-3.5 h-3.5 text-purple-400 shrink-0" />
-          <span className="truncate text-charcoal-300">{url}</span>
+        <div className="flex items-center gap-2 p-2 bg-slate-100 dark:bg-charcoal-950/70 border border-slate-200 dark:border-charcoal-800/80 rounded-lg text-[11px] font-mono text-purple-800 dark:text-purple-200">
+          <Globe className="w-3.5 h-3.5 text-purple-600 dark:text-purple-400 shrink-0" />
+          <span className="truncate text-slate-700 dark:text-charcoal-300">{url}</span>
         </div>
 
-        <div className="flex items-center justify-between text-[10px] text-charcoal-400 px-1 font-mono">
+        <div className="flex items-center justify-between text-[10px] text-slate-500 dark:text-charcoal-400 px-1 font-mono">
           <div className="flex items-center gap-1">
-            <Clock className="w-3 h-3 text-charcoal-500" />
+            <Clock className="w-3 h-3 text-slate-400 dark:text-charcoal-500" />
             <span>{timeoutMs}ms</span>
           </div>
           <div className="flex items-center gap-1">
-            <RefreshCw className="w-3 h-3 text-charcoal-500" />
+            <RefreshCw className="w-3 h-3 text-slate-400 dark:text-charcoal-500" />
             <span>{retryCount} retries</span>
           </div>
-          <div className="flex items-center gap-1 text-rose-400" title="Error recovery port enabled">
+          <div className="flex items-center gap-1 text-rose-600 dark:text-rose-400" title="Error recovery port enabled">
             <AlertTriangle className="w-3 h-3" />
             <span>on_fail</span>
           </div>

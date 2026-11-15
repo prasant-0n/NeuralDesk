@@ -58,8 +58,8 @@ export const OutputNode: React.FC<NodeProps> = ({ id, data, selected }) => {
     >
       <div className="space-y-2">
         {/* Header Controls */}
-        <div className="flex items-center justify-between text-[11px] text-charcoal-400 px-1">
-          <div className="flex items-center gap-1.5 font-medium text-emerald-300">
+        <div className="flex items-center justify-between text-[11px] text-slate-500 dark:text-charcoal-400 px-1">
+          <div className="flex items-center gap-1.5 font-medium text-emerald-700 dark:text-emerald-300">
             {outputFormat === "json" ? <FileJson className="w-3.5 h-3.5" /> : <FileText className="w-3.5 h-3.5" />}
             <span className="uppercase text-[10px] tracking-wider">{outputFormat} Output</span>
           </div>
@@ -69,14 +69,14 @@ export const OutputNode: React.FC<NodeProps> = ({ id, data, selected }) => {
               <button
                 onClick={handleCopy}
                 title="Copy to clipboard"
-                className="p-1 hover:bg-charcoal-800 rounded text-charcoal-300 hover:text-white"
+                className="p-1 hover:bg-slate-200 dark:hover:bg-charcoal-800 rounded text-slate-500 dark:text-charcoal-300 hover:text-slate-900 dark:hover:text-white"
               >
-                {copied ? <Check className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3" />}
+                {copied ? <Check className="w-3 h-3 text-emerald-600 dark:text-emerald-400" /> : <Copy className="w-3 h-3" />}
               </button>
               <button
                 onClick={handleDownload}
                 title="Download export"
-                className="p-1 hover:bg-charcoal-800 rounded text-charcoal-300 hover:text-white"
+                className="p-1 hover:bg-slate-200 dark:hover:bg-charcoal-800 rounded text-slate-500 dark:text-charcoal-300 hover:text-slate-900 dark:hover:text-white"
               >
                 <Download className="w-3 h-3" />
               </button>
@@ -86,11 +86,11 @@ export const OutputNode: React.FC<NodeProps> = ({ id, data, selected }) => {
 
         {/* Live Output Preview */}
         {isCompleted && formattedOutput ? (
-          <div className="p-2 rounded bg-charcoal-950 border border-emerald-500/30 font-mono text-[11px] text-emerald-200 max-h-28 overflow-y-auto whitespace-pre-wrap leading-relaxed">
+          <div className="p-2 rounded bg-slate-100 dark:bg-charcoal-950 border border-emerald-200 dark:border-emerald-500/30 font-mono text-[11px] text-emerald-950 dark:text-emerald-200 max-h-28 overflow-y-auto whitespace-pre-wrap leading-relaxed">
             {formattedOutput}
           </div>
         ) : (
-          <div className="p-3 rounded bg-charcoal-950/50 border border-charcoal-800/60 text-center text-[11px] text-charcoal-500 italic">
+          <div className="p-3 rounded bg-slate-50 dark:bg-charcoal-950/50 border border-slate-200 dark:border-charcoal-800/60 text-center text-[11px] text-slate-400 dark:text-charcoal-500 italic">
             Awaiting upstream execution...
           </div>
         )}

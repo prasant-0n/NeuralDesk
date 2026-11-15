@@ -27,19 +27,19 @@ export const ConditionNode: React.FC<NodeProps> = ({ id, data, selected }) => {
       outputs={outputs}
     >
       <div className="space-y-2">
-        <div className="p-2 rounded bg-charcoal-950/70 border border-charcoal-800/80 text-[11px] font-mono text-emerald-300">
-          <div className="flex items-center gap-1.5 text-charcoal-400 text-[9px] uppercase font-bold tracking-wider mb-1">
-            <GitBranch className="w-3 h-3 text-emerald-400" />
+        <div className="p-2 rounded bg-slate-100 dark:bg-charcoal-950/70 border border-slate-200 dark:border-charcoal-800/80 text-[11px] font-mono text-emerald-800 dark:text-emerald-300">
+          <div className="flex items-center gap-1.5 text-slate-500 dark:text-charcoal-400 text-[9px] uppercase font-bold tracking-wider mb-1">
+            <GitBranch className="w-3 h-3 text-emerald-600 dark:text-emerald-400" />
             <span>Expression</span>
           </div>
-          <p className="truncate text-charcoal-200">{expression}</p>
+          <p className="truncate text-slate-800 dark:text-charcoal-200">{expression}</p>
         </div>
 
         <div className="flex items-center justify-between text-[10px] px-1 font-semibold">
-          <span className="flex items-center gap-1 text-emerald-400">
+          <span className="flex items-center gap-1 text-emerald-600 dark:text-emerald-400">
             <Check className="w-3 h-3" /> Output 1: True
           </span>
-          <span className="flex items-center gap-1 text-amber-400">
+          <span className="flex items-center gap-1 text-amber-600 dark:text-amber-400">
             <X className="w-3 h-3" /> Output 2: False
           </span>
         </div>

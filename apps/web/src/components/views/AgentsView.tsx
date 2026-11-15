@@ -115,15 +115,15 @@ export const AgentsView: React.FC = () => {
   };
 
   return (
-    <div className="flex-1 overflow-hidden flex bg-charcoal-950 select-none">
+    <div className="flex-1 overflow-hidden flex bg-slate-50 dark:bg-charcoal-950 select-none transition-colors duration-150">
       {/* Left Agent Personas List */}
-      <div className="w-80 border-r border-charcoal-800 bg-charcoal-900 flex flex-col">
-        <div className="p-4 border-b border-charcoal-800">
+      <div className="w-80 border-r border-slate-200 dark:border-charcoal-800 bg-white dark:bg-charcoal-900 flex flex-col">
+        <div className="p-4 border-b border-slate-200 dark:border-charcoal-800">
           <div className="flex items-center gap-2">
-            <Bot className="w-5 h-5 text-indigo-400" />
-            <h2 className="text-sm font-bold text-white">AI Agent Studio</h2>
+            <Bot className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+            <h2 className="text-sm font-bold text-slate-900 dark:text-white">AI Agent Studio</h2>
           </div>
-          <p className="text-xs text-charcoal-400 mt-0.5">Autonomous agents configured with Gemini intelligence</p>
+          <p className="text-xs text-slate-500 dark:text-charcoal-400 mt-0.5">Autonomous agents configured with Gemini intelligence</p>
         </div>
 
         <div className="flex-1 overflow-y-auto p-3 space-y-2">
@@ -142,25 +142,25 @@ export const AgentsView: React.FC = () => {
               }}
               className={`p-3 rounded-xl border transition-all cursor-pointer ${
                 selectedAgent.id === agent.id
-                  ? "bg-indigo-500/10 border-indigo-500 ring-1 ring-indigo-500"
-                  : "bg-charcoal-950/60 border-charcoal-800 hover:border-charcoal-700"
+                  ? "bg-indigo-50 border-indigo-500 text-indigo-950 dark:bg-indigo-500/10 dark:border-indigo-500 dark:text-white ring-1 ring-indigo-500"
+                  : "bg-slate-50/80 border-slate-200 hover:border-slate-300 dark:bg-charcoal-950/60 dark:border-charcoal-800 dark:hover:border-charcoal-700"
               }`}
             >
               <div className="flex items-center justify-between">
-                <span className="font-bold text-xs text-white">{agent.name}</span>
-                <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-indigo-500/20 text-indigo-300">
+                <span className="font-bold text-xs text-slate-900 dark:text-white">{agent.name}</span>
+                <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-indigo-100 text-indigo-800 dark:bg-indigo-500/20 dark:text-indigo-300">
                   {agent.model}
                 </span>
               </div>
-              <p className="text-[11px] text-charcoal-400 mt-1">{agent.role}</p>
+              <p className="text-[11px] text-slate-600 dark:text-charcoal-400 mt-1">{agent.role}</p>
 
-              <div className="flex items-center gap-3 mt-2 text-[10px] text-charcoal-500 font-mono">
+              <div className="flex items-center gap-3 mt-2 text-[10px] text-slate-500 dark:text-charcoal-500 font-mono">
                 <span className="flex items-center gap-1">
-                  <Thermometer className="w-3 h-3 text-charcoal-600" />
+                  <Thermometer className="w-3 h-3 text-slate-400 dark:text-charcoal-600" />
                   {agent.temperature}
                 </span>
                 <span className="flex items-center gap-1">
-                  <Cpu className="w-3 h-3 text-charcoal-600" />
+                  <Cpu className="w-3 h-3 text-slate-400 dark:text-charcoal-600" />
                   {formatTokens(agent.tokensProcessed)} tk
                 </span>
               </div>
@@ -170,23 +170,23 @@ export const AgentsView: React.FC = () => {
       </div>
 
       {/* Right Interactive Chat / Playground */}
-      <div className="flex-1 flex flex-col bg-charcoal-950">
+      <div className="flex-1 flex flex-col bg-slate-50 dark:bg-charcoal-950">
         {/* Playground Header */}
-        <div className="h-14 border-b border-charcoal-800 bg-charcoal-900/60 px-5 flex items-center justify-between">
+        <div className="h-14 border-b border-slate-200 dark:border-charcoal-800 bg-white/80 dark:bg-charcoal-900/60 px-5 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="p-1.5 rounded-lg bg-indigo-500/10 border border-indigo-500/20 text-indigo-400">
+            <div className="p-1.5 rounded-lg bg-indigo-50 dark:bg-indigo-500/10 border border-indigo-200 dark:border-indigo-500/20 text-indigo-600 dark:text-indigo-400">
               <Sparkles className="w-4 h-4" />
             </div>
             <div>
-              <h3 className="text-xs font-bold text-white">{selectedAgent.name}</h3>
-              <p className="text-[10px] text-charcoal-400 font-mono">
+              <h3 className="text-xs font-bold text-slate-900 dark:text-white">{selectedAgent.name}</h3>
+              <p className="text-[10px] text-slate-500 dark:text-charcoal-400 font-mono">
                 {selectedAgent.model} • Temp {selectedAgent.temperature}
               </p>
             </div>
           </div>
 
-          <div className="flex items-center gap-2 text-xs font-mono text-charcoal-400">
-            <Terminal className="w-3.5 h-3.5 text-emerald-400" />
+          <div className="flex items-center gap-2 text-xs font-mono text-slate-500 dark:text-charcoal-400">
+            <Terminal className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
             <span>Interactive Test Bench</span>
           </div>
         </div>
@@ -198,14 +198,14 @@ export const AgentsView: React.FC = () => {
               key={idx}
               className={`flex flex-col ${m.sender === "user" ? "items-end" : "items-start"}`}
             >
-              <div className="text-[10px] text-charcoal-500 mb-1 px-1">
+              <div className="text-[10px] text-slate-400 dark:text-charcoal-500 mb-1 px-1">
                 {m.sender === "user" ? "Client Operator" : selectedAgent.name} • {m.timestamp}
               </div>
               <div
-                className={`max-w-xl p-3.5 rounded-2xl whitespace-pre-wrap leading-relaxed shadow-lg ${
+                className={`max-w-xl p-3.5 rounded-2xl whitespace-pre-wrap leading-relaxed shadow-md ${
                   m.sender === "user"
                     ? "bg-indigo-600 text-white rounded-tr-none"
-                    : "bg-charcoal-900 border border-charcoal-800 text-charcoal-200 rounded-tl-none font-mono"
+                    : "bg-white border border-slate-200 text-slate-800 dark:bg-charcoal-900 dark:border-charcoal-800 dark:text-charcoal-200 rounded-tl-none font-mono"
                 }`}
               >
                 {m.text}
@@ -214,27 +214,27 @@ export const AgentsView: React.FC = () => {
           ))}
 
           {isTyping && (
-            <div className="flex items-center gap-2 text-charcoal-400 text-xs font-mono">
-              <Loader2 className="w-3.5 h-3.5 animate-spin text-indigo-400" />
+            <div className="flex items-center gap-2 text-slate-500 dark:text-charcoal-400 text-xs font-mono">
+              <Loader2 className="w-3.5 h-3.5 animate-spin text-indigo-600 dark:text-indigo-400" />
               <span>{selectedAgent.name} is reasoning...</span>
             </div>
           )}
         </div>
 
         {/* Input Bar */}
-        <form onSubmit={handleSend} className="p-4 border-t border-charcoal-800 bg-charcoal-900">
+        <form onSubmit={handleSend} className="p-4 border-t border-slate-200 dark:border-charcoal-800 bg-white dark:bg-charcoal-900">
           <div className="flex items-center gap-2">
             <input
               type="text"
               value={inputText}
               onChange={(e) => setInputText(e.target.value)}
               placeholder={`Send test prompt to ${selectedAgent.name}...`}
-              className="flex-1 bg-charcoal-950 border border-charcoal-800 rounded-xl px-4 py-2.5 text-xs text-charcoal-100 placeholder-charcoal-500 focus:outline-none focus:border-indigo-500"
+              className="flex-1 bg-slate-100 dark:bg-charcoal-950 border border-slate-200 dark:border-charcoal-800 rounded-xl px-4 py-2.5 text-xs text-slate-900 dark:text-charcoal-100 placeholder-slate-400 dark:placeholder-charcoal-500 focus:outline-none focus:border-indigo-500"
             />
             <button
               type="submit"
               disabled={isTyping || !inputText.trim()}
-              className="px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-xs disabled:opacity-40 transition-all flex items-center gap-1.5 shadow-lg shadow-indigo-600/30"
+              className="px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-xs disabled:opacity-40 transition-all flex items-center gap-1.5 shadow-md shadow-indigo-600/30"
             >
               <Send className="w-3.5 h-3.5" />
               <span>Dispatch</span>

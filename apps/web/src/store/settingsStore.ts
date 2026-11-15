@@ -21,10 +21,18 @@ const STORAGE_KEY_API_KEY = "neuraldesk_byok_gemini_key";
 const STORAGE_KEY_EXEC_MODE = "neuraldesk_exec_mode";
 const STORAGE_KEY_THEME = "neuraldesk_theme";
 
+const getSavedTheme = (): ThemeMode => {
+  if (typeof window !== "undefined") {
+    const saved = localStorage.getItem(STORAGE_KEY_THEME);
+    if (saved === "light" || saved === "dark") return saved;
+  }
+  return "dark";
+};
+
 export const useSettingsStore = create<SettingsState>((set) => ({
   geminiApiKey: typeof window !== "undefined" ? localStorage.getItem(STORAGE_KEY_API_KEY) || "" : "",
   executionMode: (typeof window !== "undefined" && (localStorage.getItem(STORAGE_KEY_EXEC_MODE) as ExecutionMode)) || "mock",
-  theme: (typeof window !== "undefined" && (localStorage.getItem(STORAGE_KEY_THEME) as ThemeMode)) || "dark",
+  theme: getSavedTheme(),
   workspaceId: "ws_default_production",
   isSettingsOpen: false,
 
@@ -47,10 +55,8 @@ export const useSettingsStore = create<SettingsState>((set) => ({
       localStorage.setItem(STORAGE_KEY_THEME, theme);
       if (theme === "dark") {
         document.documentElement.classList.add("dark");
-        document.documentElement.classList.remove("light");
       } else {
         document.documentElement.classList.remove("dark");
-        document.documentElement.classList.add("light");
       }
     }
     set({ theme });

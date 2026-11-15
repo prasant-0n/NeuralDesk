@@ -28,21 +28,21 @@ export const ApprovalNode: React.FC<NodeProps> = ({ id, data, selected }) => {
       outputs={outputs}
     >
       <div className="space-y-2">
-        <div className="flex items-center gap-2 p-2 bg-charcoal-950/70 border border-charcoal-800/80 rounded-lg text-[11px] text-yellow-300">
-          <UserCheck className="w-3.5 h-3.5 text-yellow-400 shrink-0" />
-          <span className="text-charcoal-400">Required Role:</span>
-          <span className="font-semibold text-yellow-200">{approverRole}</span>
+        <div className="flex items-center gap-2 p-2 bg-yellow-50 dark:bg-charcoal-950/70 border border-yellow-200 dark:border-charcoal-800/80 rounded-lg text-[11px] text-yellow-900 dark:text-yellow-300">
+          <UserCheck className="w-3.5 h-3.5 text-yellow-600 dark:text-yellow-400 shrink-0" />
+          <span className="text-slate-600 dark:text-charcoal-400">Required Role:</span>
+          <span className="font-semibold text-yellow-900 dark:text-yellow-200">{approverRole}</span>
         </div>
 
-        <p className="text-[11px] text-charcoal-400 italic line-clamp-2 px-1">
+        <p className="text-[11px] text-slate-600 dark:text-charcoal-400 italic line-clamp-2 px-1">
           {instructions}
         </p>
 
         <div className="flex items-center justify-between text-[10px] px-1 font-semibold pt-1">
-          <span className="flex items-center gap-1 text-emerald-400">
+          <span className="flex items-center gap-1 text-emerald-600 dark:text-emerald-400">
             <Check className="w-3 h-3" /> Approve
           </span>
-          <span className="flex items-center gap-1 text-rose-400">
+          <span className="flex items-center gap-1 text-rose-600 dark:text-rose-400">
             <X className="w-3 h-3" /> Reject
           </span>
         </div>

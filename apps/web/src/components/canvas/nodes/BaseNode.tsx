@@ -35,70 +35,76 @@ export interface BaseNodeProps {
 
 const KIND_METADATA: Record<
   NodeKind,
-  { icon: React.FC<{ className?: string }>; color: string; bgBadge: string; textBadge: string; border: string }
+  {
+    icon: React.FC<{ className?: string }>;
+    color: string;
+    bgBadge: string;
+    textBadge: string;
+    border: string;
+  }
 > = {
   trigger: {
     icon: Zap,
-    color: "text-amber-400",
-    bgBadge: "bg-amber-500/10",
-    textBadge: "text-amber-400",
-    border: "border-amber-500/30",
+    color: "text-amber-500 dark:text-amber-400",
+    bgBadge: "bg-amber-50 dark:bg-amber-500/10",
+    textBadge: "text-amber-700 dark:text-amber-400",
+    border: "border-amber-200 dark:border-amber-500/30",
   },
   llm: {
     icon: Sparkles,
-    color: "text-indigo-400",
-    bgBadge: "bg-indigo-500/10",
-    textBadge: "text-indigo-300",
-    border: "border-indigo-500/30",
+    color: "text-indigo-600 dark:text-indigo-400",
+    bgBadge: "bg-indigo-50 dark:bg-indigo-500/10",
+    textBadge: "text-indigo-700 dark:text-indigo-300",
+    border: "border-indigo-200 dark:border-indigo-500/30",
   },
   prompt: {
     icon: FileText,
-    color: "text-sky-400",
-    bgBadge: "bg-sky-500/10",
-    textBadge: "text-sky-300",
-    border: "border-sky-500/30",
+    color: "text-sky-600 dark:text-sky-400",
+    bgBadge: "bg-sky-50 dark:bg-sky-500/10",
+    textBadge: "text-sky-700 dark:text-sky-300",
+    border: "border-sky-200 dark:border-sky-500/30",
   },
   condition: {
     icon: GitBranch,
-    color: "text-emerald-400",
-    bgBadge: "bg-emerald-500/10",
-    textBadge: "text-emerald-300",
-    border: "border-emerald-500/30",
+    color: "text-emerald-600 dark:text-emerald-400",
+    bgBadge: "bg-emerald-50 dark:bg-emerald-500/10",
+    textBadge: "text-emerald-700 dark:text-emerald-300",
+    border: "border-emerald-200 dark:border-emerald-500/30",
   },
   transform: {
     icon: ArrowRightLeft,
-    color: "text-orange-400",
-    bgBadge: "bg-orange-500/10",
-    textBadge: "text-orange-300",
-    border: "border-orange-500/30",
+    color: "text-orange-600 dark:text-orange-400",
+    bgBadge: "bg-orange-50 dark:bg-orange-500/10",
+    textBadge: "text-orange-700 dark:text-orange-300",
+    border: "border-orange-200 dark:border-orange-500/30",
   },
   tool: {
     icon: Wrench,
-    color: "text-purple-400",
-    bgBadge: "bg-purple-500/10",
-    textBadge: "text-purple-300",
-    border: "border-purple-500/30",
+    color: "text-purple-600 dark:text-purple-400",
+    bgBadge: "bg-purple-50 dark:bg-purple-500/10",
+    textBadge: "text-purple-700 dark:text-purple-300",
+    border: "border-purple-200 dark:border-purple-500/30",
   },
   approval: {
     icon: ShieldCheck,
-    color: "text-yellow-400",
-    bgBadge: "bg-yellow-500/10",
-    textBadge: "text-yellow-300",
-    border: "border-yellow-500/30",
+    color: "text-yellow-600 dark:text-yellow-400",
+    bgBadge: "bg-yellow-50 dark:bg-yellow-500/10",
+    textBadge: "text-yellow-800 dark:text-yellow-300",
+    border: "border-yellow-200 dark:border-yellow-500/30",
   },
   evaluator: {
     icon: CheckCircle2,
-    color: "text-teal-400",
-    bgBadge: "bg-teal-500/10",
-    textBadge: "text-teal-300",
-    border: "border-teal-500/30",
+    color: "text-teal-600 dark:text-teal-400",
+    bgBadge: "bg-teal-50 dark:bg-teal-500/10",
+    textBadge: "text-teal-700 dark:text-teal-300",
+    border: "border-teal-200 dark:border-teal-500/30",
   },
   output: {
     icon: Share2,
-    color: "text-emerald-400",
-    bgBadge: "bg-emerald-500/10",
-    textBadge: "text-emerald-300",
-    border: "border-emerald-500/30",
+    color: "text-emerald-600 dark:text-emerald-400",
+    bgBadge: "bg-emerald-50 dark:bg-emerald-500/10",
+    textBadge: "text-emerald-700 dark:text-emerald-300",
+    border: "border-emerald-200 dark:border-emerald-500/30",
   },
 };
 
@@ -139,8 +145,10 @@ export const BaseNode: React.FC<BaseNodeProps> = ({
   return (
     <div
       className={cn(
-        "relative group min-w-[280px] max-w-[340px] rounded-xl bg-charcoal-900/95 border text-charcoal-100 shadow-xl backdrop-blur-md transition-all duration-200 select-none",
-        selected ? "border-indigo-500 shadow-indigo-500/20 ring-1 ring-indigo-500" : "border-charcoal-800 hover:border-charcoal-700",
+        "relative group min-w-[280px] max-w-[340px] rounded-xl bg-white dark:bg-charcoal-900/95 border text-slate-800 dark:text-charcoal-100 shadow-md dark:shadow-xl backdrop-blur-md transition-all duration-200 select-none",
+        selected
+          ? "border-indigo-600 dark:border-indigo-500 shadow-indigo-500/20 ring-1 ring-indigo-500"
+          : "border-slate-200 hover:border-slate-300 dark:border-charcoal-800 dark:hover:border-charcoal-700",
         glowClass
       )}
     >
@@ -159,7 +167,7 @@ export const BaseNode: React.FC<BaseNodeProps> = ({
               id={port.id}
               className="target-handle !w-3 !h-3"
             />
-            <span className="opacity-0 group-hover/port:opacity-100 transition-opacity absolute left-4 text-[10px] bg-charcoal-950/90 border border-charcoal-800 px-1.5 py-0.5 rounded text-charcoal-300 whitespace-nowrap shadow pointer-events-none z-30">
+            <span className="opacity-0 group-hover/port:opacity-100 transition-opacity absolute left-4 text-[10px] bg-slate-900 border border-slate-800 text-white dark:bg-charcoal-950/90 dark:border-charcoal-800 dark:text-charcoal-300 px-1.5 py-0.5 rounded whitespace-nowrap shadow pointer-events-none z-30">
               {port.name} ({port.type})
             </span>
           </div>
@@ -167,14 +175,14 @@ export const BaseNode: React.FC<BaseNodeProps> = ({
       })}
 
       {/* Header */}
-      <div className="flex items-center justify-between p-3 border-b border-charcoal-800/80 bg-charcoal-950/40 rounded-t-xl">
+      <div className="flex items-center justify-between p-3 border-b border-slate-200 dark:border-charcoal-800/80 bg-slate-50/80 dark:bg-charcoal-950/40 rounded-t-xl">
         <div className="flex items-center gap-2.5 overflow-hidden">
           <div className={cn("p-1.5 rounded-lg border", meta.bgBadge, meta.border)}>
             <Icon className={cn("w-4 h-4", meta.color)} />
           </div>
           <div className="truncate">
-            <h4 className="text-xs font-semibold text-charcoal-100 truncate tracking-tight">{title}</h4>
-            {subtitle && <p className="text-[10px] text-charcoal-400 truncate">{subtitle}</p>}
+            <h4 className="text-xs font-semibold text-slate-900 dark:text-charcoal-100 truncate tracking-tight">{title}</h4>
+            {subtitle && <p className="text-[10px] text-slate-500 dark:text-charcoal-400 truncate">{subtitle}</p>}
           </div>
         </div>
 
@@ -187,9 +195,9 @@ export const BaseNode: React.FC<BaseNodeProps> = ({
           )}
 
           {/* Execution Status Icon */}
-          {isRunning && <Loader2 className="w-3.5 h-3.5 text-amber-400 animate-spin" />}
-          {isCompleted && <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />}
-          {isFailed && <AlertCircle className="w-3.5 h-3.5 text-rose-400" />}
+          {isRunning && <Loader2 className="w-3.5 h-3.5 text-amber-500 dark:text-amber-400 animate-spin" />}
+          {isCompleted && <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 dark:text-emerald-400" />}
+          {isFailed && <AlertCircle className="w-3.5 h-3.5 text-rose-500 dark:text-rose-400" />}
 
           {/* Quick Context Actions on hover */}
           <div className="opacity-0 group-hover:opacity-100 flex items-center gap-1 transition-opacity">
@@ -199,7 +207,7 @@ export const BaseNode: React.FC<BaseNodeProps> = ({
                 duplicateNode(id);
               }}
               title="Duplicate (Ctrl+D)"
-              className="p-1 hover:bg-charcoal-800 rounded text-charcoal-400 hover:text-charcoal-200"
+              className="p-1 hover:bg-slate-200 dark:hover:bg-charcoal-800 rounded text-slate-400 hover:text-slate-700 dark:text-charcoal-400 dark:hover:text-charcoal-200"
             >
               <Copy className="w-3 h-3" />
             </button>
@@ -209,7 +217,7 @@ export const BaseNode: React.FC<BaseNodeProps> = ({
                 removeNode(id);
               }}
               title="Delete node"
-              className="p-1 hover:bg-rose-950/50 rounded text-charcoal-400 hover:text-rose-400"
+              className="p-1 hover:bg-rose-100 dark:hover:bg-rose-950/50 rounded text-slate-400 hover:text-rose-600 dark:text-charcoal-400 dark:hover:text-rose-400"
             >
               <Trash2 className="w-3 h-3" />
             </button>
@@ -222,14 +230,14 @@ export const BaseNode: React.FC<BaseNodeProps> = ({
 
       {/* Execution Telemetry Footer (if executed) */}
       {(telemetry?.durationMs !== undefined || telemetry?.costUsd !== undefined) && (
-        <div className="px-3 py-1.5 bg-charcoal-950/60 border-t border-charcoal-800/60 rounded-b-xl flex items-center justify-between text-[10px] text-charcoal-400 font-mono">
+        <div className="px-3 py-1.5 bg-slate-50 dark:bg-charcoal-950/60 border-t border-slate-200 dark:border-charcoal-800/60 rounded-b-xl flex items-center justify-between text-[10px] text-slate-500 dark:text-charcoal-400 font-mono">
           <div className="flex items-center gap-1">
-            <Clock className="w-3 h-3 text-charcoal-500" />
+            <Clock className="w-3 h-3 text-slate-400 dark:text-charcoal-500" />
             <span>{formatDuration(telemetry.durationMs)}</span>
           </div>
           {telemetry.costUsd !== undefined && (
             <div className="flex items-center gap-1">
-              <Coins className="w-3 h-3 text-charcoal-500" />
+              <Coins className="w-3 h-3 text-slate-400 dark:text-charcoal-500" />
               <span>{formatCost(telemetry.costUsd)}</span>
             </div>
           )}
@@ -251,7 +259,7 @@ export const BaseNode: React.FC<BaseNodeProps> = ({
               id={port.id}
               className="source-handle !w-3 !h-3"
             />
-            <span className="opacity-0 group-hover/port:opacity-100 transition-opacity absolute right-4 text-[10px] bg-charcoal-950/90 border border-charcoal-800 px-1.5 py-0.5 rounded text-charcoal-300 whitespace-nowrap shadow pointer-events-none z-30">
+            <span className="opacity-0 group-hover/port:opacity-100 transition-opacity absolute right-4 text-[10px] bg-slate-900 border border-slate-800 text-white dark:bg-charcoal-950/90 dark:border-charcoal-800 dark:text-charcoal-300 px-1.5 py-0.5 rounded whitespace-nowrap shadow pointer-events-none z-30">
               {port.name}
             </span>
           </div>

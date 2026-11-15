@@ -8,6 +8,7 @@ import {
   type ReactFlowInstance,
 } from "@xyflow/react";
 import { useWorkflowStore } from "../../store/workflowStore";
+import { useSettingsStore } from "../../store/settingsStore";
 import { CustomEdge } from "./CustomEdge";
 import { TriggerNode } from "./nodes/TriggerNode";
 import { LLMNode } from "./nodes/LLMNode";
@@ -37,6 +38,9 @@ const EDGE_TYPES = {
 export const WorkflowCanvas: React.FC = () => {
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
   const reactFlowInstance = useRef<ReactFlowInstance | null>(null);
+
+  const theme = useSettingsStore((state) => state.theme);
+  const isDark = theme === "dark";
 
   const nodes = useWorkflowStore((state) => state.nodes);
   const edges = useWorkflowStore((state) => state.edges);
@@ -76,7 +80,6 @@ export const WorkflowCanvas: React.FC = () => {
   // Keyboard Shortcuts
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      // Don't intercept typing in inputs / textareas
       if (
         e.target instanceof HTMLInputElement ||
         e.target instanceof HTMLTextAreaElement ||
@@ -113,7 +116,10 @@ export const WorkflowCanvas: React.FC = () => {
   }, [undo, redo, selectedNodeId, duplicateNode, removeNode, selectNode]);
 
   return (
-    <div ref={reactFlowWrapper} className="w-full h-full relative flex-1 bg-charcoal-950">
+    <div
+      ref={reactFlowWrapper}
+      className="w-full h-full relative flex-1 bg-slate-100/70 dark:bg-charcoal-950 transition-colors duration-150"
+    >
       <ReactFlow
         nodes={nodes}
         edges={edges}
@@ -136,19 +142,26 @@ export const WorkflowCanvas: React.FC = () => {
         defaultEdgeOptions={{ type: "custom" }}
         proOptions={{ hideAttribution: true }}
       >
-        <Background variant={BackgroundVariant.Dots} gap={20} size={1.2} color="#1e293b" />
+        <Background
+          variant={BackgroundVariant.Dots}
+          gap={20}
+          size={1.2}
+          color={isDark ? "#334155" : "#cbd5e1"}
+          className="bg-slate-100/60 dark:bg-charcoal-950"
+        />
         <Controls showInteractive={false} className="!left-4 !bottom-4" />
         <MiniMap
           nodeColor={(n) => {
             if (n.type === "trigger") return "#f59e0b";
             if (n.type === "llm") return "#6366f1";
-            if (n.type === "prompt") return "#38bdf8";
+            if (n.type === "prompt") return "#0284c7";
             if (n.type === "condition") return "#10b981";
-            if (n.type === "tool") return "#a855f7";
+            if (n.type === "tool") return "#9333ea";
+            if (n.type === "approval") return "#eab308";
             return "#64748b";
           }}
           nodeStrokeWidth={3}
-          maskColor="rgba(2, 6, 23, 0.75)"
+          maskColor={isDark ? "rgba(2, 6, 23, 0.75)" : "rgba(241, 245, 249, 0.75)"}
           className="!right-4 !bottom-4"
         />
       </ReactFlow>

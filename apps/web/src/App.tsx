@@ -1,7 +1,6 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactFlowProvider } from "@xyflow/react";
-import { useSettingsStore } from "./store/settingsStore";
 import { Header } from "./components/layout/Header";
 import { Sidebar, type NavView } from "./components/layout/Sidebar";
 import { CanvasView } from "./components/views/CanvasView";
@@ -22,22 +21,11 @@ const queryClient = new QueryClient({
 
 export const App: React.FC = () => {
   const [activeView, setActiveView] = useState<NavView>("canvas");
-  const theme = useSettingsStore((state) => state.theme);
-
-  useEffect(() => {
-    if (theme === "dark") {
-      document.documentElement.classList.add("dark");
-      document.documentElement.classList.remove("light");
-    } else {
-      document.documentElement.classList.remove("dark");
-      document.documentElement.classList.add("light");
-    }
-  }, [theme]);
 
   return (
     <QueryClientProvider client={queryClient}>
       <ReactFlowProvider>
-        <div className="flex flex-col h-screen w-screen overflow-hidden bg-charcoal-950 text-charcoal-100 antialiased select-none">
+        <div className="flex flex-col h-screen w-screen overflow-hidden bg-slate-50 dark:bg-charcoal-950 text-slate-900 dark:text-charcoal-100 antialiased select-none transition-colors duration-150">
           {/* Top Universal Header */}
           <Header activeView={activeView} />
 
@@ -47,7 +35,7 @@ export const App: React.FC = () => {
             <Sidebar activeView={activeView} onSelectView={setActiveView} />
 
             {/* Dynamic View Router */}
-            <main className="flex-1 flex overflow-hidden">
+            <main className="flex-1 flex overflow-hidden bg-slate-50 dark:bg-charcoal-950">
               {activeView === "canvas" && <CanvasView />}
               {activeView === "dashboard" && <DashboardView onNavigateToCanvas={() => setActiveView("canvas")} />}
               {activeView === "executions" && <ExecutionsView />}

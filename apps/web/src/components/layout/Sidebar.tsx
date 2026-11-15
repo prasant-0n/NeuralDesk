@@ -32,7 +32,7 @@ const NAV_ITEMS: NavItem[] = [
 export const Sidebar: React.FC<SidebarProps> = ({ activeView, onSelectView }) => {
   return (
     <nav
-      className="w-16 bg-charcoal-900 border-r border-charcoal-800 flex flex-col items-center py-4 space-y-3 z-20 select-none"
+      className="w-16 bg-white dark:bg-charcoal-900 border-r border-slate-200 dark:border-charcoal-800 flex flex-col items-center py-4 space-y-3 z-20 select-none transition-colors duration-150"
       aria-label="Primary Navigation"
     >
       {NAV_ITEMS.map((item) => {
@@ -45,15 +45,15 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeView, onSelectView }) =>
             className={cn(
               "group relative w-11 h-11 rounded-xl flex items-center justify-center transition-all duration-150",
               isActive
-                ? "bg-indigo-600 text-white shadow-lg shadow-indigo-600/30"
-                : "text-charcoal-400 hover:text-charcoal-200 hover:bg-charcoal-800/80"
+                ? "bg-indigo-600 text-white shadow-md shadow-indigo-600/30"
+                : "text-slate-500 hover:text-slate-900 hover:bg-slate-100 dark:text-charcoal-400 dark:hover:text-charcoal-200 dark:hover:bg-charcoal-800/80"
             )}
             title={item.label}
           >
             <Icon className="w-5 h-5 transition-transform group-hover:scale-105" />
 
             {/* Hover Tooltip */}
-            <span className="absolute left-16 px-2.5 py-1 rounded-md bg-charcoal-950 border border-charcoal-800 text-xs text-charcoal-200 whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none shadow-xl z-50">
+            <span className="absolute left-16 px-2.5 py-1 rounded-md bg-slate-900 text-white border border-slate-800 dark:bg-charcoal-950 dark:border-charcoal-800 dark:text-charcoal-200 text-xs whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none shadow-xl z-50">
               {item.label}
             </span>
           </button>

@@ -24,7 +24,7 @@ interface PaletteItem {
   description: string;
   icon: React.FC<{ className?: string }>;
   color: string;
-  border: string;
+  borderHover: string;
   badge: string;
 }
 
@@ -35,8 +35,8 @@ const PALETTE_ITEMS: PaletteItem[] = [
     category: "Ingress",
     description: "Webhook, cron schedule, or manual ingress",
     icon: Zap,
-    color: "text-amber-400",
-    border: "group-hover:border-amber-500/50",
+    color: "text-amber-500 dark:text-amber-400",
+    borderHover: "hover:border-amber-500/50",
     badge: "Ingress",
   },
   {
@@ -45,8 +45,8 @@ const PALETTE_ITEMS: PaletteItem[] = [
     category: "AI & Templating",
     description: "Multi-turn Gemini 1.5 Flash / Pro reasoning",
     icon: Sparkles,
-    color: "text-indigo-400",
-    border: "group-hover:border-indigo-500/50",
+    color: "text-indigo-500 dark:text-indigo-400",
+    borderHover: "hover:border-indigo-500/50",
     badge: "Intelligence",
   },
   {
@@ -55,8 +55,8 @@ const PALETTE_ITEMS: PaletteItem[] = [
     category: "AI & Templating",
     description: "Mustache interpolation with input ports",
     icon: FileText,
-    color: "text-sky-400",
-    border: "group-hover:border-sky-500/50",
+    color: "text-sky-500 dark:text-sky-400",
+    borderHover: "hover:border-sky-500/50",
     badge: "Templating",
   },
   {
@@ -65,8 +65,8 @@ const PALETTE_ITEMS: PaletteItem[] = [
     category: "Logic & Transform",
     description: "Boolean branching router (True / False)",
     icon: GitBranch,
-    color: "text-emerald-400",
-    border: "group-hover:border-emerald-500/50",
+    color: "text-emerald-500 dark:text-emerald-400",
+    borderHover: "hover:border-emerald-500/50",
     badge: "Branching",
   },
   {
@@ -75,8 +75,8 @@ const PALETTE_ITEMS: PaletteItem[] = [
     category: "Logic & Transform",
     description: "Reshape, pluck, and map JSON keys",
     icon: ArrowRightLeft,
-    color: "text-orange-400",
-    border: "group-hover:border-orange-500/50",
+    color: "text-orange-500 dark:text-orange-400",
+    borderHover: "hover:border-orange-500/50",
     badge: "Utility",
   },
   {
@@ -85,8 +85,8 @@ const PALETTE_ITEMS: PaletteItem[] = [
     category: "Tools & Human",
     description: "External API call with retries and timeout",
     icon: Wrench,
-    color: "text-purple-400",
-    border: "group-hover:border-purple-500/50",
+    color: "text-purple-500 dark:text-purple-400",
+    borderHover: "hover:border-purple-500/50",
     badge: "Integration",
   },
   {
@@ -95,8 +95,8 @@ const PALETTE_ITEMS: PaletteItem[] = [
     category: "Tools & Human",
     description: "Pause workflow execution for manual sign-off",
     icon: ShieldCheck,
-    color: "text-yellow-400",
-    border: "group-hover:border-yellow-500/50",
+    color: "text-yellow-600 dark:text-yellow-400",
+    borderHover: "hover:border-yellow-500/50",
     badge: "Governance",
   },
   {
@@ -105,8 +105,8 @@ const PALETTE_ITEMS: PaletteItem[] = [
     category: "Egress",
     description: "Formatted JSON/Markdown terminal delivery",
     icon: Share2,
-    color: "text-emerald-400",
-    border: "group-hover:border-emerald-500/50",
+    color: "text-emerald-500 dark:text-emerald-400",
+    borderHover: "hover:border-emerald-500/50",
     badge: "Egress",
   },
 ];
@@ -131,21 +131,23 @@ export const NodePalette: React.FC = () => {
   return (
     <aside
       className={cn(
-        "relative flex flex-col bg-charcoal-900/90 border-r border-charcoal-800 backdrop-blur-md transition-all duration-300 z-10 select-none",
+        "relative flex flex-col bg-white/95 dark:bg-charcoal-900/90 border-r border-slate-200 dark:border-charcoal-800 backdrop-blur-md transition-all duration-300 z-10 select-none",
         isCollapsed ? "w-14" : "w-72"
       )}
     >
       {/* Header & Collapse Toggle */}
-      <div className="flex items-center justify-between p-3 border-b border-charcoal-800">
+      <div className="flex items-center justify-between p-3 border-b border-slate-200 dark:border-charcoal-800">
         {!isCollapsed && (
           <div>
-            <h3 className="text-xs font-bold uppercase tracking-wider text-charcoal-200">Node Library</h3>
-            <p className="text-[10px] text-charcoal-400">Drag to canvas or click to add</p>
+            <h3 className="text-xs font-bold uppercase tracking-wider text-slate-800 dark:text-charcoal-200">
+              Node Library
+            </h3>
+            <p className="text-[10px] text-slate-500 dark:text-charcoal-400">Drag to canvas or click to add</p>
           </div>
         )}
         <button
           onClick={() => setIsCollapsed(!isCollapsed)}
-          className="p-1.5 rounded-lg hover:bg-charcoal-800 text-charcoal-400 hover:text-white transition-colors ml-auto"
+          className="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-charcoal-800 text-slate-500 dark:text-charcoal-400 hover:text-slate-900 dark:hover:text-white transition-colors ml-auto"
           title={isCollapsed ? "Expand Palette" : "Collapse Palette"}
         >
           {isCollapsed ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
@@ -154,15 +156,15 @@ export const NodePalette: React.FC = () => {
 
       {/* Search Bar (When Expanded) */}
       {!isCollapsed && (
-        <div className="p-2.5 border-b border-charcoal-800/60">
+        <div className="p-2.5 border-b border-slate-200 dark:border-charcoal-800/60">
           <div className="relative">
-            <Search className="w-3.5 h-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-charcoal-400" />
+            <Search className="w-3.5 h-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400 dark:text-charcoal-400" />
             <input
               type="text"
               placeholder="Search nodes..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-charcoal-950/80 border border-charcoal-800 rounded-lg pl-8 pr-2.5 py-1.5 text-xs text-charcoal-100 placeholder-charcoal-500 focus:outline-none focus:border-indigo-500 transition-colors"
+              className="w-full bg-slate-100 dark:bg-charcoal-950/80 border border-slate-200 dark:border-charcoal-800 rounded-lg pl-8 pr-2.5 py-1.5 text-xs text-slate-800 dark:text-charcoal-100 placeholder-slate-400 dark:placeholder-charcoal-500 focus:outline-none focus:border-indigo-500 transition-colors"
             />
           </div>
         </div>
@@ -180,26 +182,26 @@ export const NodePalette: React.FC = () => {
               onClick={() => addNode(item.kind)}
               title={isCollapsed ? `${item.label} - ${item.description}` : undefined}
               className={cn(
-                "group flex items-center gap-3 p-2 rounded-xl border border-charcoal-800/80 bg-charcoal-950/50 hover:bg-charcoal-850 hover:shadow-md cursor-grab active:cursor-grabbing transition-all duration-150",
-                item.border,
+                "group flex items-center gap-3 p-2 rounded-xl border border-slate-200 dark:border-charcoal-800/80 bg-white dark:bg-charcoal-950/50 hover:bg-slate-50 dark:hover:bg-charcoal-850 hover:shadow-sm cursor-grab active:cursor-grabbing transition-all duration-150",
+                item.borderHover,
                 isCollapsed && "justify-center p-2.5"
               )}
             >
-              <div className="p-1.5 rounded-lg bg-charcoal-900 border border-charcoal-800 group-hover:scale-105 transition-transform shrink-0">
+              <div className="p-1.5 rounded-lg bg-slate-100 dark:bg-charcoal-900 border border-slate-200 dark:border-charcoal-800 group-hover:scale-105 transition-transform shrink-0">
                 <Icon className={cn("w-4 h-4", item.color)} />
               </div>
 
               {!isCollapsed && (
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center justify-between">
-                    <span className="text-xs font-semibold text-charcoal-200 group-hover:text-white truncate">
+                    <span className="text-xs font-semibold text-slate-800 dark:text-charcoal-200 group-hover:text-indigo-600 dark:group-hover:text-white truncate">
                       {item.label}
                     </span>
-                    <span className="text-[9px] uppercase font-mono px-1 rounded bg-charcoal-900 border border-charcoal-800 text-charcoal-400">
+                    <span className="text-[9px] uppercase font-mono px-1 rounded bg-slate-100 dark:bg-charcoal-900 border border-slate-200 dark:border-charcoal-800 text-slate-600 dark:text-charcoal-400">
                       {item.badge}
                     </span>
                   </div>
-                  <p className="text-[10px] text-charcoal-400 truncate mt-0.5">{item.description}</p>
+                  <p className="text-[10px] text-slate-500 dark:text-charcoal-400 truncate mt-0.5">{item.description}</p>
                 </div>
               )}
 
@@ -210,7 +212,7 @@ export const NodePalette: React.FC = () => {
                     e.stopPropagation();
                     addNode(item.kind);
                   }}
-                  className="opacity-0 group-hover:opacity-100 p-1 hover:bg-charcoal-800 rounded text-charcoal-400 hover:text-white transition-opacity"
+                  className="opacity-0 group-hover:opacity-100 p-1 hover:bg-slate-200 dark:hover:bg-charcoal-800 rounded text-slate-500 dark:text-charcoal-400 hover:text-slate-900 dark:hover:text-white transition-opacity"
                   title="Add node to canvas"
                 >
                   <Plus className="w-3.5 h-3.5" />
