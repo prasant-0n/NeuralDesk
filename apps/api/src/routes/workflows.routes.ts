@@ -182,7 +182,7 @@ workflowsRoutes.get("/:id", async (c) => {
         .where(eq(workflowVersions.workflowId, id))
         .orderBy(desc(workflowVersions.versionNumber));
 
-      const activeVer = versions.find((v) => v.isPublished) || versions[0];
+      const activeVer = versions.find((v: any) => v.isPublished) || versions[0];
       return c.json({
         data: {
           ...wf,

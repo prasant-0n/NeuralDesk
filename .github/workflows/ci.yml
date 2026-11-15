@@ -46,6 +46,9 @@ jobs:
       - name: Install Dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Build Core Monorepo Packages
+        run: pnpm --filter "./packages/*" build
+
       - name: Run Monorepo Recursive Typecheck
         run: pnpm --recursive typecheck
 
@@ -74,6 +77,9 @@ jobs:
       - name: Install Dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Build Core Monorepo Packages
+        run: pnpm --filter "./packages/*" build
+
       - name: Run Vitest Test Suite
         run: pnpm test
 
@@ -101,6 +107,9 @@ jobs:
 
       - name: Install Dependencies
         run: pnpm install --frozen-lockfile
+
+      - name: Build Core Monorepo Packages
+        run: pnpm --filter "./packages/*" build
 
       - name: Install Playwright Chromium with OS Dependencies
         run: pnpm exec playwright install --with-deps chromium

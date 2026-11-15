@@ -11,6 +11,7 @@
     "dev:web": "pnpm --filter @neuraldesk/web dev",
     "dev:api": "pnpm --filter @neuraldesk/api dev",
     "build": "pnpm --filter \"./packages/*\" build && pnpm --filter \"./apps/*\" build",
+    "build:packages": "pnpm --filter \"./packages/*\" build",
     "lint": "pnpm --recursive lint",
     "typecheck": "pnpm --recursive typecheck",
     "test": "vitest run",
