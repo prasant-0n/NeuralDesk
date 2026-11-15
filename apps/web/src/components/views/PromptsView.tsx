@@ -306,7 +306,7 @@ export const PromptsView: React.FC = () => {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <FileCode className="w-5 h-5 text-sky-600 dark:text-sky-400" />
-              <h2 className="text-sm font-bold text-slate-900 dark:text-white">Prompt Library</h2>
+              <h2 className="text-sm font-bold text-slate-900 dark:text-white">Prompt Template Library</h2>
             </div>
             <button
               onClick={() => setShowCreateModal(true)}
