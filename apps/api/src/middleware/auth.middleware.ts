@@ -8,6 +8,7 @@ import type { Context, MiddlewareHandler, Next } from "hono";
 import crypto from "node:crypto";
 import { SEED_IDS } from "@neuraldesk/db";
 import { AppError } from "./error.middleware.js";
+import { auth } from "../lib/auth.js";
 
 export interface AuthUser {
   id: string;
@@ -39,6 +40,32 @@ export const DEV_DEFAULT_USER: AuthUser = {
  */
 export function authMiddleware(): MiddlewareHandler {
   return async (c: Context, next: Next) => {
+    // 0. Resolve Better Auth session if present (via session cookies or Better-Auth headers)
+    try {
+      const session = await auth.api.getSession({ headers: c.req.raw.headers });
+      if (session?.user) {
+        c.set("user", {
+          id: session.user.id,
+          email: session.user.email,
+          name: session.user.name,
+          role: "owner",
+        });
+
+        const rawWs =
+          c.req.header("X-Workspace-Id") ||
+          c.req.query("workspaceId") ||
+          c.req.param("wsId");
+
+        const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+        const requestedWs = rawWs && uuidRegex.test(rawWs) ? rawWs : SEED_IDS.WORKSPACE_CORE;
+        c.set("workspaceId", requestedWs);
+
+        return await next();
+      }
+    } catch {
+      // Better Auth session lookup fallback
+    }
+
     const authHeader = c.req.header("Authorization") || c.req.header("authorization");
     const queryToken = c.req.query("token") || c.req.query("bearer");
 

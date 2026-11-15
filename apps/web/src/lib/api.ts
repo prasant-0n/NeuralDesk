@@ -35,6 +35,7 @@ export async function apiFetch(input: RequestInfo | URL, init: RequestInit = {})
   const mergedHeaders = getApiHeaders(existingHeaders);
 
   return fetch(input, {
+    credentials: "include",
     ...init,
     headers: mergedHeaders,
   });

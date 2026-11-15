@@ -9,6 +9,7 @@ import { ExecutionsView } from "./components/views/ExecutionsView";
 import { AgentsView } from "./components/views/AgentsView";
 import { PromptsView } from "./components/views/PromptsView";
 import { SettingsModal } from "./components/views/SettingsModal";
+import { AuthModal } from "./components/auth/AuthModal";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -46,6 +47,9 @@ export const App: React.FC = () => {
 
           {/* Global Settings & BYOK Modal */}
           <SettingsModal />
+
+          {/* Better Auth Modal */}
+          <AuthModal />
         </div>
       </ReactFlowProvider>
     </QueryClientProvider>

@@ -20,6 +20,7 @@ import { agentsRoutes } from "./routes/agents.routes.js";
 import { promptsRoutes } from "./routes/prompts.routes.js";
 import { docsRoutes } from "./routes/docs.routes.js";
 import { openApiSpec } from "./openapi.js";
+import { auth } from "./lib/auth.js";
 
 export function createApp(): Hono {
   const app = new Hono();
@@ -107,6 +108,10 @@ export function createApp(): Hono {
   app.route("/api/docs", docsRoutes);
   app.get("/openapi.json", (c) => c.json(openApiSpec));
 
+  // 5b. Better Auth Endpoints (/api/auth/*)
+  app.on(["POST", "GET"], "/api/auth/*", (c) => auth.handler(c.req.raw));
+  app.on(["POST", "GET"], "/api/auth/**", (c) => auth.handler(c.req.raw));
+
   // 6. Namespaced REST API v1 Routes
   const v1 = new Hono();
 
@@ -115,6 +120,8 @@ export function createApp(): Hono {
   v1.route("/webhooks", webhooksRoutes);
   v1.route("/docs", docsRoutes);
   v1.get("/openapi.json", (c) => c.json(openApiSpec));
+  v1.on(["POST", "GET"], "/auth/*", (c) => auth.handler(c.req.raw));
+  v1.on(["POST", "GET"], "/auth/**", (c) => auth.handler(c.req.raw));
 
   // Authenticated tenant endpoints (ND-SEC-01)
   v1.use("/workspaces/*", authMiddleware());

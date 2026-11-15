@@ -8,8 +8,11 @@ import {
   ShieldCheck,
   Moon,
   Sun,
+  LogIn,
 } from "lucide-react";
 import { useSettingsStore } from "../../store/settingsStore";
+import { useAuthStore } from "../../store/authStore";
+import { authClient } from "../../lib/authClient";
 import { cn } from "../../lib/utils";
 
 interface HeaderProps {
@@ -23,6 +26,10 @@ export const Header: React.FC<HeaderProps> = ({ activeView }) => {
   const setTheme = useSettingsStore((state) => state.setTheme);
   const setIsSettingsOpen = useSettingsStore((state) => state.setIsSettingsOpen);
   const workspaceId = useSettingsStore((state) => state.workspaceId);
+  const setIsAuthModalOpen = useAuthStore((state) => state.setIsAuthModalOpen);
+  const customUser = useAuthStore((state) => state.customUser);
+  const { data: sessionData } = authClient.useSession();
+  const activeUser = sessionData?.user || customUser;
 
   const toggleTheme = () => {
     setTheme(theme === "dark" ? "light" : "dark");
@@ -105,6 +112,29 @@ export const Header: React.FC<HeaderProps> = ({ activeView }) => {
         >
           {theme === "dark" ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4 text-indigo-600" />}
         </button>
+
+        {/* User Account / Better Auth Status */}
+        {activeUser ? (
+          <button
+            onClick={() => setIsAuthModalOpen(true)}
+            className="flex items-center gap-2 pl-1.5 pr-2.5 py-1 rounded-full border border-indigo-200 dark:border-indigo-900/60 bg-indigo-50/70 dark:bg-indigo-950/40 text-indigo-700 dark:text-indigo-300 hover:bg-indigo-100 dark:hover:bg-indigo-950/70 transition-all text-xs cursor-pointer shadow-sm"
+            title={`Logged in as ${activeUser.name} (${activeUser.email}) - Click to manage session`}
+          >
+            <div className="w-5 h-5 rounded-full bg-indigo-600 text-white font-bold text-[10px] flex items-center justify-center">
+              {activeUser.name ? activeUser.name.charAt(0).toUpperCase() : "U"}
+            </div>
+            <span className="font-semibold max-w-[100px] truncate">{activeUser.name}</span>
+          </button>
+        ) : (
+          <button
+            onClick={() => setIsAuthModalOpen(true)}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-indigo-500/30 bg-indigo-50/50 dark:bg-indigo-950/30 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-600 hover:text-white dark:hover:bg-indigo-600 dark:hover:text-white transition-all text-xs font-semibold cursor-pointer shadow-sm"
+            title="Sign In or Register with Better Auth"
+          >
+            <LogIn className="w-3.5 h-3.5" />
+            <span>Sign In</span>
+          </button>
+        )}
       </div>
     </header>
   );

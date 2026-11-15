@@ -14,6 +14,7 @@ export * from "./agents.js";
 export * from "./prompt-templates.js";
 export * from "./webhooks.js";
 export * from "./audit-logs.js";
+export * from "./auth.js";
 
 // Relations
 export * from "./relations.js";

@@ -8,8 +8,12 @@ dotenv.config();
 
 import { serve } from "@hono/node-server";
 import { ServerEnvSchema } from "@neuraldesk/shared";
+import { ensureAuthTables } from "@neuraldesk/db";
 import { app } from "./app.js";
 import { sseManager } from "./services/sse-manager.js";
+
+// Ensure Better Auth tables exist in PostgreSQL
+ensureAuthTables().catch(() => {});
 
 // Validate environment variables strictly via Zod schema
 const envResult = ServerEnvSchema.safeParse(process.env);
