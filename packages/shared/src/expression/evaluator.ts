@@ -39,16 +39,44 @@ export function parseLiteralValue(str: string): unknown {
 
 /**
  * Evaluates binary conditions safely against a context object without eval().
- * Supports: ==, !=, >, <, >=, <=, contains, matches
+ * Supports: ==, ===, !=, !==, >, <, >=, <=, contains, matches, in, not_in, is_null, is_not_null,
+ * as well as compound logical operators: && and ||.
  */
 export function evaluateCondition(
   expression: string,
   context: Record<string, unknown>
 ): boolean {
-  // Normalize variable references e.g. {{trigger.score}} -> trigger.score
-  const normalizedExpr = expression.replace(/\{\{\s*([a-zA-Z0-9_.]+)\s*\}\}/g, "$1").trim();
+  const trimmed = expression.trim();
+  if (!trimmed) return false;
 
-  const regex = /^\s*([a-zA-Z0-9_.]+)\s*(===|==|!==|!=|>=|<=|>|<|contains|matches)\s*(.+)\s*$/;
+  // Handle compound OR (||) - lower precedence than &&
+  if (trimmed.includes("||")) {
+    const clauses = splitCompoundExpression(trimmed, "||");
+    return clauses.some((clause) => evaluateCondition(clause, context));
+  }
+
+  // Handle compound AND (&&)
+  if (trimmed.includes("&&")) {
+    const clauses = splitCompoundExpression(trimmed, "&&");
+    return clauses.every((clause) => evaluateCondition(clause, context));
+  }
+
+  // Normalize variable references e.g. {{trigger.score}} -> trigger.score
+  const normalizedExpr = trimmed.replace(/\{\{\s*([a-zA-Z0-9_.]+)\s*\}\}/g, "$1").trim();
+
+  // Check unary operators: is_null / is_not_null
+  const isNullMatch = normalizedExpr.match(/^\s*([a-zA-Z0-9_.]+)\s+(is_null|is_not_null)\s*$/i);
+  if (isNullMatch) {
+    const [, leftPath, unaryOp] = isNullMatch;
+    const val = resolveContextPath(leftPath, context);
+    if (unaryOp.toLowerCase() === "is_null") {
+      return val === null || val === undefined;
+    } else {
+      return val !== null && val !== undefined;
+    }
+  }
+
+  const regex = /^\s*([a-zA-Z0-9_.]+)\s*(===|==|!==|!=|>=|<=|>|<|contains|matches|not_in|in)\s*(.+)\s*$/i;
   const match = normalizedExpr.match(regex);
   if (!match) {
     // If expression is just a single truthy boolean or path
@@ -56,7 +84,8 @@ export function evaluateCondition(
     return Boolean(directVal);
   }
 
-  const [, leftPath, operator, rawRight] = match;
+  const [, leftPath, rawOperator, rawRight] = match;
+  const operator = rawOperator.toLowerCase();
   const leftValue = resolveContextPath(leftPath, context);
   const rightValue = parseLiteralValue(rawRight.trim());
 
@@ -87,7 +116,54 @@ export function evaluateCondition(
       } catch {
         return false;
       }
+    case "in":
+      if (Array.isArray(rightValue)) {
+        return rightValue.some((item) => String(item) === String(leftValue));
+      }
+      return String(rightValue ?? "").includes(String(leftValue ?? ""));
+    case "not_in":
+      if (Array.isArray(rightValue)) {
+        return !rightValue.some((item) => String(item) === String(leftValue));
+      }
+      return !String(rightValue ?? "").includes(String(leftValue ?? ""));
     default:
       return false;
   }
+}
+
+/**
+ * Splits expression by compound operator (|| or &&) while ignoring inside quotes.
+ */
+function splitCompoundExpression(expr: string, op: "||" | "&&"): string[] {
+  const parts: string[] = [];
+  let current = "";
+  let inSingleQuote = false;
+  let inDoubleQuote = false;
+
+  for (let i = 0; i < expr.length; i++) {
+    const ch = expr[i];
+    if (ch === "'" && !inDoubleQuote) {
+      inSingleQuote = !inSingleQuote;
+      current += ch;
+    } else if (ch === '"' && !inSingleQuote) {
+      inDoubleQuote = !inDoubleQuote;
+      current += ch;
+    } else if (
+      !inSingleQuote &&
+      !inDoubleQuote &&
+      expr.startsWith(op, i)
+    ) {
+      parts.push(current.trim());
+      current = "";
+      i += op.length - 1;
+    } else {
+      current += ch;
+    }
+  }
+
+  if (current.trim()) {
+    parts.push(current.trim());
+  }
+
+  return parts;
 }

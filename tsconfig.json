@@ -4,11 +4,15 @@
     "baseUrl": ".",
     "paths": {
       "@neuraldesk/shared": ["./packages/shared/src/index.ts"],
-      "@neuraldesk/shared/*": ["./packages/shared/src/*"]
+      "@neuraldesk/shared/*": ["./packages/shared/src/*"],
+      "@neuraldesk/db": ["./packages/db/src/index.ts"],
+      "@neuraldesk/db/*": ["./packages/db/src/*"]
     }
   },
   "references": [
-    { "path": "./packages/shared" }
+    { "path": "./packages/shared" },
+    { "path": "./packages/db" },
+    { "path": "./apps/api" }
   ],
   "files": [],
   "include": []
