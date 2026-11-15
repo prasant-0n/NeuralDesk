@@ -9,6 +9,17 @@ export interface CustomUser {
   role?: string;
 }
 
+const STORAGE_KEY_PERSONA = "neuraldesk_auth_persona";
+
+const getSavedPersona = (): CustomUser | null => {
+  if (typeof window === "undefined") return null;
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY_PERSONA);
+    if (raw) return JSON.parse(raw);
+  } catch {}
+  return null;
+};
+
 interface AuthState {
   isAuthModalOpen: boolean;
   activeTab: AuthTab;
@@ -17,14 +28,30 @@ interface AuthState {
   setIsAuthModalOpen: (open: boolean) => void;
   setActiveTab: (tab: AuthTab) => void;
   setCustomUser: (user: CustomUser | null) => void;
+  signOut: () => void;
 }
 
 export const useAuthStore = create<AuthState>((set) => ({
   isAuthModalOpen: false,
   activeTab: "signin",
-  customUser: null,
+  customUser: getSavedPersona(),
 
   setIsAuthModalOpen: (open) => set({ isAuthModalOpen: open }),
   setActiveTab: (tab) => set({ activeTab: tab }),
-  setCustomUser: (user) => set({ customUser: user }),
+  setCustomUser: (user) => {
+    if (typeof window !== "undefined") {
+      if (user) {
+        localStorage.setItem(STORAGE_KEY_PERSONA, JSON.stringify(user));
+      } else {
+        localStorage.removeItem(STORAGE_KEY_PERSONA);
+      }
+    }
+    set({ customUser: user });
+  },
+  signOut: () => {
+    if (typeof window !== "undefined") {
+      localStorage.removeItem(STORAGE_KEY_PERSONA);
+    }
+    set({ customUser: null });
+  },
 }));
