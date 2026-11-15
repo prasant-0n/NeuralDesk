@@ -1,0 +1,262 @@
+import React from "react";
+import { Handle, Position } from "@xyflow/react";
+import {
+  Zap,
+  Sparkles,
+  FileText,
+  GitBranch,
+  ArrowRightLeft,
+  Wrench,
+  ShieldCheck,
+  Share2,
+  Trash2,
+  Copy,
+  Clock,
+  Coins,
+  AlertCircle,
+  CheckCircle2,
+  Loader2,
+} from "lucide-react";
+import { type NodeKind, type NodePort } from "@neuraldesk/shared";
+import { useWorkflowStore } from "../../../store/workflowStore";
+import { cn, formatDuration, formatCost } from "../../../lib/utils";
+
+export interface BaseNodeProps {
+  id: string;
+  selected?: boolean;
+  kind: NodeKind;
+  title: string;
+  subtitle?: string;
+  badgeLabel?: string;
+  inputs?: NodePort[];
+  outputs?: NodePort[];
+  children?: React.ReactNode;
+}
+
+const KIND_METADATA: Record<
+  NodeKind,
+  { icon: React.FC<{ className?: string }>; color: string; bgBadge: string; textBadge: string; border: string }
+> = {
+  trigger: {
+    icon: Zap,
+    color: "text-amber-400",
+    bgBadge: "bg-amber-500/10",
+    textBadge: "text-amber-400",
+    border: "border-amber-500/30",
+  },
+  llm: {
+    icon: Sparkles,
+    color: "text-indigo-400",
+    bgBadge: "bg-indigo-500/10",
+    textBadge: "text-indigo-300",
+    border: "border-indigo-500/30",
+  },
+  prompt: {
+    icon: FileText,
+    color: "text-sky-400",
+    bgBadge: "bg-sky-500/10",
+    textBadge: "text-sky-300",
+    border: "border-sky-500/30",
+  },
+  condition: {
+    icon: GitBranch,
+    color: "text-emerald-400",
+    bgBadge: "bg-emerald-500/10",
+    textBadge: "text-emerald-300",
+    border: "border-emerald-500/30",
+  },
+  transform: {
+    icon: ArrowRightLeft,
+    color: "text-orange-400",
+    bgBadge: "bg-orange-500/10",
+    textBadge: "text-orange-300",
+    border: "border-orange-500/30",
+  },
+  tool: {
+    icon: Wrench,
+    color: "text-purple-400",
+    bgBadge: "bg-purple-500/10",
+    textBadge: "text-purple-300",
+    border: "border-purple-500/30",
+  },
+  approval: {
+    icon: ShieldCheck,
+    color: "text-yellow-400",
+    bgBadge: "bg-yellow-500/10",
+    textBadge: "text-yellow-300",
+    border: "border-yellow-500/30",
+  },
+  evaluator: {
+    icon: CheckCircle2,
+    color: "text-teal-400",
+    bgBadge: "bg-teal-500/10",
+    textBadge: "text-teal-300",
+    border: "border-teal-500/30",
+  },
+  output: {
+    icon: Share2,
+    color: "text-emerald-400",
+    bgBadge: "bg-emerald-500/10",
+    textBadge: "text-emerald-300",
+    border: "border-emerald-500/30",
+  },
+};
+
+export const BaseNode: React.FC<BaseNodeProps> = ({
+  id,
+  selected = false,
+  kind,
+  title,
+  subtitle,
+  badgeLabel,
+  inputs = [],
+  outputs = [],
+  children,
+}) => {
+  const telemetry = useWorkflowStore((state) => state.nodeTelemetry[id]);
+  const removeNode = useWorkflowStore((state) => state.removeNode);
+  const duplicateNode = useWorkflowStore((state) => state.duplicateNode);
+
+  const meta = KIND_METADATA[kind] || KIND_METADATA.prompt;
+  const Icon = meta.icon;
+
+  const status = telemetry?.status ?? "idle";
+  const isRunning = status === "running";
+  const isCompleted = status === "completed";
+  const isFailed = status === "failed";
+  const isSkipped = status === "skipped";
+
+  const glowClass = isRunning
+    ? "node-running"
+    : isCompleted
+    ? "node-completed"
+    : isFailed
+    ? "node-failed"
+    : isSkipped
+    ? "node-skipped"
+    : "";
+
+  return (
+    <div
+      className={cn(
+        "relative group min-w-[280px] max-w-[340px] rounded-xl bg-charcoal-900/95 border text-charcoal-100 shadow-xl backdrop-blur-md transition-all duration-200 select-none",
+        selected ? "border-indigo-500 shadow-indigo-500/20 ring-1 ring-indigo-500" : "border-charcoal-800 hover:border-charcoal-700",
+        glowClass
+      )}
+    >
+      {/* Input Handles */}
+      {inputs.map((port, idx) => {
+        const topPercent = inputs.length === 1 ? 50 : ((idx + 1) / (inputs.length + 1)) * 100;
+        return (
+          <div
+            key={port.id}
+            style={{ top: `${topPercent}%` }}
+            className="absolute -left-3 transform -translate-y-1/2 flex items-center group/port"
+          >
+            <Handle
+              type="target"
+              position={Position.Left}
+              id={port.id}
+              className="target-handle !w-3 !h-3"
+            />
+            <span className="opacity-0 group-hover/port:opacity-100 transition-opacity absolute left-4 text-[10px] bg-charcoal-950/90 border border-charcoal-800 px-1.5 py-0.5 rounded text-charcoal-300 whitespace-nowrap shadow pointer-events-none z-30">
+              {port.name} ({port.type})
+            </span>
+          </div>
+        );
+      })}
+
+      {/* Header */}
+      <div className="flex items-center justify-between p-3 border-b border-charcoal-800/80 bg-charcoal-950/40 rounded-t-xl">
+        <div className="flex items-center gap-2.5 overflow-hidden">
+          <div className={cn("p-1.5 rounded-lg border", meta.bgBadge, meta.border)}>
+            <Icon className={cn("w-4 h-4", meta.color)} />
+          </div>
+          <div className="truncate">
+            <h4 className="text-xs font-semibold text-charcoal-100 truncate tracking-tight">{title}</h4>
+            {subtitle && <p className="text-[10px] text-charcoal-400 truncate">{subtitle}</p>}
+          </div>
+        </div>
+
+        {/* Action Shortcuts & Status Badge */}
+        <div className="flex items-center gap-1.5 ml-2">
+          {badgeLabel && (
+            <span className={cn("px-2 py-0.5 rounded text-[10px] font-medium border uppercase tracking-wider", meta.bgBadge, meta.border, meta.textBadge)}>
+              {badgeLabel}
+            </span>
+          )}
+
+          {/* Execution Status Icon */}
+          {isRunning && <Loader2 className="w-3.5 h-3.5 text-amber-400 animate-spin" />}
+          {isCompleted && <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />}
+          {isFailed && <AlertCircle className="w-3.5 h-3.5 text-rose-400" />}
+
+          {/* Quick Context Actions on hover */}
+          <div className="opacity-0 group-hover:opacity-100 flex items-center gap-1 transition-opacity">
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                duplicateNode(id);
+              }}
+              title="Duplicate (Ctrl+D)"
+              className="p-1 hover:bg-charcoal-800 rounded text-charcoal-400 hover:text-charcoal-200"
+            >
+              <Copy className="w-3 h-3" />
+            </button>
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                removeNode(id);
+              }}
+              title="Delete node"
+              className="p-1 hover:bg-rose-950/50 rounded text-charcoal-400 hover:text-rose-400"
+            >
+              <Trash2 className="w-3 h-3" />
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Node Body / Custom Content */}
+      <div className="p-3 text-xs space-y-2">{children}</div>
+
+      {/* Execution Telemetry Footer (if executed) */}
+      {(telemetry?.durationMs !== undefined || telemetry?.costUsd !== undefined) && (
+        <div className="px-3 py-1.5 bg-charcoal-950/60 border-t border-charcoal-800/60 rounded-b-xl flex items-center justify-between text-[10px] text-charcoal-400 font-mono">
+          <div className="flex items-center gap-1">
+            <Clock className="w-3 h-3 text-charcoal-500" />
+            <span>{formatDuration(telemetry.durationMs)}</span>
+          </div>
+          {telemetry.costUsd !== undefined && (
+            <div className="flex items-center gap-1">
+              <Coins className="w-3 h-3 text-charcoal-500" />
+              <span>{formatCost(telemetry.costUsd)}</span>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Output Handles */}
+      {outputs.map((port, idx) => {
+        const topPercent = outputs.length === 1 ? 50 : ((idx + 1) / (outputs.length + 1)) * 100;
+        return (
+          <div
+            key={port.id}
+            style={{ top: `${topPercent}%` }}
+            className="absolute -right-3 transform -translate-y-1/2 flex items-center group/port"
+          >
+            <Handle
+              type="source"
+              position={Position.Right}
+              id={port.id}
+              className="source-handle !w-3 !h-3"
+            />
+            <span className="opacity-0 group-hover/port:opacity-100 transition-opacity absolute right-4 text-[10px] bg-charcoal-950/90 border border-charcoal-800 px-1.5 py-0.5 rounded text-charcoal-300 whitespace-nowrap shadow pointer-events-none z-30">
+              {port.name}
+            </span>
+          </div>
+        );
+      })}
+    </div>
+  );
+};
