@@ -14,6 +14,7 @@ import {
   type NodeExecutionStatus,
   topologicalSortKahn,
 } from "@neuraldesk/shared";
+import { apiFetch, DEMO_AUTH_TOKEN } from "../lib/api";
 
 export interface NodeTelemetry {
   status: NodeExecutionStatus;
@@ -673,7 +674,7 @@ export const useWorkflowStore = create<WorkflowStoreState>((set, get) => ({
     const nodeOutputsMap: Record<string, unknown> = {};
 
     try {
-      const response = await fetch(`/api/v1/workflows/${workflowId}/execute`, {
+      const response = await apiFetch(`/api/v1/workflows/${workflowId}/execute`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -692,7 +693,8 @@ export const useWorkflowStore = create<WorkflowStoreState>((set, get) => ({
       const { execution_id, stream_url } = await response.json();
       set({ activeExecutionId: execution_id });
 
-      const sseUrl = stream_url || `/api/v1/executions/${execution_id}/stream`;
+      const baseSseUrl = stream_url || `/api/v1/executions/${execution_id}/stream`;
+      const sseUrl = `${baseSseUrl}${baseSseUrl.includes("?") ? "&" : "?"}token=${DEMO_AUTH_TOKEN}`;
       const eventSource = new EventSource(sseUrl);
       activeEventSource = eventSource;
 
@@ -1089,7 +1091,7 @@ export const useWorkflowStore = create<WorkflowStoreState>((set, get) => ({
     const { workflowTitle, workflowDescription, nodes, edges } = get();
     set({ isSaving: true });
     try {
-      const res = await fetch(`/api/v1/workflows`, {
+      const res = await apiFetch(`/api/v1/workflows`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -1113,7 +1115,7 @@ export const useWorkflowStore = create<WorkflowStoreState>((set, get) => ({
 
   fetchExecutionsFromApi: async () => {
     try {
-      const res = await fetch("/api/v1/executions?limit=50");
+      const res = await apiFetch("/api/v1/executions?limit=50");
       if (!res.ok) return;
       const json = await res.json();
       if (json.data && Array.isArray(json.data)) {

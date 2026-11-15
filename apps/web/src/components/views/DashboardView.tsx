@@ -33,6 +33,7 @@ import type {
 import { useWorkflowStore } from "../../store/workflowStore";
 import { useSettingsStore } from "../../store/settingsStore";
 import { formatCost, formatTokens, cn } from "../../lib/utils";
+import { apiFetch } from "../../lib/api";
 
 const DEFAULT_STATS: DashboardTelemetryResponse = {
   timeframe: "24h",
@@ -110,7 +111,7 @@ export const DashboardView: React.FC<{ onNavigateToCanvas?: () => void }> = ({ o
 
   const fetchTelemetryStats = useCallback(async (selectedTimeframe: DashboardTimeframe) => {
     try {
-      const res = await fetch(`/api/v1/executions/stats?timeframe=${selectedTimeframe}`);
+      const res = await apiFetch(`/api/v1/executions/stats?timeframe=${selectedTimeframe}`);
       if (res.ok) {
         const json: DashboardTelemetryResponse = await res.json();
         setStats(json);

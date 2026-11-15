@@ -16,6 +16,7 @@ import {
 import { formatTokens, cn } from "../../lib/utils";
 import { useSettingsStore } from "../../store/settingsStore";
 import { useWorkflowStore } from "../../store/workflowStore";
+import { apiFetch } from "../../lib/api";
 
 interface AgentPersona {
   id: string;
@@ -125,7 +126,7 @@ export const AgentsView: React.FC = () => {
         text: m.text,
       }));
 
-      const res = await fetch("/api/v1/agents/chat", {
+      const res = await apiFetch("/api/v1/agents/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

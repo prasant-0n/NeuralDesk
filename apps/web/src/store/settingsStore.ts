@@ -66,7 +66,7 @@ export const useSettingsStore = create<SettingsState>((set) => ({
   geminiApiKey: getStoredApiKey(),
   executionMode: (typeof window !== "undefined" && (localStorage.getItem(STORAGE_KEY_EXEC_MODE) as ExecutionMode)) || "mock",
   theme: getSavedTheme(),
-  workspaceId: "ws_default_production",
+  workspaceId: "00000000-0000-4000-8000-000000000002",
   isSettingsOpen: false,
 
   setGeminiApiKey: (key: string) => {

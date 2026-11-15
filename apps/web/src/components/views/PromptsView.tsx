@@ -17,6 +17,7 @@ import {
 import { useSettingsStore } from "../../store/settingsStore";
 import { useWorkflowStore } from "../../store/workflowStore";
 import { formatCost, formatTokens, cn } from "../../lib/utils";
+import { apiFetch } from "../../lib/api";
 
 interface PromptTemplate {
   id: string;
@@ -125,7 +126,7 @@ export const PromptsView: React.FC = () => {
   useEffect(() => {
     const fetchPrompts = async () => {
       try {
-        const res = await fetch("/api/v1/prompts");
+        const res = await apiFetch("/api/v1/prompts");
         if (res.ok) {
           const json = await res.json();
           if (json.data && Array.isArray(json.data) && json.data.length > 0) {
@@ -203,7 +204,7 @@ export const PromptsView: React.FC = () => {
     setTestResult(null);
 
     try {
-      const res = await fetch("/api/v1/prompts/test", {
+      const res = await apiFetch("/api/v1/prompts/test", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -264,7 +265,7 @@ export const PromptsView: React.FC = () => {
     };
 
     try {
-      await fetch("/api/v1/prompts", {
+      await apiFetch("/api/v1/prompts", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -294,7 +295,7 @@ export const PromptsView: React.FC = () => {
       const remaining = prompts.filter((p) => p.id !== id);
       if (remaining.length > 0) setSelectedPrompt(remaining[0]);
     }
-    fetch(`/api/v1/prompts/${id}`, { method: "DELETE" }).catch(() => {});
+    apiFetch(`/api/v1/prompts/${id}`, { method: "DELETE" }).catch(() => {});
   };
 
   return (

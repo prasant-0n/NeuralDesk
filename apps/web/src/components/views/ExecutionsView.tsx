@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import { useWorkflowStore, type ExecutionRecord } from "../../store/workflowStore";
 import { formatDuration, formatCost, formatTokens, cn } from "../../lib/utils";
+import { apiFetch } from "../../lib/api";
 
 type StatusFilter = "all" | "completed" | "failed" | "running" | "waiting_for_approval";
 
@@ -89,7 +90,7 @@ export const ExecutionsView: React.FC = () => {
     e.stopPropagation();
     setActionLoadingId(execId);
     try {
-      const res = await fetch(`/api/v1/executions/${execId}/rerun`, { method: "POST" });
+      const res = await apiFetch(`/api/v1/executions/${execId}/rerun`, { method: "POST" });
       if (res.ok) {
         await fetchExecutionsFromApi();
       }
@@ -105,7 +106,7 @@ export const ExecutionsView: React.FC = () => {
     e.stopPropagation();
     setActionLoadingId(execId);
     try {
-      const res = await fetch(`/api/v1/executions/${execId}/cancel`, { method: "POST" });
+      const res = await apiFetch(`/api/v1/executions/${execId}/cancel`, { method: "POST" });
       if (res.ok) {
         await fetchExecutionsFromApi();
       }
