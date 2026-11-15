@@ -10,6 +10,9 @@
 
 <br/>
 
+[![Live Demo](https://img.shields.io/badge/Production%20Web-Live%20on%20Vercel-success.svg?logo=vercel&logoColor=white)](https://neuraldesk-lovat.vercel.app)
+[![API Engine](https://img.shields.io/badge/API%20Engine-Live%20on%20Render-46E3B7.svg?logo=render&logoColor=white)](https://neuraldesk-xfe2.onrender.com/api/v1/health)
+[![API Docs](https://img.shields.io/badge/API%20Docs-Interactive%20Scalar-8B5CF6.svg)](https://neuraldesk-xfe2.onrender.com/docs)
 [![CI/CD Pipeline](https://github.com/prasant-0n/NeuralDesk/actions/workflows/ci.yml/badge.svg)](https://github.com/prasant-0n/NeuralDesk/actions/workflows/ci.yml)
 [![TypeScript: Strict](https://img.shields.io/badge/TypeScript-5.6%20Strict-blue.svg?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![React: 18.3](https://img.shields.io/badge/React-18.3%20SPA-61DAFB.svg?logo=react&logoColor=black)](https://react.dev/)
@@ -26,7 +29,7 @@
 
 <br/>
 
-[**Live Architecture**](#-system-architecture) • [**Visual Showcase**](#-visual-walkthrough--modules) • [**API Reference**](#-api-documentation--interactive-explorer) • [**Key Features**](#-enterprise-feature-matrix) • [**Engineering Highlights**](#-engineering-highlights-for-technical-recruiters) • [**Quickstart**](#-quickstart--local-development) • [**Deployment**](#-production-deployment-blueprints)
+[🚀 **Live Web Platform (Vercel)**](https://neuraldesk-lovat.vercel.app) • [🔌 **Interactive API Docs (Scalar)**](https://neuraldesk-xfe2.onrender.com/docs) • [**Visual Showcase**](#-visual-walkthrough--modules) • [**Live Architecture**](#-system-architecture) • [**Engineering Highlights**](#-engineering-highlights-for-technical-recruiters) • [**Quickstart**](#-quickstart--local-development)
 
 </div>
 
