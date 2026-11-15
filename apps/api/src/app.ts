@@ -81,8 +81,9 @@ export function createApp(): Hono {
   app.onError(errorHandler);
   app.notFound(notFoundHandler);
 
-  // 5. Root convenience health endpoint
+  // 5. Root convenience health endpoints
   app.get("/health", (c) => c.redirect("/api/v1/health"));
+  app.get("/api/health", (c) => c.redirect("/api/v1/health"));
 
   // 6. Namespaced REST API v1 Routes
   const v1 = new Hono();

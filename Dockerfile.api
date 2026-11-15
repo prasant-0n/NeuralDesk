@@ -1,0 +1,78 @@
+# ==============================================================================
+# NeuralDesk API — Multi-Stage Production Dockerfile
+# Stage 1: Build workspace packages (@neuraldesk/shared, @neuraldesk/db, @neuraldesk/api)
+# Stage 2: Minimal hardened Node.js Alpine runtime with non-root user and health check
+# ==============================================================================
+
+# ------------------------------------------------------------------------------
+# Stage 1: Builder
+# ------------------------------------------------------------------------------
+FROM node:20-alpine AS builder
+
+WORKDIR /app
+
+# Install build dependencies for native bindings if required
+RUN apk add --no-cache libc6-compat
+
+# Enable corepack and activate deterministic pnpm version
+RUN corepack enable && corepack prepare pnpm@9.12.3 --activate
+
+# Copy monorepo manifests and root configs for optimal layer caching
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml tsconfig.base.json tsconfig.json ./
+COPY packages/shared/package.json ./packages/shared/
+COPY packages/db/package.json ./packages/db/
+COPY apps/api/package.json ./apps/api/
+COPY apps/web/package.json ./apps/web/
+
+# Install workspace dependencies with frozen lockfile
+RUN pnpm install --frozen-lockfile
+
+# Copy package source directories needed for API compilation
+COPY packages/shared ./packages/shared
+COPY packages/db ./packages/db
+COPY apps/api ./apps/api
+
+# Build libraries and API server in topological dependency order
+RUN pnpm --filter @neuraldesk/shared build
+RUN pnpm --filter @neuraldesk/db build
+RUN pnpm --filter @neuraldesk/api build
+
+# Prune devDependencies to retain strictly production dependencies
+RUN pnpm prune --prod
+
+# ------------------------------------------------------------------------------
+# Stage 2: Production Runner
+# ------------------------------------------------------------------------------
+FROM node:20-alpine AS runner
+
+WORKDIR /app
+
+ENV NODE_ENV=production
+ENV PORT=3001
+ENV HOST=0.0.0.0
+
+# Install curl for reliable container health probing
+RUN apk add --no-cache curl
+
+# Security: Create non-root system user and group (nodejs:nodejs)
+RUN addgroup --system --gid 1001 nodejs && \
+    adduser --system --uid 1001 -G nodejs nodejs
+
+# Copy root manifests, pruned production node_modules, and compiled outputs
+COPY --from=builder --chown=nodejs:nodejs /app/node_modules ./node_modules
+COPY --from=builder --chown=nodejs:nodejs /app/package.json ./package.json
+COPY --from=builder --chown=nodejs:nodejs /app/packages ./packages
+COPY --from=builder --chown=nodejs:nodejs /app/apps/api ./apps/api
+
+# Run as non-root user
+USER nodejs
+
+# Expose API HTTP port
+EXPOSE 3001
+
+# Container healthcheck targeting the health probe endpoint
+HEALTHCHECK --interval=30s --timeout=5s --start-period=5s --retries=3 \
+  CMD curl -f http://localhost:3001/api/v1/health || exit 1
+
+# Production Entrypoint
+ENTRYPOINT ["node", "apps/api/dist/index.js"]

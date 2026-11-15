@@ -1,0 +1,60 @@
+# ==============================================================================
+# NeuralDesk Web Frontend — Multi-Stage Production Dockerfile
+# Stage 1: Build Vite React SPA bundle with production minification
+# Stage 2: Serve via Nginx Alpine with gzip, security headers, and SPA routing
+# ==============================================================================
+
+# ------------------------------------------------------------------------------
+# Stage 1: Builder
+# ------------------------------------------------------------------------------
+FROM node:20-alpine AS builder
+
+WORKDIR /app
+
+# Install build dependencies
+RUN apk add --no-cache libc6-compat
+
+# Enable corepack and activate deterministic pnpm version
+RUN corepack enable && corepack prepare pnpm@9.12.3 --activate
+
+# Copy monorepo manifests and root configs for optimal layer caching
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml tsconfig.base.json tsconfig.json ./
+COPY packages/shared/package.json ./packages/shared/
+COPY packages/db/package.json ./packages/db/
+COPY apps/api/package.json ./apps/api/
+COPY apps/web/package.json ./apps/web/
+
+# Install workspace dependencies with frozen lockfile
+RUN pnpm install --frozen-lockfile
+
+# Copy shared library and web client source code
+COPY packages/shared ./packages/shared
+COPY apps/web ./apps/web
+
+# Build dependencies and bundle frontend application
+RUN pnpm --filter @neuraldesk/shared build
+RUN pnpm --filter @neuraldesk/web build
+
+# ------------------------------------------------------------------------------
+# Stage 2: Production Runner (Hardened Nginx)
+# ------------------------------------------------------------------------------
+FROM nginx:alpine AS runner
+
+# Remove default static placeholders
+RUN rm -rf /usr/share/nginx/html/*
+
+# Copy compiled static assets from builder stage
+COPY --from=builder /app/apps/web/dist /usr/share/nginx/html
+
+# Copy production hardened Nginx configuration
+COPY docker/nginx.conf /etc/nginx/conf.d/default.conf
+
+# Expose HTTP ports (Standard 80 and container 3000 mapping)
+EXPOSE 80 3000
+
+# Container healthcheck testing root SPA delivery
+HEALTHCHECK --interval=30s --timeout=5s --start-period=5s --retries=3 \
+  CMD wget -qO- http://localhost:80/ || exit 1
+
+# Start Nginx in foreground
+CMD ["nginx", "-g", "daemon off;"]

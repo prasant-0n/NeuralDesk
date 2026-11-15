@@ -1,0 +1,103 @@
+# ==============================================================================
+# NeuralDesk — Orchestrated Local & Production Docker Compose Blueprint
+# Includes PostgreSQL 16, Hono API Engine, and Nginx-powered Web Client.
+# ==============================================================================
+
+services:
+  # ----------------------------------------------------------------------------
+  # 1. PostgreSQL 16 Relational Engine
+  # ----------------------------------------------------------------------------
+  postgres:
+    image: postgres:16-alpine
+    container_name: neuraldesk-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: neuraldesk_dev
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d neuraldesk_dev"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
+    networks:
+      - neuraldesk-net
+
+  # ----------------------------------------------------------------------------
+  # 2. NeuralDesk Backend API Server
+  # ----------------------------------------------------------------------------
+  api:
+    image: neuraldesk-api:latest
+    build:
+      context: .
+      dockerfile: Dockerfile.api
+    container_name: neuraldesk-api
+    restart: unless-stopped
+    ports:
+      - "3001:3001"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      NODE_ENV: production
+      PORT: 3001
+      HOST: 0.0.0.0
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/neuraldesk_dev
+      DATABASE_POOL_SIZE: 10
+      CORS_ORIGIN: http://localhost:3000
+      JWT_SECRET: super_secret_jwt_signing_key_replace_in_production_min_32_chars
+      ENCRYPTION_KEY: 0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef
+      WEBHOOK_SIGNING_SECRET: whsec_sample_secret_key_for_local_testing
+      GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+      GEMINI_DEFAULT_MODEL: gemini-1.5-flash
+      MAX_CONCURRENT_EXECUTIONS: 3
+      EXECUTION_TIMEOUT_MS: 30000
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3001/api/v1/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    networks:
+      - neuraldesk-net
+
+  # ----------------------------------------------------------------------------
+  # 3. NeuralDesk Web Client (Nginx Edge)
+  # ----------------------------------------------------------------------------
+  web:
+    image: neuraldesk-web:latest
+    build:
+      context: .
+      dockerfile: Dockerfile.web
+    container_name: neuraldesk-web
+    restart: unless-stopped
+    ports:
+      - "3000:80"
+    depends_on:
+      api:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:80/"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 5s
+    networks:
+      - neuraldesk-net
+
+# ------------------------------------------------------------------------------
+# Named Networks & Volumes
+# ------------------------------------------------------------------------------
+networks:
+  neuraldesk-net:
+    name: neuraldesk_network
+    driver: bridge
+
+volumes:
+  postgres_data:
+    name: neuraldesk_postgres_data

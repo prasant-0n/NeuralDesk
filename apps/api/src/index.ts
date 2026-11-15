@@ -7,11 +7,22 @@ import * as dotenv from "dotenv";
 dotenv.config();
 
 import { serve } from "@hono/node-server";
+import { ServerEnvSchema } from "@neuraldesk/shared";
 import { app } from "./app.js";
 import { sseManager } from "./services/sse-manager.js";
 
-const PORT = parseInt(process.env.PORT || "3001", 10);
-const HOST = process.env.HOST || "0.0.0.0";
+// Validate environment variables strictly via Zod schema
+const envResult = ServerEnvSchema.safeParse(process.env);
+if (!envResult.success) {
+  console.error("❌ Environment validation error:", envResult.error.format());
+  if (process.env.NODE_ENV === "production") {
+    process.exit(1);
+  }
+}
+
+const env = envResult.success ? envResult.data : ServerEnvSchema.parse({});
+const PORT = env.PORT;
+const HOST = env.HOST;
 
 console.log("⚡ Starting NeuralDesk API Server...");
 

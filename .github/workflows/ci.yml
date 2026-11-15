@@ -1,0 +1,152 @@
+# ==============================================================================
+# NeuralDesk — Production CI/CD Pipeline
+# Automates linting, typechecking, Vitest tests, Playwright E2E, and production builds.
+# ==============================================================================
+
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # ----------------------------------------------------------------------------
+  # 1. Lint & Recursive Typecheck
+  # ----------------------------------------------------------------------------
+  lint-and-typecheck:
+    name: Lint & Typecheck
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 9.12.3
+
+      - name: Setup Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: "pnpm"
+
+      - name: Install Dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run Monorepo Recursive Typecheck
+        run: pnpm --recursive typecheck
+
+  # ----------------------------------------------------------------------------
+  # 2. Vitest Unit & Integration Tests (84 tests)
+  # ----------------------------------------------------------------------------
+  test-unit-integration:
+    name: Unit & Integration Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 9.12.3
+
+      - name: Setup Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: "pnpm"
+
+      - name: Install Dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run Vitest Test Suite
+        run: pnpm test
+
+  # ----------------------------------------------------------------------------
+  # 3. Playwright End-to-End Tests (Headless)
+  # ----------------------------------------------------------------------------
+  test-e2e:
+    name: End-to-End Tests (Playwright)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 9.12.3
+
+      - name: Setup Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: "pnpm"
+
+      - name: Install Dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Install Playwright Chromium with OS Dependencies
+        run: pnpm exec playwright install --with-deps chromium
+
+      - name: Run Playwright E2E Headless Tests
+        run: pnpm test:e2e
+
+      - name: Upload Playwright Test Report Artifact
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 14
+
+  # ----------------------------------------------------------------------------
+  # 4. Production Build Verification
+  # ----------------------------------------------------------------------------
+  build:
+    name: Production Build Verification
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    needs: [lint-and-typecheck, test-unit-integration]
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 9.12.3
+
+      - name: Setup Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: "pnpm"
+
+      - name: Install Dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build Monorepo Packages and Applications
+        run: pnpm build
+
+      - name: Verify API Build Artifacts
+        run: |
+          test -f apps/api/dist/index.js || (echo "❌ API dist/index.js missing!" && exit 1)
+          echo "✓ API build artifact verified (apps/api/dist/index.js)"
+
+      - name: Verify Web Client Build Artifacts
+        run: |
+          test -f apps/web/dist/index.html || (echo "❌ Web dist/index.html missing!" && exit 1)
+          echo "✓ Web SPA build artifact verified (apps/web/dist/index.html)"

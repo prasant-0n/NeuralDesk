@@ -48,6 +48,11 @@ describe("NeuralDesk API Integration Test Suite", () => {
       const response = await request(server).get("/health");
       expect([200, 302]).toContain(response.status);
     });
+
+    it("GET /api/health convenience alias should redirect to /api/v1/health", async () => {
+      const response = await request(server).get("/api/health");
+      expect([200, 302]).toContain(response.status);
+    });
   });
 
   // -------------------------------------------------------------------------

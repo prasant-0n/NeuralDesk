@@ -188,3 +188,50 @@ describe("Safe Expression Evaluator & Template Compiler", () => {
     expect(compiled).toBe("Analyze customer ticket for Acme Corp: Connection pool exhausted");
   });
 });
+
+describe("Environment Variables & Zod Configuration Contracts", () => {
+  it("should validate and apply default server environment schema", async () => {
+    const { ServerEnvSchema, validateServerEnv } = await import(
+      "../../packages/shared/src/index.js"
+    );
+
+    const parsed = validateServerEnv({});
+    expect(parsed.PORT).toBe(3001);
+    expect(parsed.HOST).toBe("0.0.0.0");
+    expect(parsed.NODE_ENV).toBe("development");
+    expect(parsed.DATABASE_POOL_SIZE).toBe(10);
+    expect(parsed.DATABASE_URL).toContain("postgres");
+    expect(parsed.ENABLE_SIMULATION_MODE).toBe(true);
+  });
+
+  it("should validate and coerce custom environment variables", async () => {
+    const { ServerEnvSchema } = await import("../../packages/shared/src/index.js");
+
+    const customEnv = {
+      NODE_ENV: "production",
+      PORT: "8080",
+      DATABASE_URL: "postgresql://user:pass@neon.tech:5432/db?sslmode=require",
+      DATABASE_POOL_SIZE: "25",
+      GEMINI_API_KEY: "test_key",
+      CORS_ORIGIN: "https://neuraldesk.app",
+    };
+
+    const parsed = ServerEnvSchema.parse(customEnv);
+    expect(parsed.PORT).toBe(8080);
+    expect(parsed.NODE_ENV).toBe("production");
+    expect(parsed.DATABASE_POOL_SIZE).toBe(25);
+    expect(parsed.GEMINI_API_KEY).toBe("test_key");
+    expect(parsed.CORS_ORIGIN).toBe("https://neuraldesk.app");
+  });
+
+  it("should validate client environment schema", async () => {
+    const { ClientEnvSchema, validateClientEnv } = await import(
+      "../../packages/shared/src/index.js"
+    );
+
+    const defaultClient = validateClientEnv({});
+    expect(defaultClient.VITE_API_URL).toBe("http://localhost:3001/api/v1");
+    expect(defaultClient.VITE_APP_NAME).toBe("NeuralDesk");
+    expect(defaultClient.VITE_DEFAULT_THEME).toBe("dark");
+  });
+});
