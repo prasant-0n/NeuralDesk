@@ -11,6 +11,18 @@
       "destination": "https://neuraldesk-xfe2.onrender.com/api/$1"
     },
     {
+      "source": "/docs",
+      "destination": "https://neuraldesk-xfe2.onrender.com/docs"
+    },
+    {
+      "source": "/docs/(.*)",
+      "destination": "https://neuraldesk-xfe2.onrender.com/docs/$1"
+    },
+    {
+      "source": "/openapi.json",
+      "destination": "https://neuraldesk-xfe2.onrender.com/api/v1/openapi.json"
+    },
+    {
       "source": "/(.*)",
       "destination": "/index.html"
     }
