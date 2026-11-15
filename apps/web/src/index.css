@@ -159,3 +159,191 @@
   border-radius: 0.5rem !important;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6) !important;
 }
+
+/* ==========================================================================
+   LIGHT MODE PALETTE & COMPONENT OVERRIDES
+   Activates whenever .dark is toggled off (or .light is active)
+   ========================================================================== */
+html:not(.dark),
+html.light {
+  color-scheme: light;
+}
+
+html:not(.dark) body,
+html.light body {
+  background-color: #f8fafc !important;
+  color: #0f172a !important;
+}
+
+/* App Backgrounds */
+html:not(.dark) .bg-charcoal-950,
+html.light .bg-charcoal-950 {
+  background-color: #f8fafc !important;
+}
+
+html:not(.dark) .bg-charcoal-950\/80,
+html.light .bg-charcoal-950\/80,
+html:not(.dark) .bg-charcoal-950\/90,
+html.light .bg-charcoal-950\/90 {
+  background-color: rgba(248, 250, 252, 0.95) !important;
+}
+
+html:not(.dark) .bg-charcoal-925,
+html.light .bg-charcoal-925,
+html:not(.dark) .bg-charcoal-900,
+html.light .bg-charcoal-900 {
+  background-color: #ffffff !important;
+}
+
+html:not(.dark) .bg-charcoal-900\/95,
+html.light .bg-charcoal-900\/95,
+html:not(.dark) .bg-charcoal-900\/90,
+html.light .bg-charcoal-900\/90,
+html:not(.dark) .bg-charcoal-900\/80,
+html.light .bg-charcoal-900\/80 {
+  background-color: rgba(255, 255, 255, 0.96) !important;
+}
+
+html:not(.dark) .bg-charcoal-850,
+html.light .bg-charcoal-850 {
+  background-color: #f1f5f9 !important;
+}
+
+html:not(.dark) .bg-charcoal-800,
+html.light .bg-charcoal-800 {
+  background-color: #e2e8f0 !important;
+}
+
+html:not(.dark) .bg-charcoal-800\/50,
+html.light .bg-charcoal-800\/50 {
+  background-color: rgba(226, 232, 240, 0.6) !important;
+}
+
+html:not(.dark) .hover\:bg-charcoal-800:hover,
+html.light .hover\:bg-charcoal-800:hover {
+  background-color: #e2e8f0 !important;
+}
+
+html:not(.dark) .hover\:bg-charcoal-850:hover,
+html.light .hover\:bg-charcoal-850:hover {
+  background-color: #f1f5f9 !important;
+}
+
+/* Borders */
+html:not(.dark) .border-charcoal-800,
+html.light .border-charcoal-800,
+html:not(.dark) .border-charcoal-800\/80,
+html.light .border-charcoal-800\/80,
+html:not(.dark) .border-charcoal-850,
+html.light .border-charcoal-850,
+html:not(.dark) .border-charcoal-700,
+html.light .border-charcoal-700 {
+  border-color: #e2e8f0 !important;
+}
+
+html:not(.dark) .border-charcoal-900,
+html.light .border-charcoal-900 {
+  border-color: #cbd5e1 !important;
+}
+
+/* Typography */
+html:not(.dark) .text-white,
+html.light .text-white,
+html:not(.dark) .text-charcoal-100,
+html.light .text-charcoal-100,
+html:not(.dark) .text-charcoal-200,
+html.light .text-charcoal-200 {
+  color: #0f172a !important;
+}
+
+html:not(.dark) .text-charcoal-300,
+html.light .text-charcoal-300,
+html:not(.dark) .text-charcoal-400,
+html.light .text-charcoal-400 {
+  color: #475569 !important;
+}
+
+html:not(.dark) .text-charcoal-500,
+html.light .text-charcoal-500 {
+  color: #64748b !important;
+}
+
+html:not(.dark) .hover\:text-white:hover,
+html.light .hover\:text-white:hover {
+  color: #0f172a !important;
+}
+
+/* Form Inputs & Textareas */
+html:not(.dark) input,
+html.light input,
+html:not(.dark) textarea,
+html.light textarea,
+html:not(.dark) select,
+html.light select {
+  background-color: #ffffff !important;
+  color: #0f172a !important;
+  border-color: #cbd5e1 !important;
+}
+
+/* React Flow Canvas in Light Mode */
+html:not(.dark) .react-flow__background,
+html.light .react-flow__background {
+  background-color: #f8fafc !important;
+}
+
+html:not(.dark) .react-flow__background pattern circle,
+html.light .react-flow__background pattern circle {
+  fill: #cbd5e1 !important;
+}
+
+html:not(.dark) .react-flow__node,
+html.light .react-flow__node {
+  background-color: #ffffff !important;
+  color: #0f172a !important;
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.08), 0 2px 4px -2px rgb(0 0 0 / 0.06) !important;
+  border-color: #e2e8f0 !important;
+}
+
+html:not(.dark) .react-flow__controls,
+html.light .react-flow__controls {
+  background: #ffffff !important;
+  border: 1px solid #e2e8f0 !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08) !important;
+}
+
+html:not(.dark) .react-flow__controls-button,
+html.light .react-flow__controls-button {
+  background: #ffffff !important;
+  border-bottom: 1px solid #e2e8f0 !important;
+  fill: #475569 !important;
+  color: #475569 !important;
+}
+
+html:not(.dark) .react-flow__controls-button:hover,
+html.light .react-flow__controls-button:hover {
+  background: #f1f5f9 !important;
+  fill: #0f172a !important;
+}
+
+html:not(.dark) .react-flow__minimap,
+html.light .react-flow__minimap {
+  background: #ffffff !important;
+  border: 1px solid #e2e8f0 !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08) !important;
+}
+
+/* Light Scrollbars */
+html:not(.dark) ::-webkit-scrollbar-track,
+html.light ::-webkit-scrollbar-track {
+  background: #f1f5f9 !important;
+}
+
+html:not(.dark) ::-webkit-scrollbar-thumb,
+html.light ::-webkit-scrollbar-thumb {
+  background: #cbd5e1 !important;
+}
+
+html:not(.dark) ::-webkit-scrollbar-thumb:hover,
+html.light ::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8 !important;
+}

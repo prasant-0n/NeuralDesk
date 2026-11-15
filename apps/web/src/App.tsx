@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactFlowProvider } from "@xyflow/react";
+import { useSettingsStore } from "./store/settingsStore";
 import { Header } from "./components/layout/Header";
 import { Sidebar, type NavView } from "./components/layout/Sidebar";
 import { CanvasView } from "./components/views/CanvasView";
@@ -21,6 +22,17 @@ const queryClient = new QueryClient({
 
 export const App: React.FC = () => {
   const [activeView, setActiveView] = useState<NavView>("canvas");
+  const theme = useSettingsStore((state) => state.theme);
+
+  useEffect(() => {
+    if (theme === "dark") {
+      document.documentElement.classList.add("dark");
+      document.documentElement.classList.remove("light");
+    } else {
+      document.documentElement.classList.remove("dark");
+      document.documentElement.classList.add("light");
+    }
+  }, [theme]);
 
   return (
     <QueryClientProvider client={queryClient}>
