@@ -32,7 +32,7 @@ export interface NodeTelemetry {
 export interface ExecutionRecord {
   id: string;
   workflowId: string;
-  status: "completed" | "failed" | "running";
+  status: "completed" | "failed" | "running" | "waiting_for_approval" | "cancelled";
   triggerSource: "manual" | "webhook" | "schedule";
   startedAt: string;
   durationMs: number;
@@ -1120,7 +1120,9 @@ export const useWorkflowStore = create<WorkflowStoreState>((set, get) => ({
         const records: ExecutionRecord[] = json.data.map((item: any) => ({
           id: item.id,
           workflowId: item.workflowId,
-          status: item.status === "completed" ? "completed" : item.status === "failed" ? "failed" : "running",
+          status: (item.status === "completed" || item.status === "failed" || item.status === "waiting_for_approval" || item.status === "cancelled")
+            ? item.status
+            : "running",
           triggerSource: item.triggerType || "manual",
           startedAt: item.startedAt,
           durationMs: item.durationMs || 0,

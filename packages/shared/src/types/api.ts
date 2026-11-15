@@ -172,3 +172,65 @@ export interface SSEHeartbeatData {
   timestamp: string;
   active_execution_id?: string;
 }
+
+// ---------------------------------------------------------------------------
+// Telemetry & Dashboard Intelligence Contracts
+// ---------------------------------------------------------------------------
+export type DashboardTimeframe = "1h" | "24h" | "7d" | "30d" | "all";
+
+export interface DashboardKPIs {
+  totalRuns: number;
+  completedRuns: number;
+  failedRuns: number;
+  runningRuns: number;
+  successRate: number;
+  totalTokens: number;
+  promptTokens: number;
+  completionTokens: number;
+  totalCostUsd: number;
+  avgLatencyMs: number;
+  activeWorkflows: number;
+}
+
+export interface LatencySLAMetrics {
+  p50: number;
+  p90: number;
+  p95: number;
+  p99: number;
+  min: number;
+  max: number;
+}
+
+export interface ActivityPoint {
+  time: string;
+  executions: number;
+  tokens: number;
+  latency: number;
+  cost: number;
+}
+
+export interface ModelMetric {
+  model: string;
+  requests: number;
+  tokens: number;
+  cost: number;
+}
+
+export interface SystemHealthMetrics {
+  status: "healthy" | "degraded" | "down";
+  uptimeSeconds: number;
+  activeRuns: number;
+  maxConcurrency: number;
+  dbStatus: "connected" | "unreachable";
+  dbLatencyMs: number;
+}
+
+export interface DashboardTelemetryResponse {
+  timeframe: DashboardTimeframe;
+  kpis: DashboardKPIs;
+  latencySLA: LatencySLAMetrics;
+  throughput: ActivityPoint[];
+  modelBreakdown: ModelMetric[];
+  systemHealth: SystemHealthMetrics;
+}
+

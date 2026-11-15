@@ -50,12 +50,15 @@ export function createApp(): Hono {
   }
 
   // 3. CORS Configuration
+  const configuredOrigins = process.env.CORS_ORIGIN
+    ? process.env.CORS_ORIGIN.split(",").map((o) => o.trim())
+    : [];
   const allowedOrigins = [
     "http://localhost:5173",
     "http://127.0.0.1:5173",
     "http://localhost:3000",
     "http://localhost:3001",
-    process.env.CORS_ORIGIN || "",
+    ...configuredOrigins,
   ].filter(Boolean);
 
   app.use(
@@ -63,7 +66,7 @@ export function createApp(): Hono {
     cors({
       origin: (origin) => {
         if (!origin) return "*";
-        if (allowedOrigins.includes(origin)) return origin;
+        if (allowedOrigins.includes("*") || allowedOrigins.includes(origin)) return origin;
         if (process.env.NODE_ENV !== "production") return origin;
         return null;
       },

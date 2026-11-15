@@ -7,8 +7,26 @@ import { Hono } from "hono";
 import { z } from "zod";
 import { db, agents, eq, and, desc, SEED_IDS } from "@neuraldesk/db";
 import { AppError } from "../middleware/error.middleware.js";
+import { getLLMProvider } from "../providers/index.js";
 
 export const agentsRoutes = new Hono();
+
+const ChatRequestSchema = z.object({
+  agentId: z.string().optional(),
+  message: z.string().min(1),
+  history: z
+    .array(
+      z.object({
+        sender: z.enum(["user", "agent"]),
+        text: z.string(),
+      })
+    )
+    .default([]),
+  model: z.string().default("gemini-3.8-flash"),
+  temperature: z.number().min(0.0).max(2.0).default(0.7),
+  systemPrompt: z.string().optional(),
+  apiKey: z.string().optional(),
+});
 
 const CreateAgentSchema = z.object({
   workspaceId: z.string().uuid().optional(),
@@ -60,6 +78,76 @@ const inMemoryAgents = new Map<string, StoredAgent>([
     },
   ],
 ]);
+
+// 0. POST /api/v1/agents/chat - Interactive conversation with real Gemini or simulated persona
+agentsRoutes.post("/chat", async (c) => {
+  const body = await c.req.json();
+  const validated = ChatRequestSchema.parse(body);
+
+  const activeApiKey =
+    validated.apiKey ||
+    c.req.header("x-api-key") ||
+    process.env.GEMINI_API_KEY;
+
+  const mode = activeApiKey && activeApiKey !== "your_gemini_api_key_here" ? "live" : "simulation";
+  const provider = getLLMProvider("gemini", mode, activeApiKey);
+
+  // Build conversational context
+  let historyContext = "";
+  if (validated.history && validated.history.length > 0) {
+    historyContext =
+      validated.history
+        .slice(-6)
+        .map((h) => `${h.sender === "user" ? "User" : "Agent"}: ${h.text}`)
+        .join("\n\n") + "\n\n";
+  }
+
+  const fullPrompt = `${historyContext}User: ${validated.message}\nAgent:`;
+  const systemPrompt = validated.systemPrompt || "You are a professional enterprise AI assistant.";
+
+  // Generate response
+  const startTime = Date.now();
+  const result = await provider.executeStream({
+    prompt: fullPrompt,
+    systemPrompt,
+    model: validated.model,
+    temperature: validated.temperature,
+    maxTokens: 2048,
+    apiKey: activeApiKey,
+  });
+
+  const durationMs = Date.now() - startTime;
+
+  // Tool Call Detection / Simulation
+  let toolCall: { name: string; args: Record<string, unknown>; status: string } | undefined;
+  const msgLower = validated.message.toLowerCase();
+  if (validated.agentId === "agent_sales" || /lead|crm|company|prospect|evaluat/i.test(msgLower)) {
+    toolCall = {
+      name: "crm_lead_enricher",
+      args: { query: validated.message.slice(0, 30), source: "enterprise_crm_v2" },
+      status: "200 OK (Enriched)",
+    };
+  } else if (validated.agentId === "agent_triage" || /ticket|incident|urgent|timeout|bug/i.test(msgLower)) {
+    toolCall = {
+      name: "slack_pager_router",
+      args: { channel: "#incident-escalations", priority: "P1" },
+      status: "200 OK (Dispatched)",
+    };
+  }
+
+  return c.json({
+    text: result.text,
+    tokens: {
+      prompt: result.promptTokens || 35,
+      completion: result.completionTokens || 85,
+      total: (result.promptTokens || 35) + (result.completionTokens || 85),
+    },
+    costUsd: result.costUsd || 0.00002,
+    durationMs,
+    model: validated.model,
+    toolCall,
+  });
+});
 
 // 1. GET /api/v1/agents - List agents
 agentsRoutes.get("/", async (c) => {
