@@ -1309,3 +1309,8 @@ export const useWorkflowStore = create<WorkflowStoreState>((set, get) => ({
     get().pushHistory();
   },
 }));
+
+if (typeof window !== "undefined") {
+  (window as any).__WORKFLOW_STORE__ = useWorkflowStore;
+}
+
