@@ -18,6 +18,7 @@ import {
   SEED_IDS,
 } from "@neuraldesk/db";
 import { AppError } from "../middleware/error.middleware.js";
+import { requireWorkspaceRole } from "../middleware/auth.middleware.js";
 import { CreateWorkflowSchema } from "@neuraldesk/shared";
 
 export const workspacesRoutes = new Hono();
@@ -135,8 +136,8 @@ workspacesRoutes.get("/:id", async (c) => {
   return c.json({ data: mem });
 });
 
-// 4. PUT /api/v1/workspaces/:id - Update workspace
-workspacesRoutes.put("/:id", async (c) => {
+// 4. PUT /api/v1/workspaces/:id - Update workspace (requires owner or admin)
+workspacesRoutes.put("/:id", requireWorkspaceRole(["owner", "admin"]), async (c) => {
   const id = c.req.param("id");
   const body = await c.req.json();
   const validated = UpdateWorkspaceSchema.parse(body);
@@ -173,8 +174,8 @@ workspacesRoutes.put("/:id", async (c) => {
   return c.json({ data: updatedMem });
 });
 
-// 5. DELETE /api/v1/workspaces/:id - Delete workspace
-workspacesRoutes.delete("/:id", async (c) => {
+// 5. DELETE /api/v1/workspaces/:id - Delete workspace (strictly owner only)
+workspacesRoutes.delete("/:id", requireWorkspaceRole(["owner"]), async (c) => {
   const id = c.req.param("id");
 
   try {
@@ -217,8 +218,8 @@ workspacesRoutes.get("/:id/members", async (c) => {
   return c.json({ data: list });
 });
 
-// 7. POST /api/v1/workspaces/:id/members - Add member
-workspacesRoutes.post("/:id/members", async (c) => {
+// 7. POST /api/v1/workspaces/:id/members - Add member (owner or admin only)
+workspacesRoutes.post("/:id/members", requireWorkspaceRole(["owner", "admin"]), async (c) => {
   const id = c.req.param("id");
   const body = await c.req.json();
   const validated = AddMemberSchema.parse(body);
@@ -247,8 +248,8 @@ workspacesRoutes.post("/:id/members", async (c) => {
   return c.json({ data: newMember }, 201);
 });
 
-// 8. DELETE /api/v1/workspaces/:id/members/:userId - Remove member
-workspacesRoutes.delete("/:id/members/:userId", async (c) => {
+// 8. DELETE /api/v1/workspaces/:id/members/:userId - Remove member (owner or admin only)
+workspacesRoutes.delete("/:id/members/:userId", requireWorkspaceRole(["owner", "admin"]), async (c) => {
   const id = c.req.param("id");
   const userId = c.req.param("userId");
 

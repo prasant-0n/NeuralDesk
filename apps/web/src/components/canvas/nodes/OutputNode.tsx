@@ -1,9 +1,10 @@
 import React, { useState } from "react";
 import { type NodeProps } from "@xyflow/react";
 import { BaseNode } from "./BaseNode";
-import { Copy, Download, Check, FileJson, FileText } from "lucide-react";
+import { Copy, Download, Check, FileJson, FileText, FastForward, Clock } from "lucide-react";
 import { useWorkflowStore } from "../../../store/workflowStore";
 import { type NodePort } from "@neuraldesk/shared";
+import { cn } from "../../../lib/utils";
 
 export const OutputNode: React.FC<NodeProps> = ({ id, data, selected }) => {
   const nodeData = data as Record<string, unknown>;
@@ -14,8 +15,17 @@ export const OutputNode: React.FC<NodeProps> = ({ id, data, selected }) => {
   const [copied, setCopied] = useState(false);
   const inputs = (nodeData.inputs as NodePort[]) || [{ id: "input", name: "Payload", type: "any" }];
 
-  const outputData = telemetry?.outputData;
-  const isCompleted = telemetry?.status === "completed";
+  const outputData = telemetry?.outputData as Record<string, unknown> | undefined;
+  const status = telemetry?.status ?? "idle";
+  const isCompleted = status === "completed";
+  const isSkipped = status === "skipped";
+  const isRunning = status === "running";
+
+  // Check if output payload represents a condition false branch
+  const isFalseBranch = Boolean(
+    outputData &&
+    (outputData.result === false || outputData.branch === "false" || outputData.conditionMet === false)
+  );
 
   const formattedOutput = outputData
     ? typeof outputData === "string"
@@ -45,6 +55,12 @@ export const OutputNode: React.FC<NodeProps> = ({ id, data, selected }) => {
     URL.revokeObjectURL(url);
   };
 
+  const badgeText = isSkipped
+    ? "Bypassed"
+    : isFalseBranch
+    ? "False Path"
+    : outputFormat;
+
   return (
     <BaseNode
       id={id}
@@ -52,16 +68,22 @@ export const OutputNode: React.FC<NodeProps> = ({ id, data, selected }) => {
       kind="output"
       title={(nodeData.label as string) || "Output Delivery"}
       subtitle="Terminal Egress Viewport"
-      badgeLabel={outputFormat}
+      badgeLabel={badgeText}
       inputs={inputs}
       outputs={[]}
     >
       <div className="space-y-2">
         {/* Header Controls */}
         <div className="flex items-center justify-between text-[11px] text-slate-500 dark:text-charcoal-400 px-1">
-          <div className="flex items-center gap-1.5 font-medium text-emerald-700 dark:text-emerald-300">
-            {outputFormat === "json" ? <FileJson className="w-3.5 h-3.5" /> : <FileText className="w-3.5 h-3.5" />}
-            <span className="uppercase text-[10px] tracking-wider">{outputFormat} Output</span>
+          <div className="flex items-center gap-1.5 font-medium">
+            {outputFormat === "json" ? (
+              <FileJson className={cn("w-3.5 h-3.5", isFalseBranch ? "text-amber-600 dark:text-amber-400" : "text-emerald-700 dark:text-emerald-300")} />
+            ) : (
+              <FileText className={cn("w-3.5 h-3.5", isFalseBranch ? "text-amber-600 dark:text-amber-400" : "text-emerald-700 dark:text-emerald-300")} />
+            )}
+            <span className={cn("uppercase text-[10px] tracking-wider", isFalseBranch ? "text-amber-700 dark:text-amber-400 font-semibold" : "text-emerald-700 dark:text-emerald-300")}>
+              {isFalseBranch ? "Standard / False Route" : `${outputFormat} Output`}
+            </span>
           </div>
 
           {formattedOutput && (
@@ -86,12 +108,35 @@ export const OutputNode: React.FC<NodeProps> = ({ id, data, selected }) => {
 
         {/* Live Output Preview */}
         {isCompleted && formattedOutput ? (
-          <div className="p-2 rounded bg-slate-100 dark:bg-charcoal-950 border border-emerald-200 dark:border-emerald-500/30 font-mono text-[11px] text-emerald-950 dark:text-emerald-200 max-h-28 overflow-y-auto whitespace-pre-wrap leading-relaxed">
+          <div
+            className={cn(
+              "p-2 rounded font-mono text-[11px] max-h-28 overflow-y-auto whitespace-pre-wrap leading-relaxed border",
+              isFalseBranch
+                ? "bg-amber-50/50 dark:bg-amber-950/20 border-amber-200 dark:border-amber-500/30 text-amber-950 dark:text-amber-200"
+                : "bg-slate-100 dark:bg-charcoal-950 border-emerald-200 dark:border-emerald-500/30 text-emerald-950 dark:text-emerald-200"
+            )}
+          >
             {formattedOutput}
           </div>
+        ) : isSkipped ? (
+          <div className="flex items-start gap-2 p-2.5 rounded-lg bg-slate-50 dark:bg-charcoal-950 border border-slate-200 dark:border-charcoal-800 text-[11px]">
+            <FastForward className="w-4 h-4 text-slate-400 dark:text-charcoal-500 shrink-0 mt-0.5" />
+            <div className="space-y-0.5">
+              <p className="font-semibold text-slate-700 dark:text-charcoal-300">Branch Bypassed</p>
+              <p className="text-[10px] text-slate-500 dark:text-charcoal-400 leading-tight">
+                Upstream condition routed execution to an alternative branch.
+              </p>
+            </div>
+          </div>
+        ) : isRunning ? (
+          <div className="flex items-center justify-center gap-2 p-3 rounded bg-indigo-50/40 dark:bg-indigo-950/20 border border-indigo-200 dark:border-indigo-500/30 text-[11px] text-indigo-600 dark:text-indigo-400 font-medium">
+            <span className="w-2 h-2 rounded-full bg-indigo-600 dark:bg-indigo-400 animate-ping" />
+            <span>Processing egress payload...</span>
+          </div>
         ) : (
-          <div className="p-3 rounded bg-slate-50 dark:bg-charcoal-950/50 border border-slate-200 dark:border-charcoal-800/60 text-center text-[11px] text-slate-400 dark:text-charcoal-500 italic">
-            Awaiting upstream execution...
+          <div className="flex items-center justify-center gap-1.5 p-3 rounded bg-slate-50 dark:bg-charcoal-950/50 border border-slate-200 dark:border-charcoal-800/60 text-center text-[11px] text-slate-400 dark:text-charcoal-500">
+            <Clock className="w-3.5 h-3.5" />
+            <span>Awaiting upstream execution...</span>
           </div>
         )}
       </div>

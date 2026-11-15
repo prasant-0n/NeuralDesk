@@ -12,6 +12,7 @@ import { useSettingsStore } from "../../store/settingsStore";
 export const CustomEdge: React.FC<EdgeProps> = ({
   id,
   source,
+  target,
   sourceX,
   sourceY,
   targetX,
@@ -38,18 +39,29 @@ export const CustomEdge: React.FC<EdgeProps> = ({
   const isDark = theme === "dark";
 
   const sourceStatus = nodeTelemetry[source]?.status;
-  const isRunning = sourceStatus === "running";
-  const isSuccess = sourceStatus === "completed";
-  const isFailed = sourceStatus === "failed";
+  const targetStatus = nodeTelemetry[target]?.status;
+
+  const isRunning = sourceStatus === "running" || targetStatus === "running";
+  const isTargetSkipped = targetStatus === "skipped";
+  const isTargetCompleted = targetStatus === "completed";
+  const isTargetFailed = targetStatus === "failed";
+  const isSourceCompleted = sourceStatus === "completed";
 
   const branch = (data?.branch as string) || "";
+  const isFalseBranch = branch === "false";
 
   const edgeClass = isRunning
     ? "edge-running"
-    : isSuccess
-    ? "edge-success"
-    : isFailed
+    : isTargetSkipped
+    ? "edge-skipped"
+    : isTargetCompleted
+    ? isFalseBranch
+      ? "edge-false-success"
+      : "edge-success"
+    : isTargetFailed
     ? "edge-failed"
+    : isSourceCompleted && !isTargetSkipped
+    ? "edge-success"
     : "";
 
   const handleDelete = (e: React.MouseEvent) => {
@@ -58,6 +70,21 @@ export const CustomEdge: React.FC<EdgeProps> = ({
   };
 
   const defaultStroke = isDark ? "#475569" : "#94a3b8";
+  const skippedStroke = isDark ? "#334155" : "#cbd5e1";
+
+  const resolvedStroke = isRunning
+    ? "#6366f1"
+    : isTargetSkipped
+    ? skippedStroke
+    : isTargetCompleted
+    ? isFalseBranch
+      ? "#f59e0b"
+      : "#10b981"
+    : isTargetFailed
+    ? "#f43f5e"
+    : selected
+    ? "#6366f1"
+    : defaultStroke;
 
   return (
     <>
@@ -68,16 +95,8 @@ export const CustomEdge: React.FC<EdgeProps> = ({
         className={edgeClass}
         style={{
           ...style,
-          stroke: isRunning
-            ? "#6366f1"
-            : isSuccess
-            ? "#10b981"
-            : isFailed
-            ? "#f43f5e"
-            : selected
-            ? "#6366f1"
-            : defaultStroke,
-          strokeWidth: selected ? 2.5 : 2,
+          stroke: resolvedStroke,
+          strokeWidth: selected ? 2.5 : isTargetSkipped ? 1.5 : 2,
         }}
       />
       <EdgeLabelRenderer>
@@ -91,11 +110,17 @@ export const CustomEdge: React.FC<EdgeProps> = ({
         >
           {branch && (
             <span
-              className={`px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider rounded-full border shadow-sm ${
-                branch === "true"
-                  ? "bg-emerald-50 text-emerald-700 border-emerald-300 dark:bg-emerald-950/80 dark:text-emerald-400 dark:border-emerald-700/60"
+              className={`px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider rounded-full border shadow-sm transition-all ${
+                isTargetSkipped
+                  ? "bg-slate-100 text-slate-400 border-slate-200 dark:bg-charcoal-850 dark:text-charcoal-500 dark:border-charcoal-700 opacity-60"
+                  : branch === "true"
+                  ? isTargetCompleted
+                    ? "bg-emerald-100 text-emerald-800 border-emerald-400 dark:bg-emerald-950 dark:text-emerald-300 dark:border-emerald-600 ring-1 ring-emerald-500/30"
+                    : "bg-emerald-50 text-emerald-700 border-emerald-300 dark:bg-emerald-950/80 dark:text-emerald-400 dark:border-emerald-700/60"
                   : branch === "false"
-                  ? "bg-amber-50 text-amber-700 border-amber-300 dark:bg-amber-950/80 dark:text-amber-400 dark:border-amber-700/60"
+                  ? isTargetCompleted
+                    ? "bg-amber-100 text-amber-800 border-amber-400 dark:bg-amber-950 dark:text-amber-300 dark:border-amber-600 ring-1 ring-amber-500/30"
+                    : "bg-amber-50 text-amber-700 border-amber-300 dark:bg-amber-950/80 dark:text-amber-400 dark:border-amber-700/60"
                   : "bg-rose-50 text-rose-700 border-rose-300 dark:bg-rose-950/80 dark:text-rose-400 dark:border-rose-700/60"
               }`}
             >

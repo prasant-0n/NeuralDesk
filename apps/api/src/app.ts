@@ -6,7 +6,9 @@
 import { Hono } from "hono";
 import { cors } from "hono/cors";
 import { logger } from "hono/logger";
-import { errorHandler, notFoundHandler } from "./middleware/error.middleware.js";
+import { bodyLimit } from "hono/body-limit";
+import { errorHandler, notFoundHandler, AppError } from "./middleware/error.middleware.js";
+import { authMiddleware } from "./middleware/auth.middleware.js";
 
 // Routes
 import { healthRoutes } from "./routes/health.routes.js";
@@ -31,7 +33,18 @@ export function createApp(): Hono {
     await next();
   });
 
-  // 2. Structured Request Logger (disabled in test runs)
+  // 2. Request Body Size Limit (Mitigates memory exhaustion and payload flood DoS)
+  app.use(
+    "*",
+    bodyLimit({
+      maxSize: 2 * 1024 * 1024, // 2MB
+      onError: () => {
+        throw new AppError("Request payload exceeds 2MB limit", 413, "PAYLOAD_TOO_LARGE");
+      },
+    })
+  );
+
+  // 3. Structured Request Logger (disabled in test runs)
   if (process.env.NODE_ENV !== "test") {
     app.use("*", logger());
   }
@@ -49,10 +62,10 @@ export function createApp(): Hono {
     "*",
     cors({
       origin: (origin) => {
-        if (!origin || allowedOrigins.includes(origin) || process.env.NODE_ENV !== "production") {
-          return origin || "*";
-        }
-        return allowedOrigins[0];
+        if (!origin) return "*";
+        if (allowedOrigins.includes(origin)) return origin;
+        if (process.env.NODE_ENV !== "production") return origin;
+        return null;
       },
       allowMethods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
       allowHeaders: [
@@ -61,6 +74,7 @@ export function createApp(): Hono {
         "X-Request-Id",
         "X-NeuralDesk-Signature",
         "X-Idempotency-Key",
+        "X-Workspace-Id",
         "Last-Event-ID",
         "Accept",
       ],
@@ -88,11 +102,27 @@ export function createApp(): Hono {
   // 6. Namespaced REST API v1 Routes
   const v1 = new Hono();
 
+  // Public unauthenticated endpoints
   v1.route("/health", healthRoutes);
+  v1.route("/webhooks", webhooksRoutes);
+
+  // Authenticated tenant endpoints (ND-SEC-01)
+  v1.use("/workspaces/*", authMiddleware());
+  v1.use("/workspaces", authMiddleware());
+  v1.use("/workflows/*", authMiddleware());
+  v1.use("/workflows", authMiddleware());
+  v1.use("/executions/*", authMiddleware());
+  v1.use("/executions", authMiddleware());
+  v1.use("/approvals/*", authMiddleware());
+  v1.use("/approvals", authMiddleware());
+  v1.use("/agents/*", authMiddleware());
+  v1.use("/agents", authMiddleware());
+  v1.use("/prompts/*", authMiddleware());
+  v1.use("/prompts", authMiddleware());
+
   v1.route("/workspaces", workspacesRoutes);
   v1.route("/workflows", workflowsRoutes);
   v1.route("/", executionsRoutes); // /workflows/:id/execute, /executions, /approvals
-  v1.route("/webhooks", webhooksRoutes);
   v1.route("/agents", agentsRoutes);
   v1.route("/prompts", promptsRoutes);
 

@@ -220,6 +220,19 @@ export class ExecutionOrchestrator {
         const sourceOutput = scope.getNodeOutput(edge.source);
         if (sourceOutput) {
           Object.assign(nodeInputs, sourceOutput);
+          if (edge.targetHandle) {
+            const val =
+              edge.sourceHandle && sourceOutput[edge.sourceHandle] !== undefined
+                ? sourceOutput[edge.sourceHandle]
+                : sourceOutput.output !== undefined
+                ? sourceOutput.output
+                : sourceOutput.prompt !== undefined
+                ? sourceOutput.prompt
+                : sourceOutput.text !== undefined
+                ? sourceOutput.text
+                : sourceOutput;
+            nodeInputs[edge.targetHandle] = val;
+          }
         }
       }
 
@@ -362,6 +375,25 @@ export class ExecutionOrchestrator {
         nodeRuns.push(approvalRun);
         this.persistNodeRun(approvalRun, dbExecutionId);
         this.persistExecutionState(executionId, dbExecutionId);
+
+        sseManager.broadcast(executionId, "node:complete", {
+          execution_id: executionId,
+          node_key: nodeKey,
+          status: "waiting_for_approval",
+          duration_ms: durationMs,
+          outputs: handlerResult.outputs,
+        });
+
+        sseManager.broadcast(executionId, "execution:waiting_for_approval", {
+          execution_id: executionId,
+          workflow_id: workflowId,
+          status: "waiting_for_approval",
+          duration_ms: Date.now() - execStartTime,
+          approval_id: handlerResult.approvalId,
+          pending_node_key: nodeKey,
+        });
+
+        sseManager.closeExecution(executionId);
         return; // Pause DAG execution
       }
 
@@ -511,13 +543,24 @@ export class ExecutionOrchestrator {
       }
     }
 
-    if (workflowId === SEED_IDS.WF_SUPPORT) {
+    if (
+      workflowId === SEED_IDS.WF_SUPPORT ||
+      workflowId === "wf_prod_support_triage" ||
+      workflowId === "wf_support_triage"
+    ) {
       return supportWorkflowDefinition as any;
     }
-    if (workflowId === SEED_IDS.WF_DOC_SUMMARIZER) {
+    if (
+      workflowId === SEED_IDS.WF_DOC_SUMMARIZER ||
+      workflowId === "wf_doc_summarizer"
+    ) {
       return docSummarizerWorkflowDefinition as any;
     }
-    if (workflowId === SEED_IDS.WF_LEAD_ENRICHMENT) {
+    if (
+      workflowId === SEED_IDS.WF_LEAD_ENRICHMENT ||
+      workflowId === "wf_lead_extractor" ||
+      workflowId === "wf_lead_enrichment"
+    ) {
       return leadEnrichmentWorkflowDefinition as any;
     }
 

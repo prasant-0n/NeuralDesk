@@ -21,7 +21,8 @@ const ollamaInstance = new OllamaProvider();
  */
 export function getLLMProvider(
   providerName: string,
-  mode: "real" | "simulation" | "live" | "mock" = "real"
+  mode: "real" | "simulation" | "live" | "mock" = "real",
+  apiKey?: string
 ): ILLMProvider {
   // If execution mode is mock or simulation, always use deterministic MockProvider
   if (mode === "mock" || mode === "simulation") {
@@ -36,14 +37,21 @@ export function getLLMProvider(
     case "ollama":
       return ollamaInstance;
     case "gemini":
-    default:
-      // If live mode requested but GEMINI_API_KEY is not configured, fall back to mock with warning
-      if (!process.env.GEMINI_API_KEY) {
+    default: {
+      const activeKey =
+        apiKey ||
+        (process.env.GEMINI_API_KEY &&
+        process.env.GEMINI_API_KEY !== "your_gemini_api_key_here"
+          ? process.env.GEMINI_API_KEY
+          : undefined);
+
+      if (!activeKey) {
         console.warn(
-          "[Provider Factory] GEMINI_API_KEY is not configured. Falling back to deterministic MockProvider."
+          "[Provider Factory] No active Gemini API key configured. Falling back to deterministic MockProvider."
         );
         return mockInstance;
       }
       return geminiInstance;
+    }
   }
 }

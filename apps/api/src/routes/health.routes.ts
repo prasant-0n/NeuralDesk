@@ -9,6 +9,12 @@ import { sseManager } from "../services/sse-manager.js";
 
 export const healthRoutes = new Hono();
 
+// ND-SEC-17: Public lightweight liveness probe (no internal telemetry leak)
+healthRoutes.get("/live", (c) => {
+  return c.json({ status: "ok", uptimeSeconds: Math.floor(process.uptime()) }, 200);
+});
+
+// Deep readiness & diagnostics probe
 healthRoutes.get("/", async (c) => {
   const startedAt = Date.now();
   let dbStatus: "connected" | "unreachable" = "unreachable";

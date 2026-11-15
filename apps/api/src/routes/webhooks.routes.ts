@@ -33,6 +33,15 @@ interface StoredWebhook {
 // Default secret for test suites and initial dev
 export const DEFAULT_WEBHOOK_SECRET = "whsec_sample_secret_key_for_local_testing";
 
+// ND-SEC-12: In-memory webhook replay cache for 300s tolerance window
+const processedSignatures = new Map<string, number>();
+setInterval(() => {
+  const now = Date.now();
+  for (const [sig, exp] of processedSignatures.entries()) {
+    if (exp <= now) processedSignatures.delete(sig);
+  }
+}, 60 * 1000).unref();
+
 // In-memory registry with sample pre-registered webhooks
 const inMemoryWebhooks = new Map<string, StoredWebhook>([
   [
@@ -123,6 +132,19 @@ webhooksRoutes.post(
       );
     }
 
+    // ND-SEC-12: Reject duplicate replay of identical signed webhook within tolerance window
+    const replayKey = `${urlToken}:${signatureHeader}`;
+    const nowMs = Date.now();
+    const existingSigExp = processedSignatures.get(replayKey);
+    if (existingSigExp && existingSigExp > nowMs) {
+      throw new AppError(
+        "Webhook signature has already been processed (replay detected).",
+        409,
+        "REPLAY_DETECTED"
+      );
+    }
+    processedSignatures.set(replayKey, nowMs + 300 * 1000);
+
     // Parse payload
     let parsedPayload: Record<string, unknown> = {};
     if (rawBody && rawBody.trim() !== "") {
@@ -164,10 +186,21 @@ webhooksRoutes.post(
   }
 );
 
-// 2. GET /api/v1/webhooks - List all registered webhooks
+// 2. GET /api/v1/webhooks - List all registered webhooks (ND-SEC-04: Sanitized, secretHash stripped)
 webhooksRoutes.get("/", async (c) => {
   try {
-    const list = await db.select().from(webhooks).orderBy(desc(webhooks.createdAt));
+    const list = await db
+      .select({
+        id: webhooks.id,
+        workflowId: webhooks.workflowId,
+        urlToken: webhooks.urlToken,
+        name: webhooks.name,
+        isActive: webhooks.isActive,
+        createdAt: webhooks.createdAt,
+        lastTriggeredAt: webhooks.lastTriggeredAt,
+      })
+      .from(webhooks)
+      .orderBy(desc(webhooks.createdAt));
     if (list.length > 0) {
       return c.json({ data: list });
     }

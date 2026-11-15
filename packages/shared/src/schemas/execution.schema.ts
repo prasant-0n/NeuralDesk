@@ -31,7 +31,7 @@ export const ExecutionTriggerSourceSchema = z.enum(["manual", "webhook", "schedu
 export const ExecuteWorkflowRequestSchema = z.object({
   mode: ExecutionModeSchema.default("real"),
   triggerSource: ExecutionTriggerSourceSchema.default("manual"),
-  inputs: z.record(z.unknown()).default({}),
+  inputs: z.record(z.string(), z.unknown()).default({}),
   versionNumber: z.number().int().min(1).optional(),
 });
 
@@ -47,7 +47,7 @@ export const WebhookIngressSchema = z.object({
   workflowId: z.string().min(1),
   timestamp: z.number().int().positive(),
   signature: z.string().min(1),
-  payload: z.record(z.unknown()),
+  payload: z.record(z.string(), z.unknown()),
 });
 
 export const TokenUsageMetadataSchema = z.object({
@@ -80,8 +80,8 @@ export const NodeRunRecordSchema = z.object({
   nodeKey: z.string().min(1),
   nodeType: z.enum(NODE_KINDS),
   status: NodeExecutionStatusSchema,
-  inputData: z.record(z.unknown()).optional(),
-  outputData: z.record(z.unknown()).optional(),
+  inputData: z.record(z.string(), z.unknown()).optional(),
+  outputData: z.record(z.string(), z.unknown()).optional(),
   promptResolved: z.string().optional(),
   llmModel: z.string().optional(),
   promptTokens: z.number().int().nonnegative().default(0),

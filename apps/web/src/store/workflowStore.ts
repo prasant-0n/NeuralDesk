@@ -121,7 +121,12 @@ function createDefaultNodeData(kind: NodeKind, label?: string): Record<string, u
           triggerType: "webhook",
           webhookPath: "/api/v1/ingress/webhook-1",
           webhookMethod: "POST",
-          samplePayload: { text: "Critical: Payment processing gateway timeout on charge #9382." },
+          samplePayload: {
+            customer_message: "Critical checkout page 500 error on production! We are unable to process payments.",
+            text: "Critical checkout page 500 error on production! We are unable to process payments.",
+            customer_email: "vip@acme.corp",
+            priority: 5,
+          },
         },
       };
     case "llm":
@@ -241,7 +246,6 @@ function createDefaultNodeData(kind: NodeKind, label?: string): Record<string, u
         config: {
           outputFormat: "json",
           enableDownload: true,
-          primaryOutputKey: "result",
         },
       };
     default:
@@ -260,19 +264,19 @@ const DEFAULT_NODES: Node[] = [
   {
     id: "trigger_1",
     type: "trigger",
-    position: { x: 50, y: 150 },
+    position: { x: 50, y: 160 },
     data: createDefaultNodeData("trigger", "Customer Inbound"),
   },
   {
     id: "prompt_1",
     type: "prompt",
-    position: { x: 380, y: 150 },
+    position: { x: 440, y: 160 },
     data: createDefaultNodeData("prompt", "Triage Classifier"),
   },
   {
     id: "llm_1",
     type: "llm",
-    position: { x: 720, y: 150 },
+    position: { x: 840, y: 160 },
     data: {
       ...createDefaultNodeData("llm", "Gemini 1.5 Flash"),
       config: {
@@ -282,7 +286,7 @@ const DEFAULT_NODES: Node[] = [
         topP: 0.9,
         maxTokens: 1024,
         jsonMode: true,
-        systemPrompt: "You are an automated support classifier. Output JSON with { 'sentiment': 'NEGATIVE' | 'NEUTRAL' | 'POSITIVE', 'urgency': 1-5, 'summary': string }.",
+        systemPrompt: "You are an automated support classifier. Output JSON with { 'sentiment': 'NEGATIVE' | 'NEUTRAL' | 'POSITIVE', 'priority': 1-5, 'urgency': 1-5, 'summary': string }.",
         userPromptTemplate: "{{input}}",
       },
     },
@@ -290,19 +294,19 @@ const DEFAULT_NODES: Node[] = [
   {
     id: "cond_1",
     type: "condition",
-    position: { x: 1080, y: 150 },
+    position: { x: 1240, y: 160 },
     data: createDefaultNodeData("condition", "Urgency Gate"),
   },
   {
     id: "tool_1",
     type: "tool",
-    position: { x: 1420, y: 60 },
+    position: { x: 1680, y: 50 },
     data: createDefaultNodeData("tool", "Slack Pager Alert"),
   },
   {
     id: "out_1",
     type: "output",
-    position: { x: 1420, y: 280 },
+    position: { x: 1680, y: 310 },
     data: createDefaultNodeData("output", "Standard Triage Result"),
   },
 ];
@@ -903,12 +907,25 @@ export const useWorkflowStore = create<WorkflowStoreState>((set, get) => ({
           totalCompletionTokens += completionTokens;
           totalCostUsd += cost;
 
-          const outputResult = {
-            sentiment: "NEGATIVE",
-            urgency: 5,
-            summary: "Critical payment processing timeout on charge #9382",
-            requiresEscalation: true,
-          };
+          const isLeadLLM = nodeId.includes("lead") || nodeId.includes("score");
+          const outputResult = isLeadLLM
+            ? {
+                score: 94,
+                priority: 5,
+                urgency: 5,
+                intent: "VIP",
+                company: "Acme Global Dynamics",
+                status: "VIP Qualified",
+                summary: "High-intent enterprise lead with 3500 employees and $450k budget.",
+              }
+            : {
+                sentiment: "NEGATIVE",
+                priority: 5,
+                urgency: 5,
+                urgencyScore: 95,
+                summary: "Critical payment processing timeout on charge #9382",
+                requiresEscalation: true,
+              };
           nodeOutputsMap[nodeId] = outputResult;
 
           get().updateNodeTelemetry(nodeId, {
@@ -923,7 +940,7 @@ export const useWorkflowStore = create<WorkflowStoreState>((set, get) => ({
         } else if (nodeKind === "condition") {
           await new Promise((r) => setTimeout(r, 120));
           const evaluatedBranch: "true" | "false" = "true"; // Simulation triggers true branch
-          nodeOutputsMap[nodeId] = { branch: evaluatedBranch };
+          nodeOutputsMap[nodeId] = { result: true, branch: evaluatedBranch, conditionMet: true };
 
           // Mark unselected branch downstream nodes as skipped
           edges
@@ -936,7 +953,7 @@ export const useWorkflowStore = create<WorkflowStoreState>((set, get) => ({
             status: "completed",
             finishedAt: new Date().toISOString(),
             durationMs: Date.now() - nodeStartTime,
-            outputData: { selectedBranch: evaluatedBranch },
+            outputData: { result: true, branch: evaluatedBranch, conditionMet: true, selectedBranch: evaluatedBranch },
           });
         } else if (nodeKind === "trigger") {
           await new Promise((r) => setTimeout(r, 50));
@@ -951,12 +968,27 @@ export const useWorkflowStore = create<WorkflowStoreState>((set, get) => ({
           });
         } else if (nodeKind === "tool") {
           await new Promise((r) => setTimeout(r, 180));
-          const toolResult = {
-            status: 200,
-            channel: "#incident-escalations",
-            messageId: "msg_slack_9832",
-            delivered: true,
-          };
+          const isCrm = nodeId.includes("crm") || String(config.url || "").includes("leads");
+          const toolResult = isCrm
+            ? {
+                response: {
+                  id: "lead_enterprise_982",
+                  company: "Acme Global Dynamics",
+                  contact: "Sarah Jenkins (VP Engineering)",
+                  employeeCount: 3500,
+                  annualBudget: "$450,000",
+                  intentSignal: "High: Viewed pricing page 7 times in past 48 hours",
+                  notes: "Immediate requirement to replace legacy orchestration with NeuralDesk.",
+                },
+                statusCode: 200,
+                delivered: true,
+              }
+            : {
+                status: 200,
+                channel: "#incident-escalations",
+                messageId: "msg_slack_9832",
+                delivered: true,
+              };
           nodeOutputsMap[nodeId] = toolResult;
 
           get().updateNodeTelemetry(nodeId, {
@@ -976,10 +1008,29 @@ export const useWorkflowStore = create<WorkflowStoreState>((set, get) => ({
             durationMs: Date.now() - nodeStartTime,
             outputData: rendered,
           });
+        } else if (nodeKind === "approval") {
+          await new Promise((r) => setTimeout(r, 120));
+          const approvalOutput = {
+            approved: true,
+            status: "approved",
+            decision: "approved",
+            reviewer: "VP Sales (Automated Sign-Off)",
+            reviewedAt: new Date().toISOString(),
+            instructions: (config.instructions as string) || "Sign-off recorded for VIP SDR routing.",
+          };
+          nodeOutputsMap[nodeId] = approvalOutput;
+
+          get().updateNodeTelemetry(nodeId, {
+            status: "completed",
+            finishedAt: new Date().toISOString(),
+            durationMs: Date.now() - nodeStartTime,
+            outputData: approvalOutput,
+          });
         } else {
-          // General nodes (output, transform, approval)
+          // General nodes (output, transform)
           await new Promise((r) => setTimeout(r, 100));
-          const genericOutput = { status: "processed", nodeKind, timestamp: new Date().toISOString() };
+          const lastOutput = Object.values(nodeOutputsMap).pop() || { status: "processed" };
+          const genericOutput = { status: "processed", nodeKind, payload: lastOutput, timestamp: new Date().toISOString() };
           nodeOutputsMap[nodeId] = genericOutput;
 
           get().updateNodeTelemetry(nodeId, {
@@ -1155,7 +1206,7 @@ export const useWorkflowStore = create<WorkflowStoreState>((set, get) => ({
         {
           id: "prompt_doc",
           type: "prompt",
-          position: { x: 380, y: 180 },
+          position: { x: 450, y: 180 },
           data: {
             ...createDefaultNodeData("prompt", "Summarization Prompt"),
             config: {
@@ -1167,7 +1218,7 @@ export const useWorkflowStore = create<WorkflowStoreState>((set, get) => ({
         {
           id: "llm_doc",
           type: "llm",
-          position: { x: 720, y: 180 },
+          position: { x: 850, y: 180 },
           data: {
             ...createDefaultNodeData("llm", "Gemini 1.5 Pro"),
             config: {
@@ -1184,13 +1235,13 @@ export const useWorkflowStore = create<WorkflowStoreState>((set, get) => ({
         {
           id: "transform_doc",
           type: "transform",
-          position: { x: 1060, y: 180 },
+          position: { x: 1250, y: 180 },
           data: createDefaultNodeData("transform", "Markdown Formatting"),
         },
         {
           id: "out_doc",
           type: "output",
-          position: { x: 1380, y: 180 },
+          position: { x: 1650, y: 180 },
           data: {
             ...createDefaultNodeData("output", "Executive Brief"),
             config: { outputFormat: "markdown", enableDownload: true },
@@ -1221,13 +1272,22 @@ export const useWorkflowStore = create<WorkflowStoreState>((set, get) => ({
           position: { x: 60, y: 180 },
           data: {
             ...createDefaultNodeData("trigger", "Hourly Schedule"),
-            config: { triggerType: "schedule", cronExpression: "0 * * * *" },
+            config: {
+              triggerType: "schedule",
+              cronExpression: "0 * * * *",
+              samplePayload: {
+                schedule: "0 * * * *",
+                targetCrm: "Salesforce / HubSpot",
+                batchLimit: 25,
+                source: "CRM Inbound Ingress",
+              },
+            },
           },
         },
         {
           id: "tool_crm",
           type: "tool",
-          position: { x: 380, y: 180 },
+          position: { x: 450, y: 180 },
           data: {
             ...createDefaultNodeData("tool", "Fetch Unscored Leads"),
             config: {
@@ -1240,22 +1300,23 @@ export const useWorkflowStore = create<WorkflowStoreState>((set, get) => ({
         {
           id: "llm_score",
           type: "llm",
-          position: { x: 720, y: 180 },
+          position: { x: 850, y: 180 },
           data: {
             ...createDefaultNodeData("llm", "Lead Scoring LLM"),
             config: {
               provider: "gemini",
-              model: "gemini-1.5-flash",
+              model: "gemini-3.8-flash",
               temperature: 0.2,
               jsonMode: true,
-              systemPrompt: "Score lead intent from 0 to 100 and classify into VIP vs Standard.",
+              systemPrompt: "Score lead intent from 0 to 100 and classify into VIP vs Standard. Output strict JSON with { 'score': number, 'priority': 1-5, 'urgency': 1-5, 'intent': 'VIP' | 'STANDARD', 'company': string, 'summary': string }.",
+              userPromptTemplate: "Analyze and score this inbound sales lead:\n{{response}}\nEvaluate company scale, expansion intent, and budget.",
             },
           },
         },
         {
           id: "cond_lead",
           type: "condition",
-          position: { x: 1060, y: 180 },
+          position: { x: 1250, y: 180 },
           data: {
             ...createDefaultNodeData("condition", "High Intent Filter (Score >= 80)"),
             config: {
@@ -1267,22 +1328,27 @@ export const useWorkflowStore = create<WorkflowStoreState>((set, get) => ({
         {
           id: "approval_vip",
           type: "approval",
-          position: { x: 1400, y: 80 },
+          position: { x: 1680, y: 70 },
           data: {
             ...createDefaultNodeData("approval", "VP Sales Sign-Off"),
-            config: { approverRole: "VP Sales", timeoutMinutes: 120 },
+            config: {
+              approverRole: "VP Sales",
+              timeoutMinutes: 120,
+              autoApproveInSimulation: true,
+              instructions: "Review high-scoring enterprise lead findings before adding to VIP Sales Pipeline.",
+            },
           },
         },
         {
           id: "out_vip",
           type: "output",
-          position: { x: 1720, y: 80 },
+          position: { x: 2080, y: 70 },
           data: createDefaultNodeData("output", "VIP Sales Pipeline"),
         },
         {
           id: "out_standard",
           type: "output",
-          position: { x: 1400, y: 300 },
+          position: { x: 1680, y: 310 },
           data: createDefaultNodeData("output", "Email Nurture Campaign"),
         },
       ];

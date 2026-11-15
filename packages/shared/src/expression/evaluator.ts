@@ -1,7 +1,10 @@
 /**
  * NeuralDesk Safe Expression Evaluator
  * AST/Token-based boolean condition evaluation strictly forbidding eval() and new Function().
+ * Hardened against ReDoS (ND-SEC-06) and Prototype Pollution (ND-SEC-10).
  */
+
+export const FORBIDDEN_KEYS = new Set(["__proto__", "constructor", "prototype"]);
 
 export function resolveContextPath(path: string, obj: unknown): unknown {
   if (obj === null || obj === undefined) {
@@ -10,7 +13,24 @@ export function resolveContextPath(path: string, obj: unknown): unknown {
   const parts = path.split(".");
   let current: any = obj;
   for (const part of parts) {
+    if (FORBIDDEN_KEYS.has(part)) {
+      return undefined;
+    }
     if (current === null || current === undefined || typeof current !== "object") {
+      return undefined;
+    }
+    if (!Object.prototype.hasOwnProperty.call(current, part)) {
+      // Fallback: If looking for a direct property e.g. "sentiment" and current contains "nodes", search node outputs
+      if (parts.length === 1 && current && typeof current === "object") {
+        const nodes = (current as any).nodes;
+        if (nodes && typeof nodes === "object") {
+          for (const nodeOut of Object.values(nodes)) {
+            if (nodeOut && typeof nodeOut === "object" && Object.prototype.hasOwnProperty.call(nodeOut, part)) {
+              return (nodeOut as any)[part];
+            }
+          }
+        }
+      }
       return undefined;
     }
     current = current[part];
@@ -111,8 +131,16 @@ export function evaluateCondition(
       return String(leftValue ?? "").toLowerCase().includes(String(rightValue ?? "").toLowerCase());
     case "matches":
       try {
-        const pattern = new RegExp(String(rightValue));
-        return pattern.test(String(leftValue ?? ""));
+        const rawPattern = String(rightValue);
+        // ND-SEC-06: Guard against ReDoS (catastrophic backtracking)
+        if (rawPattern.length > 64) return false;
+        if (/(\+|\*|\{\d+,?\d*\}).*\1/.test(rawPattern) && /(\([^)]*(\+|\*)[^)]*\)(\+|\*))/.test(rawPattern)) {
+          return false;
+        }
+        const pattern = new RegExp(rawPattern);
+        const testTarget = String(leftValue ?? "");
+        if (testTarget.length > 20000) return false;
+        return pattern.test(testTarget);
       } catch {
         return false;
       }

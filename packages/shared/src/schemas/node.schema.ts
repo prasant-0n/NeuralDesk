@@ -29,8 +29,8 @@ export const TriggerNodeConfigSchema = z.object({
   webhookMethod: z.enum(["GET", "POST", "PUT"]).optional(),
   cronExpression: z.string().optional(),
   timezone: z.string().optional(),
-  inputSchema: z.record(z.unknown()).optional(),
-  samplePayload: z.record(z.unknown()).optional(),
+  inputSchema: z.record(z.string(), z.unknown()).optional(),
+  samplePayload: z.record(z.string(), z.unknown()).optional(),
 });
 
 // ---------------------------------------------------------------------------
@@ -46,7 +46,7 @@ export const LLMNodeConfigSchema = z.object({
   topK: z.number().int().min(1).max(128).optional(),
   maxTokens: z.number().int().min(1).max(65536).default(2048),
   jsonMode: z.boolean().default(false),
-  responseSchema: z.record(z.unknown()).optional(),
+  responseSchema: z.record(z.string(), z.unknown()).optional(),
   safetyThreshold: z.enum(GEMINI_SAFETY_THRESHOLDS).optional(),
   stopSequences: z.array(z.string()).optional(),
 });
@@ -139,8 +139,8 @@ export const ToolNodeConfigSchema = z.object({
   toolType: z.enum(["http_request", "database_query", "custom_function"]).default("http_request"),
   httpMethod: z.enum(["GET", "POST", "PUT", "PATCH", "DELETE"]).default("GET"),
   url: z.string().url().optional(),
-  headers: z.record(z.string()).optional(),
-  queryParams: z.record(z.string()).optional(),
+  headers: z.record(z.string(), z.string()).optional(),
+  queryParams: z.record(z.string(), z.string()).optional(),
   bodyTemplate: z.string().optional(),
   timeoutMs: z.number().int().min(100).max(60000).default(10000),
   retryCount: z.number().int().min(0).max(5).default(0),
@@ -175,7 +175,7 @@ export const EvaluatorNodeConfigSchema = z.object({
       "custom_regex",
     ])
     .default("exact_match"),
-  expectedSchema: z.record(z.unknown()).optional(),
+  expectedSchema: z.record(z.string(), z.unknown()).optional(),
   similarityThreshold: z.number().min(0.0).max(1.0).optional(),
   judgePrompt: z.string().optional(),
   judgeModel: z.string().optional(),

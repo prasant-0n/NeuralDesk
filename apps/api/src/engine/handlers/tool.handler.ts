@@ -7,6 +7,66 @@
 import { compilePromptTemplate } from "@neuraldesk/shared";
 import type { INodeHandler, NodeExecutionContext, NodeExecutionResult } from "./types.js";
 
+function isPrivateOrLoopbackIP(hostname: string): boolean {
+  if (
+    hostname === "localhost" ||
+    hostname.endsWith(".localhost") ||
+    hostname === "127.0.0.1" ||
+    hostname === "::1" ||
+    hostname === "0.0.0.0"
+  ) {
+    return true;
+  }
+
+  // AWS/GCP/Azure link-local metadata address
+  if (hostname === "169.254.169.254" || hostname.startsWith("169.254.")) {
+    return true;
+  }
+
+  // RFC 1918 IPv4 ranges
+  const ipv4Match = hostname.match(/^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/);
+  if (ipv4Match) {
+    const o1 = Number(ipv4Match[1]);
+    const o2 = Number(ipv4Match[2]);
+    if (o1 === 10) return true;
+    if (o1 === 172 && o2 >= 16 && o2 <= 31) return true;
+    if (o1 === 192 && o2 === 168) return true;
+    if (o1 === 127) return true;
+    if (o1 === 169 && o2 === 254) return true;
+    if (o1 === 0) return true;
+  }
+
+  return false;
+}
+
+export function validateOutboundUrl(targetUrl: string): URL {
+  let parsed: URL;
+  try {
+    parsed = new URL(targetUrl);
+  } catch {
+    throw new Error(`SSRF Guard: Invalid URL '${targetUrl}'`);
+  }
+
+  if (parsed.protocol !== "http:" && parsed.protocol !== "https:") {
+    throw new Error(`SSRF Guard: Unsupported protocol '${parsed.protocol}'. Only http and https are allowed.`);
+  }
+
+  if (process.env.NODE_ENV === "production") {
+    if (parsed.protocol !== "https:") {
+      throw new Error("SSRF Guard: In production, outbound HTTP tool requests must use HTTPS.");
+    }
+    if (isPrivateOrLoopbackIP(parsed.hostname)) {
+      throw new Error(`SSRF Guard: Outbound requests to private/internal network address '${parsed.hostname}' are prohibited.`);
+    }
+  } else {
+    if (parsed.hostname === "169.254.169.254" || parsed.hostname.startsWith("169.254.")) {
+      throw new Error("SSRF Guard: Outbound requests to cloud instance metadata are prohibited.");
+    }
+  }
+
+  return parsed;
+}
+
 export class ToolHandler implements INodeHandler {
   public async execute(ctx: NodeExecutionContext): Promise<NodeExecutionResult> {
     const config = ctx.nodeConfig;
@@ -23,11 +83,34 @@ export class ToolHandler implements INodeHandler {
       !resolvedUrl ||
       resolvedUrl.includes("hooks.slack.internal/services") ||
       resolvedUrl.includes("example.com") ||
+      resolvedUrl.includes(".internal") ||
       resolvedUrl.includes("placeholder");
 
     if (isMockMode || isPlaceholderUrl) {
       // Simulate realistic outbound API call latency (30-80ms)
       await new Promise((r) => setTimeout(r, 45));
+
+      const isCrmLeads = resolvedUrl.includes("leads") || resolvedUrl.includes("crm");
+      const samplePayload = isCrmLeads
+        ? {
+            id: "lead_enterprise_982",
+            company: "Acme Global Dynamics",
+            contact: "Sarah Jenkins (VP Engineering)",
+            employeeCount: 3500,
+            annualBudget: "$450,000",
+            intentSignals: [
+              "Viewed pricing page 7 times in past 48 hours",
+              "Downloaded Enterprise Security & Compliance Whitepaper",
+              "Requested technical architecture briefing for 100 seats",
+            ],
+            notes: "Immediate requirement to replace legacy orchestration with NeuralDesk.",
+          }
+        : {
+            ok: true,
+            message: "Notification dispatched successfully to on-call channel.",
+            timestamp: new Date().toISOString(),
+          };
+
       return {
         status: "completed",
         outputs: {
@@ -37,11 +120,9 @@ export class ToolHandler implements INodeHandler {
           method,
           delivered: true,
           simulated: true,
-          responseBody: {
-            ok: true,
-            message: "Notification dispatched successfully to on-call channel.",
-            timestamp: new Date().toISOString(),
-          },
+          response: samplePayload,
+          responseBody: samplePayload,
+          ...samplePayload,
         },
       };
     }
@@ -76,12 +157,15 @@ export class ToolHandler implements INodeHandler {
       }
     }
 
+    // Validate Outbound URL against SSRF attacks (ND-SEC-05)
+    const targetUrlObj = validateOutboundUrl(resolvedUrl);
+
     // Execute Request with AbortController timeout
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), timeoutMs);
 
     try {
-      const response = await fetch(resolvedUrl, {
+      const response = await fetch(targetUrlObj.toString(), {
         method,
         headers,
         body,

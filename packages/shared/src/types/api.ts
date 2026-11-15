@@ -83,6 +83,7 @@ export const SSE_EVENT_TYPES = [
   "execution:start",
   "execution:complete",
   "execution:error",
+  "execution:waiting_for_approval",
   "node:start",
   "node:stream:chunk",
   "node:complete",

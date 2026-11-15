@@ -51,9 +51,11 @@ export class ExecutionScope {
   /**
    * Generates a context dictionary for expression evaluation and template interpolation.
    */
-  public toContext(): Record<string, unknown> {
+  public toContext(currentInputs?: Record<string, unknown>): Record<string, unknown> {
     const nodesObj: Record<string, unknown> = {};
     const stepsObj: Record<string, unknown> = {};
+    const flatNodeOutputs: Record<string, unknown> = {};
+    const reservedKeys = new Set(["nodes", "steps", "trigger", "$execution", "env"]);
 
     for (const [key, val] of this.nodeOutputs.entries()) {
       nodesObj[key] = val;
@@ -61,11 +63,22 @@ export class ExecutionScope {
         output: val,
         ...val,
       };
+
+      // Flatten upstream outputs so keys like sentiment, urgency, priority are directly accessible
+      if (typeof val === "object" && val !== null) {
+        for (const [propKey, propVal] of Object.entries(val)) {
+          if (!reservedKeys.has(propKey)) {
+            flatNodeOutputs[propKey] = propVal;
+          }
+        }
+      }
     }
 
     const context: Record<string, unknown> = {
+      ...flatNodeOutputs,
       trigger: { ...this.initialInputs },
       ...this.initialInputs,
+      ...(currentInputs || {}),
       nodes: nodesObj,
       steps: stepsObj,
       $execution: {

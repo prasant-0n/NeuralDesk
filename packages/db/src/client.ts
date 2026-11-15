@@ -38,9 +38,20 @@ export function createPgPool(
     options?.ssl ??
     (connStr.includes("sslmode=require") || connStr.includes("neon.tech"));
 
+  // ND-SEC-09: Enforce TLS certificate validation in production to protect against MitM
+  const isProduction = process.env.NODE_ENV === "production";
+  const sslConfig: pg.ConnectionConfig["ssl"] = requiresSsl
+    ? typeof options?.ssl === "object"
+      ? options.ssl
+      : {
+          rejectUnauthorized: isProduction,
+          ca: process.env.DATABASE_CA_CERT,
+        }
+    : undefined;
+
   const pool = new Pool({
     connectionString: connStr,
-    ssl: requiresSsl ? { rejectUnauthorized: false } : undefined,
+    ssl: sslConfig,
     max: options?.maxPoolSize ?? parseInt(process.env.DATABASE_POOL_SIZE || "10", 10),
   });
 

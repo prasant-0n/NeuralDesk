@@ -16,6 +16,10 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
+# ND-SEC-18: Principle of Least Privilege permissions
+permissions:
+  contents: read
+
 jobs:
   # ----------------------------------------------------------------------------
   # 1. Lint & Recursive Typecheck

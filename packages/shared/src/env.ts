@@ -44,10 +44,23 @@ export type ClientEnv = z.infer<typeof ClientEnvSchema>;
 
 /**
  * Validates and safely parses runtime environment variables.
- * Returns parsed typed environment variables or throws descriptive validation error.
+ * Enforces explicit production secrets (ND-SEC-19).
  */
-export function validateServerEnv(env: Record<string, string | undefined> = process.env): ServerEnv {
-  return ServerEnvSchema.parse(env);
+export function validateServerEnv(
+  env: Record<string, string | undefined> = process.env,
+  options: { strict?: boolean } = {}
+): ServerEnv {
+  const parsed = ServerEnvSchema.parse(env);
+  const shouldEnforce = options.strict ?? (process.env.NODE_ENV === "production");
+  if (shouldEnforce && parsed.NODE_ENV === "production") {
+    if (parsed.JWT_SECRET === "super_secret_jwt_signing_key_replace_in_production_min_32_chars") {
+      throw new Error("FATAL: JWT_SECRET must be explicitly configured in production.");
+    }
+    if (parsed.WEBHOOK_SIGNING_SECRET === "whsec_sample_secret_key_for_local_testing") {
+      throw new Error("FATAL: WEBHOOK_SIGNING_SECRET must be explicitly configured in production.");
+    }
+  }
+  return parsed;
 }
 
 /**

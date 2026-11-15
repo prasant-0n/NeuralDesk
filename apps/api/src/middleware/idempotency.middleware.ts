@@ -3,8 +3,9 @@
  * Enforces exactly-once semantics for mutating requests using X-Idempotency-Key with 24-hour TTL.
  */
 
+import crypto from "node:crypto";
 import type { Context, MiddlewareHandler } from "hono";
-import { db, idempotencyKeys, eq } from "@neuraldesk/db";
+import { db, idempotencyKeys, eq, and } from "@neuraldesk/db";
 import { AppError } from "./error.middleware.js";
 
 interface CachedIdempotentEntry {
@@ -61,12 +62,25 @@ export function idempotencyMiddleware(options: IdempotencyOptions = {}): Middlew
       return await next();
     }
 
-    const idempotencyKey = headerKey.trim();
+    const rawIdempotencyKey = headerKey.trim();
+    const workspaceId =
+      options.workspaceId ||
+      c.get("workspaceId") ||
+      c.req.header("X-Workspace-Id") ||
+      c.req.param("wsId") ||
+      "00000000-0000-4000-8000-000000000002"; // Default seed workspace
+
+    // ND-SEC-02: Derive cryptographically scoped hash: SHA256(workspaceId:method:path:key)
+    const scopedKey = crypto
+      .createHash("sha256")
+      .update(`${workspaceId}:${method}:${c.req.path}:${rawIdempotencyKey}`)
+      .digest("hex");
+
     const now = new Date();
     const expiresAt = new Date(now.getTime() + ttlSeconds * 1000);
 
     // 1. Check in-memory cache first
-    const memEntry = memoryCache.get(idempotencyKey);
+    const memEntry = memoryCache.get(scopedKey);
     if (memEntry && memEntry.expiresAt > now) {
       if (memEntry.status === "pending") {
         throw new AppError(
@@ -88,7 +102,12 @@ export function idempotencyMiddleware(options: IdempotencyOptions = {}): Middlew
       const records = await db
         .select()
         .from(idempotencyKeys)
-        .where(eq(idempotencyKeys.idempotencyKey, idempotencyKey))
+        .where(
+          and(
+            eq(idempotencyKeys.workspaceId, workspaceId),
+            eq(idempotencyKeys.idempotencyKey, scopedKey)
+          )
+        )
         .limit(1);
 
       if (records.length > 0) {
@@ -109,17 +128,11 @@ export function idempotencyMiddleware(options: IdempotencyOptions = {}): Middlew
         }
       }
 
-      // Mark as pending in database
-      const fallbackWorkspaceId =
-        options.workspaceId ||
-        c.req.param("wsId") ||
-        "00000000-0000-4000-8000-000000000002"; // Default seed workspace
-
       await db
         .insert(idempotencyKeys)
         .values({
-          workspaceId: fallbackWorkspaceId,
-          idempotencyKey,
+          workspaceId,
+          idempotencyKey: scopedKey,
           status: "pending",
           expiresAt,
         })
@@ -132,7 +145,7 @@ export function idempotencyMiddleware(options: IdempotencyOptions = {}): Middlew
     }
 
     // Set pending in memory cache
-    memoryCache.set(idempotencyKey, {
+    memoryCache.set(scopedKey, {
       status: "pending",
       statusCode: 200,
       expiresAt,
@@ -148,7 +161,7 @@ export function idempotencyMiddleware(options: IdempotencyOptions = {}): Middlew
         const clonedRes = c.res.clone();
         try {
           const bodyJson = await clonedRes.json();
-          memoryCache.set(idempotencyKey, {
+          memoryCache.set(scopedKey, {
             status: "resolved",
             statusCode: resStatus,
             responsePayload: bodyJson,
@@ -163,24 +176,29 @@ export function idempotencyMiddleware(options: IdempotencyOptions = {}): Middlew
                   status: "resolved",
                   responsePayload: bodyJson,
                 })
-                .where(eq(idempotencyKeys.idempotencyKey, idempotencyKey));
+                .where(
+                  and(
+                    eq(idempotencyKeys.workspaceId, workspaceId),
+                    eq(idempotencyKeys.idempotencyKey, scopedKey)
+                  )
+                );
             } catch {
               // Ignore background update error
             }
           }
         } catch {
           // If response body is not JSON, resolve without payload
-          memoryCache.set(idempotencyKey, {
+          memoryCache.set(scopedKey, {
             status: "resolved",
             statusCode: resStatus,
             expiresAt,
           });
         }
       } else {
-        memoryCache.delete(idempotencyKey);
+        memoryCache.delete(scopedKey);
       }
     } catch (error) {
-      memoryCache.delete(idempotencyKey);
+      memoryCache.delete(scopedKey);
       throw error;
     }
   };

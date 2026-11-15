@@ -20,9 +20,9 @@ describe("NeuralDesk API Integration Test Suite", () => {
     server = http.createServer(getRequestListener(app.fetch));
   });
 
-  afterAll((done) => {
+  afterAll(async () => {
     sseManager.reset();
-    server.close(done);
+    await new Promise<void>((resolve) => server.close(() => resolve()));
   });
 
   // -------------------------------------------------------------------------

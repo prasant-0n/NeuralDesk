@@ -48,11 +48,13 @@ export class OutputHandler implements INodeHandler {
       default: {
         if (typeof finalContent === "object" && finalContent !== null) {
           formattedOutput = {
+            ...ctx.inputs,
             ...(finalContent as Record<string, unknown>),
             ...(primaryKey ? { [primaryKey]: finalContent } : {}),
           };
         } else {
           formattedOutput = {
+            ...ctx.inputs,
             result: finalContent,
             ...(primaryKey ? { [primaryKey]: finalContent } : {}),
           };

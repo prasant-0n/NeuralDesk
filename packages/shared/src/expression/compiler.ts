@@ -3,7 +3,7 @@
  * Resolves dynamic Mustache variable tokens {{nodeKey.outputProperty}} from execution scope.
  */
 
-import { resolveContextPath } from "./evaluator.js";
+import { resolveContextPath, FORBIDDEN_KEYS } from "./evaluator.js";
 
 /**
  * Interpolates template strings with values from the node execution scope.
@@ -17,7 +17,16 @@ export function compilePromptTemplate(
     const parts = path.split(".");
     const rootKey = parts[0];
 
-    if (!(rootKey in scope)) {
+    // ND-SEC-10: Reject prototype traversal
+    if (FORBIDDEN_KEYS.has(rootKey)) {
+      return match;
+    }
+
+    if (!Object.prototype.hasOwnProperty.call(scope, rootKey)) {
+      const fallbackVal = resolveContextPath(path, scope);
+      if (fallbackVal !== undefined && fallbackVal !== null) {
+        return typeof fallbackVal === "object" ? JSON.stringify(fallbackVal) : String(fallbackVal);
+      }
       return match; // Return unchanged if root key not present
     }
 

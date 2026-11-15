@@ -4,6 +4,9 @@
  */
 
 export const SUPPORTED_GEMINI_MODELS = [
+  "gemini-3.8-flash",
+  "gemini-flash-latest",
+  "gemini-pro-latest",
   "gemini-1.5-flash",
   "gemini-1.5-pro",
   "gemini-2.0-flash",
@@ -35,6 +38,18 @@ export interface ModelPricingTier {
  * Reference: Google Cloud Vertex AI / Gemini API Official Pricing
  */
 export const MODEL_PRICING: Record<string, ModelPricingTier> = {
+  "gemini-3.8-flash": {
+    promptPer1M: 0.075,
+    completionPer1M: 0.3,
+  },
+  "gemini-flash-latest": {
+    promptPer1M: 0.075,
+    completionPer1M: 0.3,
+  },
+  "gemini-pro-latest": {
+    promptPer1M: 1.25,
+    completionPer1M: 5.0,
+  },
   "gemini-1.5-flash": {
     promptPer1M: 0.075,
     completionPer1M: 0.3,
@@ -94,6 +109,36 @@ export interface ModelHyperparameters {
 }
 
 export const MODEL_HYPERPARAMETERS: Record<GeminiModel, ModelHyperparameters> = {
+  "gemini-3.8-flash": {
+    defaultTemperature: 0.7,
+    minTemperature: 0.0,
+    maxTemperature: 2.0,
+    defaultTopP: 0.95,
+    defaultTopK: 40,
+    defaultMaxTokens: 2048,
+    maxOutputLimit: 8192,
+    contextWindowLimit: 1_048_576,
+  },
+  "gemini-flash-latest": {
+    defaultTemperature: 0.7,
+    minTemperature: 0.0,
+    maxTemperature: 2.0,
+    defaultTopP: 0.95,
+    defaultTopK: 40,
+    defaultMaxTokens: 2048,
+    maxOutputLimit: 8192,
+    contextWindowLimit: 1_048_576,
+  },
+  "gemini-pro-latest": {
+    defaultTemperature: 0.5,
+    minTemperature: 0.0,
+    maxTemperature: 2.0,
+    defaultTopP: 0.95,
+    defaultTopK: 40,
+    defaultMaxTokens: 4096,
+    maxOutputLimit: 8192,
+    contextWindowLimit: 2_097_152,
+  },
   "gemini-1.5-flash": {
     defaultTemperature: 0.7,
     minTemperature: 0.0,

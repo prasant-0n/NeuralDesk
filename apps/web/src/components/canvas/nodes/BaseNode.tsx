@@ -16,6 +16,7 @@ import {
   AlertCircle,
   CheckCircle2,
   Loader2,
+  FastForward,
 } from "lucide-react";
 import { type NodeKind, type NodePort } from "@neuraldesk/shared";
 import { useWorkflowStore } from "../../../store/workflowStore";
@@ -145,9 +146,9 @@ export const BaseNode: React.FC<BaseNodeProps> = ({
   return (
     <div
       className={cn(
-        "relative group min-w-[280px] max-w-[340px] rounded-xl bg-white dark:bg-charcoal-900/95 border text-slate-800 dark:text-charcoal-100 shadow-md dark:shadow-xl backdrop-blur-md transition-all duration-200 select-none",
+        "relative group w-[340px] min-w-[320px] max-w-[380px] rounded-xl bg-white dark:bg-charcoal-900/95 border text-slate-800 dark:text-charcoal-100 shadow-md dark:shadow-xl backdrop-blur-md transition-all duration-200 select-none",
         selected
-          ? "border-indigo-600 dark:border-indigo-500 shadow-indigo-500/20 ring-1 ring-indigo-500"
+          ? "border-indigo-600 dark:border-indigo-500 shadow-indigo-500/25 ring-2 ring-indigo-500/80 dark:ring-indigo-400/80"
           : "border-slate-200 hover:border-slate-300 dark:border-charcoal-800 dark:hover:border-charcoal-700",
         glowClass
       )}
@@ -175,32 +176,39 @@ export const BaseNode: React.FC<BaseNodeProps> = ({
       })}
 
       {/* Header */}
-      <div className="flex items-center justify-between p-3 border-b border-slate-200 dark:border-charcoal-800/80 bg-slate-50/80 dark:bg-charcoal-950/40 rounded-t-xl">
-        <div className="flex items-center gap-2.5 overflow-hidden">
-          <div className={cn("p-1.5 rounded-lg border", meta.bgBadge, meta.border)}>
+      <div className="flex items-center justify-between p-3 border-b border-slate-200 dark:border-charcoal-800/80 bg-slate-50/80 dark:bg-charcoal-950/40 rounded-t-xl gap-2">
+        <div className="flex items-center gap-2 min-w-0 flex-1">
+          <div className={cn("p-1.5 rounded-lg border shrink-0", meta.bgBadge, meta.border)}>
             <Icon className={cn("w-4 h-4", meta.color)} />
           </div>
-          <div className="truncate">
-            <h4 className="text-xs font-semibold text-slate-900 dark:text-charcoal-100 truncate tracking-tight">{title}</h4>
+          <div className="min-w-0 flex-1">
+            <h4 className="text-xs font-semibold text-slate-900 dark:text-charcoal-100 truncate tracking-tight" title={title}>
+              {title}
+            </h4>
             {subtitle && <p className="text-[10px] text-slate-500 dark:text-charcoal-400 truncate">{subtitle}</p>}
           </div>
         </div>
 
         {/* Action Shortcuts & Status Badge */}
-        <div className="flex items-center gap-1.5 ml-2">
+        <div className="flex items-center gap-1.5 ml-1 shrink-0">
           {badgeLabel && (
-            <span className={cn("px-2 py-0.5 rounded text-[10px] font-medium border uppercase tracking-wider", meta.bgBadge, meta.border, meta.textBadge)}>
+            <span className={cn("px-1.5 py-0.5 rounded text-[9px] font-semibold border uppercase tracking-wider shrink-0 whitespace-nowrap", meta.bgBadge, meta.border, meta.textBadge)}>
               {badgeLabel}
             </span>
           )}
 
           {/* Execution Status Icon */}
-          {isRunning && <Loader2 className="w-3.5 h-3.5 text-amber-500 dark:text-amber-400 animate-spin" />}
-          {isCompleted && <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 dark:text-emerald-400" />}
-          {isFailed && <AlertCircle className="w-3.5 h-3.5 text-rose-500 dark:text-rose-400" />}
+          {isRunning && <Loader2 className="w-3.5 h-3.5 text-amber-500 dark:text-amber-400 animate-spin shrink-0" />}
+          {isCompleted && <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 dark:text-emerald-400 shrink-0" />}
+          {isFailed && <AlertCircle className="w-3.5 h-3.5 text-rose-500 dark:text-rose-400 shrink-0" />}
+          {isSkipped && (
+            <span title="Branch Bypassed" className="shrink-0 flex items-center">
+              <FastForward className="w-3.5 h-3.5 text-slate-400 dark:text-charcoal-400" />
+            </span>
+          )}
 
           {/* Quick Context Actions on hover */}
-          <div className="opacity-0 group-hover:opacity-100 flex items-center gap-1 transition-opacity">
+          <div className="hidden group-hover:flex items-center gap-1 transition-opacity shrink-0">
             <button
               onClick={(e) => {
                 e.stopPropagation();

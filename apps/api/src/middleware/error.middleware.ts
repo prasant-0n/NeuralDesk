@@ -143,6 +143,11 @@ export const errorHandler: ErrorHandler = (err: Error, c: Context) => {
     typeUri = `https://api.neuraldesk.ai/errors/${code.toLowerCase().replace(/_/g, "-")}`;
   }
 
+  // ND-SEC-15: Sanitize internal server errors in production to avoid leaking internal error details
+  if (status >= 500 && process.env.NODE_ENV === "production" && !(err instanceof AppError)) {
+    detail = "An internal server error occurred. Please contact support with the trace ID.";
+  }
+
   const responseBody: Rfc7807ProblemDetails = {
     type: typeUri,
     title,

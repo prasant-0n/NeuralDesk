@@ -10,7 +10,7 @@ import type { INodeHandler, NodeExecutionContext, NodeExecutionResult } from "./
 export class ConditionHandler implements INodeHandler {
   public async execute(ctx: NodeExecutionContext): Promise<NodeExecutionResult> {
     const config = ctx.nodeConfig;
-    const context = ctx.scope.toContext();
+    const context = ctx.scope.toContext(ctx.inputs);
     let isMet = false;
 
     if (typeof config.expression === "string" && config.expression.trim()) {
@@ -21,7 +21,7 @@ export class ConditionHandler implements INodeHandler {
 
       for (const rule of config.rules) {
         if (!rule || !rule.leftPath) continue;
-        const leftVal = resolveContextPath(rule.leftPath, context);
+        const leftVal = resolveContextPath(rule.leftPath, context) ?? resolveContextPath(rule.leftPath, ctx.inputs);
         const op = rule.operator;
         const rightVal = rule.rightValue;
 
@@ -56,8 +56,15 @@ export class ConditionHandler implements INodeHandler {
             break;
           case "matches":
             try {
-              const regex = new RegExp(String(rightVal));
-              rulePassed = regex.test(String(leftVal ?? ""));
+              const rawPat = String(rightVal);
+              // ND-SEC-06: Guard against ReDoS (catastrophic backtracking)
+              if (rawPat.length > 64 || /(\([^)]*(\+|\*)[^)]*\)(\+|\*))/.test(rawPat)) {
+                rulePassed = false;
+              } else {
+                const regex = new RegExp(rawPat);
+                const testTarget = String(leftVal ?? "");
+                rulePassed = testTarget.length <= 20000 ? regex.test(testTarget) : false;
+              }
             } catch {
               rulePassed = false;
             }
@@ -91,6 +98,7 @@ export class ConditionHandler implements INodeHandler {
       status: "completed",
       branch,
       outputs: {
+        ...ctx.inputs,
         result: isMet,
         branch,
         conditionMet: isMet,

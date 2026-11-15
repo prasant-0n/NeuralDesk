@@ -141,6 +141,27 @@ export class MockProvider implements ILLMProvider {
         return this.synthesizeFromSchema(options.responseSchema, combinedContext, rand);
       }
 
+      // Lead scoring & intent extraction workflow
+      if (
+        combinedContext.includes("lead") ||
+        combinedContext.includes("crm") ||
+        combinedContext.includes("score")
+      ) {
+        return JSON.stringify(
+          {
+            score: 92,
+            priority: 5,
+            urgency: 5,
+            intent: "VIP",
+            company: "Acme Global Dynamics",
+            status: "VIP Qualified",
+            summary: "High-intent enterprise lead with 3500 employees and $450k budget.",
+          },
+          null,
+          2
+        );
+      }
+
       // Customer support sentiment classification workflow
       if (
         combinedContext.includes("sentiment") ||
@@ -152,6 +173,8 @@ export class MockProvider implements ILLMProvider {
         return JSON.stringify(
           {
             sentiment: "NEGATIVE",
+            priority: 5,
+            urgency: 5,
             urgencyScore,
             category: "Infrastructure Outage & API Latency",
             summary: "Customer reports continuous 5000ms timeouts on high-traffic production endpoints.",

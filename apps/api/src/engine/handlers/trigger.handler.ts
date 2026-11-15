@@ -20,6 +20,9 @@ export class TriggerHandler implements INodeHandler {
     if (!resolvedOutputs.customer_message && resolvedOutputs.message) {
       resolvedOutputs.customer_message = resolvedOutputs.message;
     }
+    if (!resolvedOutputs.customer_message && resolvedOutputs.text) {
+      resolvedOutputs.customer_message = resolvedOutputs.text;
+    }
     if (!resolvedOutputs.customerEmail && resolvedOutputs.email) {
       resolvedOutputs.customerEmail = resolvedOutputs.email;
     }

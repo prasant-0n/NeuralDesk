@@ -101,6 +101,9 @@ export function hmacWebhookMiddleware(options: HmacMiddlewareOptions = {}): Midd
     }
 
     if (!secret) {
+      if (process.env.NODE_ENV === "production") {
+        throw new AppError("Webhook secret not configured on server", 500, "INTERNAL_SERVER_ERROR");
+      }
       secret = "whsec_sample_secret_key_for_local_testing";
     }
 

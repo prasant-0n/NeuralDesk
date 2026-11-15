@@ -18,7 +18,12 @@ export class GeminiProvider implements ILLMProvider {
     options: LLMRequestOptions,
     onChunk?: LLMChunkHandler
   ): Promise<LLMExecutionResult> {
-    const apiKey = options.apiKey || process.env.GEMINI_API_KEY;
+    const apiKey =
+      options.apiKey ||
+      (process.env.GEMINI_API_KEY &&
+      process.env.GEMINI_API_KEY !== "your_gemini_api_key_here"
+        ? process.env.GEMINI_API_KEY
+        : undefined);
     if (!apiKey) {
       throw new Error(
         "GEMINI_API_KEY is not configured. Provide an API key or use simulation/mock mode."
@@ -146,7 +151,20 @@ export class GeminiProvider implements ILLMProvider {
   }
 
   private resolveModel(modelName: string): string {
+    if (
+      modelName === "gemini-1.5-flash" ||
+      modelName === "gemini-2.0-flash" ||
+      modelName === "gemini-2.5-flash"
+    ) {
+      return "gemini-3.8-flash";
+    }
+    if (
+      modelName === "gemini-1.5-pro" ||
+      modelName === "gemini-2.5-pro"
+    ) {
+      return "gemini-pro-latest";
+    }
     const matched = SUPPORTED_GEMINI_MODELS.find((m) => m === modelName);
-    return matched || "gemini-1.5-flash";
+    return matched || "gemini-3.8-flash";
   }
 }

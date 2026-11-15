@@ -55,6 +55,7 @@ describe("Frontend Canvas & Zustand Store Test Suite", () => {
     });
 
     it("should duplicate an existing node with offset position and distinct ID", () => {
+      const origNode = useWorkflowStore.getState().nodes.find((n) => n.id === "llm_1")!;
       const initialCount = useWorkflowStore.getState().nodes.length;
       useWorkflowStore.getState().duplicateNode("llm_1");
 
@@ -64,8 +65,8 @@ describe("Frontend Canvas & Zustand Store Test Suite", () => {
       const duplicated = state.nodes[state.nodes.length - 1];
       expect(duplicated.id).not.toBe("llm_1");
       expect(duplicated.type).toBe("llm");
-      expect(duplicated.position.x).toBe(720 + 40);
-      expect(duplicated.position.y).toBe(150 + 40);
+      expect(duplicated.position.x).toBe(origNode.position.x + 40);
+      expect(duplicated.position.y).toBe(origNode.position.y + 40);
     });
 
     it("should remove a node and cascade-delete connected edges", () => {

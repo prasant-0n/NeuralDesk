@@ -27,7 +27,7 @@ const TriggerExecutionSchema = z.object({
   mode: z.enum(["real", "simulation", "mock", "live"]).default("real"),
   trigger_source: z.enum(["manual", "webhook", "schedule", "api"]).optional(),
   triggerSource: z.enum(["manual", "webhook", "schedule", "api"]).optional(),
-  inputs: z.record(z.unknown()).default({}),
+  inputs: z.record(z.string(), z.unknown()).default({}),
   version_number: z.number().int().min(1).optional(),
   versionNumber: z.number().int().min(1).optional(),
   workflow_definition: z.any().optional(),
@@ -248,6 +248,11 @@ const ApprovalDecisionSchema = z.object({
 });
 
 executionsRoutes.post("/approvals/:id/decide", async (c) => {
+  const user = c.get("user");
+  if (user && user.role === "viewer") {
+    throw new AppError("Viewers are not permitted to record human review decisions.", 403, "FORBIDDEN");
+  }
+
   const id = c.req.param("id");
   const body = await c.req.json();
   const validated = ApprovalDecisionSchema.parse(body);
@@ -261,6 +266,7 @@ executionsRoutes.post("/approvals/:id/decide", async (c) => {
     modifiedOutput: validated.modifiedOutput || null,
     reviewedAt,
     comments: validated.comments || null,
+    reviewerId: validated.reviewerId || user?.id || null,
   };
 
   inMemoryApprovals.set(id, updatedRecord);

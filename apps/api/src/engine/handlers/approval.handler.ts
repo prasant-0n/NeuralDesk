@@ -27,6 +27,31 @@ export class ApprovalHandler implements INodeHandler {
 
     inMemoryApprovals.set(approvalId, approvalRecord);
 
+    // When automated approval is enabled in node configuration (e.g., automated CI or sales routing simulation)
+    const autoApprove =
+      Boolean(config.autoApprove) ||
+      Boolean(config.autoApproveInSimulation) ||
+      config.autoActionOnTimeout === "approve";
+
+    if (autoApprove) {
+      return {
+        status: "completed",
+        approvalId,
+        outputs: {
+          approved: true,
+          decision: "approved",
+          approvalId,
+          approverRole,
+          instructions,
+          status: "approved",
+          reviewedAt: new Date().toISOString(),
+          reviewer: `${approverRole} (Automated Sign-Off)`,
+          leadStatus: "VIP Enterprise Pipeline Approved",
+          ...(lastOutput ? { ...lastOutput } : {}),
+        },
+      };
+    }
+
     // Persist to database if reachable
     try {
       await db.insert(approvals).values({

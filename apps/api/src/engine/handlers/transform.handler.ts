@@ -7,6 +7,8 @@
 import { compilePromptTemplate, resolveContextPath } from "@neuraldesk/shared";
 import type { INodeHandler, NodeExecutionContext, NodeExecutionResult } from "./types.js";
 
+const FORBIDDEN_KEYS = new Set(["__proto__", "constructor", "prototype"]);
+
 export class TransformHandler implements INodeHandler {
   public async execute(ctx: NodeExecutionContext): Promise<NodeExecutionResult> {
     const config = ctx.nodeConfig;
@@ -15,7 +17,7 @@ export class TransformHandler implements INodeHandler {
     const outputs: Record<string, unknown> = {};
 
     for (const rule of rules) {
-      if (!rule || !rule.targetKey) continue;
+      if (!rule || !rule.targetKey || FORBIDDEN_KEYS.has(rule.targetKey)) continue;
       const targetKey = rule.targetKey;
       const op = rule.operation || config.transformType || "json_pick";
       const sourceExpr = String(rule.sourceExpression || "");
@@ -33,9 +35,22 @@ export class TransformHandler implements INodeHandler {
         }
         case "regex_extract": {
           const text = String(resolveContextPath(sourceExpr, context) ?? "");
-          const pattern = rule.pattern ? new RegExp(String(rule.pattern)) : /(.+)/;
-          const match = text.match(pattern);
-          val = match ? (match[1] !== undefined ? match[1] : match[0]) : null;
+          if (text.length > 20000) {
+            val = null;
+            break;
+          }
+          const rawPat = rule.pattern ? String(rule.pattern) : "(.+)";
+          if (rawPat.length > 64 || /(\([^)]*(\+|\*)[^)]*\)(\+|\*))/.test(rawPat)) {
+            val = null;
+            break;
+          }
+          try {
+            const pattern = new RegExp(rawPat);
+            const match = text.match(pattern);
+            val = match ? (match[1] !== undefined ? match[1] : match[0]) : null;
+          } catch {
+            val = null;
+          }
           break;
         }
         case "math_op": {

@@ -42,7 +42,7 @@ export class LLMHandler implements INodeHandler {
 
     const providerName = String(config.provider || "gemini");
     const model = String(config.model || "gemini-1.5-flash");
-    const provider = getLLMProvider(providerName, ctx.mode);
+    const provider = getLLMProvider(providerName, ctx.mode, ctx.apiKey);
 
     // 3. Execute streaming inference
     const result = await provider.executeStream(
