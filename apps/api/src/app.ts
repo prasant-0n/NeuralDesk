@@ -18,6 +18,8 @@ import { executionsRoutes } from "./routes/executions.routes.js";
 import { webhooksRoutes } from "./routes/webhooks.routes.js";
 import { agentsRoutes } from "./routes/agents.routes.js";
 import { promptsRoutes } from "./routes/prompts.routes.js";
+import { docsRoutes } from "./routes/docs.routes.js";
+import { openApiSpec } from "./openapi.js";
 
 export function createApp(): Hono {
   const app = new Hono();
@@ -98,9 +100,12 @@ export function createApp(): Hono {
   app.onError(errorHandler);
   app.notFound(notFoundHandler);
 
-  // 5. Root convenience health endpoints
+  // 5. Root convenience health & docs endpoints
   app.get("/health", (c) => c.redirect("/api/v1/health"));
   app.get("/api/health", (c) => c.redirect("/api/v1/health"));
+  app.route("/docs", docsRoutes);
+  app.route("/api/docs", docsRoutes);
+  app.get("/openapi.json", (c) => c.json(openApiSpec));
 
   // 6. Namespaced REST API v1 Routes
   const v1 = new Hono();
@@ -108,6 +113,8 @@ export function createApp(): Hono {
   // Public unauthenticated endpoints
   v1.route("/health", healthRoutes);
   v1.route("/webhooks", webhooksRoutes);
+  v1.route("/docs", docsRoutes);
+  v1.get("/openapi.json", (c) => c.json(openApiSpec));
 
   // Authenticated tenant endpoints (ND-SEC-01)
   v1.use("/workspaces/*", authMiddleware());

@@ -18,13 +18,15 @@
 [![Canvas Engine](https://img.shields.io/badge/Canvas-@xyflow%2Freact%20v12-purple.svg)](https://reactflow.dev/)
 [![Database](https://img.shields.io/badge/Database-PostgreSQL%2016%20%2F%20Neon-336791.svg?logo=postgresql&logoColor=white)](https://www.postgresql.org/)
 [![ORM](https://img.shields.io/badge/ORM-Drizzle%20ORM-green.svg)](https://orm.drizzle.team/)
-[![Vitest](https://img.shields.io/badge/Tests-84%20Passing-brightgreen.svg?logo=vitest&logoColor=white)](https://vitest.dev/)
+[![OpenAPI: 3.1.0](https://img.shields.io/badge/OpenAPI-3.1.0%20Spec-6BA539.svg?logo=openapi-initiative&logoColor=white)](openapi.yaml)
+[![API Reference](https://img.shields.io/badge/API%20Docs-Scalar%20%7C%20Swagger-8B5CF6.svg)](docs/API_REFERENCE.md)
+[![Vitest](https://img.shields.io/badge/Tests-86%20Passing-brightgreen.svg?logo=vitest&logoColor=white)](https://vitest.dev/)
 [![Playwright](https://img.shields.io/badge/E2E-Playwright%20Chromium-45ba4b.svg?logo=playwright&logoColor=white)](https://playwright.dev/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
 <br/>
 
-[**Live Architecture**](#-system-architecture) • [**Visual Showcase**](#-visual-walkthrough--modules) • [**Key Features**](#-enterprise-feature-matrix) • [**Engineering Highlights**](#-engineering-highlights-for-technical-recruiters) • [**Quickstart**](#-quickstart--local-development) • [**Deployment**](#-production-deployment-blueprints)
+[**Live Architecture**](#-system-architecture) • [**Visual Showcase**](#-visual-walkthrough--modules) • [**API Reference**](#-api-documentation--interactive-explorer) • [**Key Features**](#-enterprise-feature-matrix) • [**Engineering Highlights**](#-engineering-highlights-for-technical-recruiters) • [**Quickstart**](#-quickstart--local-development) • [**Deployment**](#-production-deployment-blueprints)
 
 </div>
 
@@ -157,6 +159,46 @@ flowchart TD
 
 ---
 
+## 🔌 API Documentation & Interactive Explorer
+
+NeuralDesk is engineered API-first with full **OpenAPI 3.1.0** compliance, providing rich machine-readable specifications and interactive documentation out of the box:
+
+<div align="center">
+
+| Documentation Surface | Endpoint / Link | Highlights |
+|---|---|---|
+| **Interactive API Explorer (Scalar)** | [`http://localhost:3001/docs`](http://localhost:3001/docs) or `/api/docs` | Modern dark/light UI with interactive "Try it out", schema viewer & multi-language code generation. |
+| **Interactive Swagger UI** | [`http://localhost:3001/docs/swagger`](http://localhost:3001/docs/swagger) | Classic OpenAPI specification explorer. |
+| **OpenAPI 3.1.0 JSON** | [`/api/v1/openapi.json`](http://localhost:3001/api/v1/openapi.json) or [`openapi.json`](openapi.json) | Full machine-readable OpenAPI schema (70+ KB) covering all 26+ routes. |
+| **OpenAPI 3.1.0 YAML** | [`openapi.yaml`](openapi.yaml) | Standard YAML contract for Postman / Insomnia import and API gateways. |
+| **Enterprise API Manual** | [**`docs/API_REFERENCE.md`**](docs/API_REFERENCE.md) | Exhaustive documentation with curl, TypeScript SDK & Python examples. |
+
+</div>
+
+### Key API Capabilities & Design Decisions:
+* **RFC 7807 Problem Details:** Uniform structured error responses (`application/problem+json`) with validation field pointers and correlation trace IDs.
+* **Push-Based Telemetry (SSE):** Real-time execution step waterfalls and token tracking streamed via HTTP `text/event-stream` (`/api/v1/executions/:id/stream`).
+* **Zero-Leak BYOK Credential Vault:** Multi-tenant Gemini API keys encrypted at rest using **AES-256-GCM** and decrypted ephemerally in-memory during inference.
+* **Cryptographic Webhook Security:** Timing-attack safe **HMAC-SHA256** signature verification (`X-NeuralDesk-Signature`) for external event triggers.
+
+```bash
+# 1. Trigger asynchronous DAG execution
+curl -s -X POST http://localhost:3001/api/v1/workflows/wf_customer_support/execute \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer mock_jwt_admin_user" \
+  -d '{"mode":"real","inputs":{"customerEmail":"cto@enterprise.com","subject":"Production Outage"}}' | jq
+
+# 2. Subscribe to real-time execution telemetry stream (SSE)
+curl -N -H "Authorization: Bearer mock_jwt_admin_user" \
+  http://localhost:3001/api/v1/executions/exec_98af21d0/stream
+
+# 3. Retrieve SLA Latency Percentiles (P50, P90, P95, P99)
+curl -s http://localhost:3001/api/v1/executions/stats?timeframe=24h \
+  -H "Authorization: Bearer mock_jwt_admin_user" | jq .slaMetrics
+```
+
+---
+
 ## 🎯 Engineering Highlights for Technical Recruiters
 
 | Architectural Pillar | Implementation Details & Design Decision |
@@ -166,8 +208,9 @@ flowchart TD
 | **Micro-Telemetry via SSE** | Instead of polling, execution progress, node states (`pending` → `running` → `completed` / `failed`), and output tokens stream over persistent HTTP `text/event-stream` connections with automatic client reconnection. |
 | **Zero-Leak Security (AES-256-GCM)** | Sensitive credentials (Gemini API keys, webhook signing secrets) are strictly isolated from the frontend. Multi-tenant BYOK credentials are encrypted at rest with AES-256-GCM and decrypted ephemerally in worker memory. |
 | **Safe AST Logic Sandboxing** | Conditional node routing evaluates expressions using a deterministic AST tokenizer and parser. Zero usage of dangerous JavaScript `eval()` or `new Function()`. |
+| **OpenAPI 3.1.0 & Interactive Explorer** | Native Scalar and Swagger UI endpoints with exhaustive JSON/YAML schemas, RFC 7807 problem details, and multi-language SDK examples. |
 | **Monorepo Architecture** | Clean Turborepo / pnpm workspace structure separating `@neuraldesk/shared` (Zod schemas, contracts), `@neuraldesk/db` (Drizzle schema, migrations), `@neuraldesk/api` (Hono runtime), and `@neuraldesk/web` (React SPA). |
-| **Complete Automated Verification** | 84 unit and integration tests across contracts, schemas, and orchestrator logic, plus 5 headless Playwright E2E browser journeys running on GitHub Actions. |
+| **Complete Automated Verification** | 86 unit and integration tests across contracts, schemas, and orchestrator logic, plus 5 headless Playwright E2E browser journeys running on GitHub Actions. |
 
 ---
 

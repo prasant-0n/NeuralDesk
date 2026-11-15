@@ -66,7 +66,10 @@ docs/
 * [Schema Models Specification](./02-database/schema-models.md): Complete Drizzle ORM TypeScript code for Neon PostgreSQL / Turso SQLite, including Idempotency Keys, Approvals, and the 30-Day Automated Log Pruning Strategy.
 * [Migrations & Seed Data](./02-database/migrations-and-seed.md): Connection pooling setup, migration runbooks, and reference workflows.
 
-### [03. API Specifications](./03-api/rest-specification.md)
+### [03. API Specifications & Interactive Documentation](./03-api/rest-specification.md)
+* [**Complete Enterprise API Reference Manual (`API_REFERENCE.md`)**](./API_REFERENCE.md): Full end-to-end endpoint guide, cURL / TypeScript / Python code snippets, and RFC 7807 error catalog.
+* [**Interactive API Documentation (Scalar / Swagger UI)**](http://localhost:3001/docs): Live browser explorer hosted at `/docs` and `/api/docs`.
+* [**OpenAPI 3.1.0 Specification**](../openapi.yaml): Standard JSON & YAML OpenAPI schemas.
 * [REST API Specification](./03-api/rest-specification.md): RFC 7807 error envelopes, endpoints, and request/response JSON schemas.
 * [Server-Sent Events (SSE) Streaming](./03-api/sse-streaming.md): Real-time `text/event-stream` contract, event frame types, wire samples, and `Last-Event-ID` reconnection recovery buffer.
 * [Webhook Ingress Gateway](./03-api/webhook-ingress.md): HMAC SHA-256 signature verification, timing attack defense, replay attack mitigation, and Webhook Idempotency/Deduplication engine.

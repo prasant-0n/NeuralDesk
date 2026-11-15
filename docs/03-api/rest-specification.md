@@ -1,17 +1,42 @@
-# 03. API — REST API Specification & Contracts
+# 03. API — REST API Specification & OpenAPI Contracts
 
-[← Back to Documentation Portal](../README.md) | [Next: SSE Streaming →](./sse-streaming.md)
+[← Back to Documentation Portal](../README.md) | [Complete Enterprise API Reference Manual →](../API_REFERENCE.md) | [Next: SSE Streaming →](./sse-streaming.md)
 
 ---
 
-## 1.1 Conventions & Error Standard
+## 🌟 Interactive API Reference & OpenAPI 3.1.0
+
+NeuralDesk provides modern, interactive documentation and machine-readable specifications:
+
+* **Interactive API Reference Explorer (Scalar UI):** [`http://localhost:3001/docs`](http://localhost:3001/docs) or `/api/docs`
+* **Swagger UI Explorer:** [`http://localhost:3001/docs/swagger`](http://localhost:3001/docs/swagger)
+* **OpenAPI 3.1.0 JSON Specification:** [`/api/v1/openapi.json`](http://localhost:3001/api/v1/openapi.json) or [`openapi.json`](../../openapi.json)
+* **OpenAPI 3.1.0 YAML Specification:** [`openapi.yaml`](../../openapi.yaml)
+* **Full Enterprise API Reference Document:** [**`docs/API_REFERENCE.md`**](../API_REFERENCE.md)
+
+---
+
+## 1. Architectural Standards
 
 * **Base URL:** `/api/v1`
 * **Transport:** HTTPS with `application/json; charset=utf-8`
+* **Real-Time Stream:** `text/event-stream; charset=utf-8` (Server-Sent Events)
+* **Error Envelope:** Strict **RFC 7807 Problem Details for HTTP APIs** (`application/problem+json`)
+* **Security:** Bearer JWT for tenant operations, HMAC-SHA256 for inbound webhooks, and AES-256-GCM BYOK credential isolation.
 
-### Standard RFC 7807 Error Envelope
+---
+
+## 2. Standard RFC 7807 Error Envelope
+
+All API errors conform strictly to the IETF RFC 7807 specification:
+
 ```json
 {
+  "type": "about:blank",
+  "title": "Validation Failed",
+  "status": 400,
+  "detail": "Invalid workflow graph configuration.",
+  "instance": "/api/v1/workflows/wf_88201/execute",
   "error": {
     "code": "VALIDATION_FAILED",
     "message": "Invalid workflow graph configuration.",
@@ -22,7 +47,7 @@
         "issue": "Expected number <= 1.0, received 1.5"
       }
     ],
-    "timestamp": "2026-11-15T12:00:00.000Z",
+    "timestamp": "2026-11-16T03:00:00.000Z",
     "path": "/api/v1/workflows/wf_88201/execute"
   }
 }
@@ -30,51 +55,37 @@
 
 ---
 
-## 1.2 Core Endpoints Reference
+## 3. Core API Endpoints Summary
 
-### 1. Workflows Management
-* **`GET /api/v1/workspaces/:wsId/workflows`**: List workspace workflows with pagination & filters.
-* **`POST /api/v1/workspaces/:wsId/workflows`**: Create a new workflow canvas.
-* **`GET /api/v1/workflows/:id`**: Fetch active workflow graph definition and nodes.
-* **`PUT /api/v1/workflows/:id`**: Save updated canvas nodes and edges.
-* **`DELETE /api/v1/workflows/:id`**: Soft-delete workflow.
-
-### 2. Versioning
-* **`POST /api/v1/workflows/:id/versions`**: Create an immutable snapshot of current canvas state.
-* **`POST /api/v1/workflows/:id/versions/:verId/publish`**: Designate version as active production version.
-
-### 3. Execution Management
-* **`POST /api/v1/workflows/:id/execute`**: Trigger asynchronous execution.
-
-**Request Payload:**
-```json
-{
-  "mode": "real",
-  "trigger_source": "manual",
-  "inputs": {
-    "customer_message": "Our database connection dropped again! Urgent fix needed.",
-    "customer_tier": "enterprise"
-  }
-}
-```
-
-**Response `202 Accepted`:**
-```json
-{
-  "execution_id": "exec_55aa88ff",
-  "workflow_id": "wf_9a8b7c6d",
-  "version_number": 3,
-  "mode": "real",
-  "status": "running",
-  "started_at": "2026-11-15T12:05:00.120Z",
-  "stream_url": "/api/v1/executions/exec_55aa88ff/stream"
-}
-```
-
-* **`GET /api/v1/executions/:id`**: Fetch execution telemetry and token economics.
-* **`GET /api/v1/executions/:id/runs`**: Retrieve granular step run records.
-* **`POST /api/v1/executions/:id/cancel`**: Abort in-flight execution.
+| Domain | Method | Path | Description |
+|---|---|---|---|
+| **Health** | `GET` | `/api/v1/health` | Deep readiness probe, DB ping, uptime & memory |
+| **Health** | `GET` | `/api/v1/health/live` | Lightweight liveness probe for k8s / load balancer |
+| **Workspaces** | `GET` | `/api/v1/workspaces` | List accessible tenant workspaces |
+| **Workspaces** | `POST` | `/api/v1/workspaces` | Create new workspace with optional BYOK keys |
+| **Workspaces** | `GET` | `/api/v1/workspaces/:id/members` | List workspace members & RBAC roles |
+| **Workflows** | `GET` | `/api/v1/workflows` | List workflows (paginated with filters) |
+| **Workflows** | `POST` | `/api/v1/workflows` | Create workflow canvas |
+| **Workflows** | `GET` | `/api/v1/workflows/:id` | Get workflow DAG nodes, edges & active version |
+| **Workflows** | `POST` | `/api/v1/workflows/:id/versions` | Create immutable snapshot of canvas state |
+| **Workflows** | `POST` | `/api/v1/workflows/:id/versions/:verId/publish` | Promote version snapshot to production |
+| **Workflows** | `POST` | `/api/v1/workflows/:id/validate` | Topological DAG cycle validation (Kahn's alg) |
+| **Execution** | `POST` | `/api/v1/workflows/:id/execute` | Trigger DAG execution (returns 202 + stream URL) |
+| **Execution** | `GET` | `/api/v1/executions` | List executions with status & duration |
+| **Execution** | `GET` | `/api/v1/executions/:id` | Get execution status, tokens & cost |
+| **Execution** | `GET` | `/api/v1/executions/:id/runs` | Step-by-step trace waterfall & node I/O |
+| **Execution** | `GET` | `/api/v1/executions/:id/stream` | Real-time SSE telemetry stream |
+| **Execution** | `POST` | `/api/v1/executions/:id/rerun` | Re-run execution with replay inputs |
+| **Execution** | `POST` | `/api/v1/executions/:id/cancel` | Abort in-flight DAG execution |
+| **Telemetry** | `GET` | `/api/v1/executions/stats` | Latency SLAs ($P_{50}, P_{90}, P_{95}, P_{99}$), throughput |
+| **Governance** | `GET` | `/api/v1/approvals` | List pending Human Gate approval requests |
+| **Governance** | `POST` | `/api/v1/approvals/:id/decide` | Submit human approval/rejection decision |
+| **AI Agents** | `POST` | `/api/v1/agents/chat` | Multi-turn chat with Gemini function calling |
+| **AI Agents** | `GET` | `/api/v1/agents` | List autonomous agent personas |
+| **Prompts** | `POST` | `/api/v1/prompts/test` | Live Mustache compiler, tokens & cost preview |
+| **Prompts** | `GET` | `/api/v1/prompts` | List versioned prompt templates |
+| **Webhooks** | `POST` | `/api/v1/webhooks/ingress/:path` | Cryptographic HMAC-SHA256 verified trigger |
 
 ---
 
-[Next: SSE Streaming →](./sse-streaming.md)
+*For detailed request payloads, curl snippets, Python/TypeScript SDK examples, and cryptographic verification code, see [**`docs/API_REFERENCE.md`**](../API_REFERENCE.md).*

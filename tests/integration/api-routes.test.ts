@@ -542,4 +542,33 @@ describe("NeuralDesk API Integration Test Suite", () => {
       expect(response.body.error.details[0]).toHaveProperty("issue");
     });
   });
+
+  // -------------------------------------------------------------------------
+  // 8. OpenAPI 3.1.0 Specification & Interactive Documentation Endpoints
+  // -------------------------------------------------------------------------
+  describe("OpenAPI 3.1.0 & Interactive Documentation", () => {
+    it("GET /api/v1/openapi.json should return standard OpenAPI 3.1.0 document", async () => {
+      const response = await request(server).get("/api/v1/openapi.json");
+
+      expect(response.status).toBe(200);
+      expect(response.headers["content-type"]).toContain("application/json");
+      expect(response.body.openapi).toBe("3.1.0");
+      expect(response.body.info).toHaveProperty("title");
+      expect(response.body.info).toHaveProperty("version", "1.0.0");
+      expect(response.body.paths).toHaveProperty("/api/v1/health");
+      expect(response.body.paths).toHaveProperty("/api/v1/workflows/{id}/execute");
+      expect(response.body.paths).toHaveProperty("/api/v1/executions/stats");
+      expect(response.body.paths).toHaveProperty("/api/v1/agents/chat");
+      expect(response.body.paths).toHaveProperty("/api/v1/prompts/test");
+    });
+
+    it("GET /docs should serve interactive Scalar API documentation UI", async () => {
+      const response = await request(server).get("/docs");
+
+      expect(response.status).toBe(200);
+      expect(response.headers["content-type"]).toContain("text/html");
+      expect(response.text).toContain("NeuralDesk API Reference");
+      expect(response.text).toContain("scalar/api-reference");
+    });
+  });
 });
