@@ -120,10 +120,30 @@ export const SignUpPage: React.FC = () => {
     }
   };
 
-  const handleSocialMock = (provider: string) => {
-    setErrorMessage(
-      `${provider} SSO registration requires enterprise OAuth configured in your environment. Use standard email registration or the 1-Click Evaluation persona below.`
-    );
+  const handleSocialSignIn = async (provider: "google" | "microsoft") => {
+    setIsLoading(true);
+    setErrorMessage(null);
+    setSuccessMessage(null);
+
+    try {
+      const res = await authClient.signIn.social({
+        provider,
+        callbackURL: window.location.origin + redirectUrl,
+      });
+
+      if (res?.error) {
+        setErrorMessage(
+          res.error.message ||
+            `${provider === "google" ? "Google Workspace" : "Microsoft 365"} OAuth is not configured with client credentials. Provide GOOGLE_CLIENT_ID / MICROSOFT_CLIENT_ID or use registration below.`
+        );
+      }
+    } catch (err: any) {
+      setErrorMessage(
+        `${provider === "google" ? "Google" : "Microsoft"} OAuth integration requires active OAuth credentials or Neon Managed Auth enabled. Use standard registration or 1-Click Evaluation below.`
+      );
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -146,23 +166,14 @@ export const SignUpPage: React.FC = () => {
         </div>
       )}
 
-      {/* Social Registration */}
+      {/* Enterprise Social Registration (Google & Microsoft) */}
       <div className="grid grid-cols-2 gap-3">
         <button
           type="button"
-          onClick={() => handleSocialMock("GitHub")}
-          className="flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl border border-slate-200 dark:border-charcoal-700 bg-white dark:bg-charcoal-800 hover:bg-slate-50 dark:hover:bg-charcoal-700 text-slate-700 dark:text-charcoal-200 text-xs font-semibold shadow-sm transition-all cursor-pointer"
-        >
-          <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
-            <path fillRule="evenodd" clipRule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" />
-          </svg>
-          <span>GitHub</span>
-        </button>
-
-        <button
-          type="button"
-          onClick={() => handleSocialMock("Google")}
-          className="flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl border border-slate-200 dark:border-charcoal-700 bg-white dark:bg-charcoal-800 hover:bg-slate-50 dark:hover:bg-charcoal-700 text-slate-700 dark:text-charcoal-200 text-xs font-semibold shadow-sm transition-all cursor-pointer"
+          onClick={() => handleSocialSignIn("google")}
+          disabled={isLoading}
+          className="flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl border border-slate-200 dark:border-charcoal-700 bg-white dark:bg-charcoal-800 hover:bg-slate-50 dark:hover:bg-charcoal-700 text-slate-700 dark:text-charcoal-200 text-xs font-semibold shadow-sm hover:shadow transition-all cursor-pointer disabled:opacity-50"
+          title="Sign up with Google Workspace"
         >
           <svg className="w-4 h-4" viewBox="0 0 24 24">
             <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
@@ -172,6 +183,22 @@ export const SignUpPage: React.FC = () => {
           </svg>
           <span>Google</span>
         </button>
+
+        <button
+          type="button"
+          onClick={() => handleSocialSignIn("microsoft")}
+          disabled={isLoading}
+          className="flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl border border-slate-200 dark:border-charcoal-700 bg-white dark:bg-charcoal-800 hover:bg-slate-50 dark:hover:bg-charcoal-700 text-slate-700 dark:text-charcoal-200 text-xs font-semibold shadow-sm hover:shadow transition-all cursor-pointer disabled:opacity-50"
+          title="Sign up with Microsoft 365 / Azure Entra ID"
+        >
+          <svg className="w-4 h-4" viewBox="0 0 21 21">
+            <rect x="1" y="1" width="9" height="9" fill="#F25022" />
+            <rect x="11" y="1" width="9" height="9" fill="#7FBA00" />
+            <rect x="1" y="11" width="9" height="9" fill="#00A4EF" />
+            <rect x="11" y="11" width="9" height="9" fill="#FFB900" />
+          </svg>
+          <span>Microsoft</span>
+        </button>
       </div>
 
       <div className="relative flex items-center justify-center">
@@ -179,7 +206,7 @@ export const SignUpPage: React.FC = () => {
           <div className="w-full border-t border-slate-200 dark:border-charcoal-800" />
         </div>
         <span className="relative px-3 bg-white dark:bg-charcoal-900 text-[11px] font-medium uppercase tracking-wider text-slate-400 dark:text-charcoal-500">
-          Or register with email
+          Or register with work email
         </span>
       </div>
 
