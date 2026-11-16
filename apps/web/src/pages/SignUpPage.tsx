@@ -115,10 +115,19 @@ export const SignUpPage: React.FC = () => {
           );
         }
       } else {
-        setSuccessMessage("Account created successfully! Loading workspace...");
-        setTimeout(() => {
-          navigate(redirectUrl, { replace: true });
-        }, 600);
+        if (!res.data?.token || !res.data?.user?.emailVerified) {
+          setSuccessMessage(
+            "Account created! Please check your email inbox to verify your account, then sign in."
+          );
+          setTimeout(() => {
+            navigate("/signin", { replace: true });
+          }, 2500);
+        } else {
+          setSuccessMessage("Account created successfully! Loading workspace...");
+          setTimeout(() => {
+            navigate(redirectUrl, { replace: true });
+          }, 600);
+        }
       }
     } catch (err: any) {
       setErrorMessage(

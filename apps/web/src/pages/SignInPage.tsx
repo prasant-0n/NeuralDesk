@@ -60,6 +60,13 @@ export const SignInPage: React.FC = () => {
 
       if (res.error) {
         if (
+          (res.error as any)?.code === "email_not_confirmed" ||
+          res.error.message?.includes("Email verification required")
+        ) {
+          setErrorMessage(
+            "Email verification required: Please verify your account via the verification email sent to your inbox before signing in."
+          );
+        } else if (
           res.error.message?.includes("Email and password") ||
           (res.error as any)?.code === "validation_failed"
         ) {
