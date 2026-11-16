@@ -74,35 +74,35 @@ for event in execution.stream():
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
           {/* Left Column: Technical Narrative */}
           <div className="lg:col-span-5 space-y-6">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-xs font-semibold">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-50 dark:bg-indigo-500/10 border border-indigo-200 dark:border-indigo-500/20 text-indigo-700 dark:text-indigo-400 text-xs font-semibold">
               <Code className="w-3.5 h-3.5" />
               <span>Developer-First Architecture</span>
             </div>
 
-            <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-white leading-tight">
+            <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-slate-900 dark:text-white leading-tight">
               Deploy in Code or Visual Studio.{" "}
-              <span className="bg-gradient-to-r from-indigo-400 to-cyan-400 bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-indigo-600 to-cyan-600 dark:from-indigo-400 dark:to-cyan-400 bg-clip-text text-transparent">
                 Zero Vendor Lock-In.
               </span>
             </h2>
 
-            <p className="text-sm sm:text-base text-slate-400 leading-relaxed">
+            <p className="text-sm sm:text-base text-slate-600 dark:text-slate-400 leading-relaxed">
               Every graph created in the visual canvas exports as clean, versionable
               JSON/YAML schemas. Trigger executions through modern SDKs, webhooks,
               or direct REST endpoints with RFC 7807 compliance.
             </p>
 
-            <ul className="space-y-3 text-xs sm:text-sm text-slate-300">
+            <ul className="space-y-3 text-xs sm:text-sm text-slate-700 dark:text-slate-300">
               <li className="flex items-center gap-2.5">
-                <div className="w-1.5 h-1.5 rounded-full bg-cyan-400" />
+                <div className="w-1.5 h-1.5 rounded-full bg-cyan-500 dark:bg-cyan-400" />
                 <span>Typed TypeScript & Python SDKs with auto-complete</span>
               </li>
               <li className="flex items-center gap-2.5">
-                <div className="w-1.5 h-1.5 rounded-full bg-indigo-400" />
+                <div className="w-1.5 h-1.5 rounded-full bg-indigo-500 dark:bg-indigo-400" />
                 <span>Streaming Server-Sent Events (SSE) out of the box</span>
               </li>
               <li className="flex items-center gap-2.5">
-                <div className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+                <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 dark:bg-emerald-400" />
                 <span>HMAC-SHA256 signature verification for inbound webhooks</span>
               </li>
             </ul>
@@ -112,7 +112,7 @@ for event in execution.stream():
                 href="/docs"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 text-xs font-semibold text-indigo-400 hover:text-cyan-300 transition-colors"
+                className="inline-flex items-center gap-2 text-xs font-semibold text-indigo-600 dark:text-indigo-400 hover:text-cyan-600 dark:hover:text-cyan-300 transition-colors"
               >
                 <span>Read the Complete API Specification</span>
                 <ExternalLink className="w-3.5 h-3.5" />

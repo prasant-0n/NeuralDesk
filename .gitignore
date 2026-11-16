@@ -37,6 +37,7 @@ playwright-report/
 blob-report/
 .nyc_output/
 tests/puppeteer/screenshots/*.png
+images/
 
 # Logs & debugging
 logs/

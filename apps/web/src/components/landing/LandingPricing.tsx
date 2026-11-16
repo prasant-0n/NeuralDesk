@@ -65,29 +65,29 @@ export const LandingPricing: React.FC = () => {
   ];
 
   return (
-    <section id="pricing" className="relative py-24 md:py-32 bg-slate-950/60 dark:bg-charcoal-950/80 border-t border-slate-800/80">
+    <section id="pricing" className="relative py-24 md:py-32 bg-slate-50/50 dark:bg-charcoal-950/80 border-t border-slate-200 dark:border-slate-800/80">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="text-center max-w-3xl mx-auto mb-14">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 text-xs font-semibold mb-4">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-50 dark:bg-cyan-500/10 border border-cyan-200 dark:border-cyan-500/20 text-cyan-700 dark:text-cyan-400 text-xs font-semibold mb-4">
             <Zap className="w-3.5 h-3.5" />
             <span>Transparent Pricing</span>
           </div>
-          <h2 className="text-3xl sm:text-5xl font-extrabold tracking-tight text-white mb-4">
+          <h2 className="text-3xl sm:text-5xl font-extrabold tracking-tight text-slate-900 dark:text-white mb-4">
             Simple, Deterministic Pricing
           </h2>
-          <p className="text-base sm:text-lg text-slate-400 mb-8">
+          <p className="text-base sm:text-lg text-slate-600 dark:text-slate-400 mb-8">
             Start building for free. Scale seamlessly with BYOK without surprise token markups.
           </p>
 
           {/* Billing Cadence Toggle */}
-          <div className="inline-flex items-center p-1 rounded-2xl bg-slate-900 border border-slate-800 text-xs font-medium">
+          <div className="inline-flex items-center p-1 rounded-2xl bg-slate-200/80 dark:bg-slate-900 border border-slate-300 dark:border-slate-800 text-xs font-medium">
             <button
               onClick={() => setIsAnnual(false)}
               className={`px-4 py-2 rounded-xl transition-all ${
                 !isAnnual
-                  ? "bg-slate-800 text-white font-semibold shadow"
-                  : "text-slate-400 hover:text-white"
+                  ? "bg-white dark:bg-slate-800 text-slate-900 dark:text-white font-semibold shadow"
+                  : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
               }`}
             >
               Monthly Billing
@@ -97,11 +97,11 @@ export const LandingPricing: React.FC = () => {
               className={`flex items-center gap-1.5 px-4 py-2 rounded-xl transition-all ${
                 isAnnual
                   ? "bg-indigo-600 text-white font-semibold shadow-lg shadow-indigo-600/30"
-                  : "text-slate-400 hover:text-white"
+                  : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
               }`}
             >
               <span>Annual Billing</span>
-              <span className="px-1.5 py-0.5 rounded-full bg-cyan-400/20 text-cyan-300 text-[10px] font-bold">
+              <span className="px-1.5 py-0.5 rounded-full bg-cyan-100 dark:bg-cyan-400/20 text-cyan-800 dark:text-cyan-300 text-[10px] font-bold">
                 Save 20%
               </span>
             </button>
@@ -117,37 +117,37 @@ export const LandingPricing: React.FC = () => {
                 key={tier.name}
                 className={`relative rounded-3xl p-8 border flex flex-col justify-between transition-all duration-300 ${
                   tier.popular
-                    ? "border-indigo-500 bg-slate-900/90 shadow-2xl shadow-indigo-950/60 scale-[1.02] z-10"
-                    : "border-slate-800/80 bg-slate-950/80 hover:border-slate-700"
+                    ? "border-2 border-indigo-500 bg-white dark:bg-slate-900/90 shadow-xl dark:shadow-2xl shadow-indigo-500/10 dark:shadow-indigo-950/60 scale-[1.02] z-10"
+                    : "border-slate-200/90 dark:border-slate-800/80 bg-white dark:bg-slate-950/80 hover:border-slate-300 dark:hover:border-slate-700 shadow-md dark:shadow-none"
                 }`}
               >
                 {tier.popular && (
-                  <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full bg-gradient-to-r from-indigo-500 to-cyan-400 text-slate-950 font-bold text-[11px] uppercase tracking-wider shadow-md">
+                  <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full bg-gradient-to-r from-indigo-600 to-cyan-500 text-white font-bold text-[11px] uppercase tracking-wider shadow-md">
                     Most Popular
                   </div>
                 )}
 
                 <div>
                   <div className="flex items-center justify-between mb-4">
-                    <div className="w-10 h-10 rounded-xl bg-indigo-500/10 border border-indigo-500/30 flex items-center justify-center text-indigo-400">
+                    <div className="w-10 h-10 rounded-xl bg-indigo-50 dark:bg-indigo-500/10 border border-indigo-200 dark:border-indigo-500/30 flex items-center justify-center text-indigo-600 dark:text-indigo-400">
                       <Icon className="w-5 h-5" />
                     </div>
-                    <span className="text-xs font-mono text-slate-500 uppercase">
+                    <span className="text-xs font-mono text-slate-500 uppercase font-semibold">
                       TIER: {tier.name}
                     </span>
                   </div>
 
-                  <h3 className="text-xl font-bold text-white mb-2">{tier.name}</h3>
-                  <p className="text-xs text-slate-400 mb-6 leading-relaxed">
+                  <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2">{tier.name}</h3>
+                  <p className="text-xs text-slate-600 dark:text-slate-400 mb-6 leading-relaxed">
                     {tier.tagline}
                   </p>
 
                   <div className="flex items-baseline gap-2 mb-2">
-                    <span className="text-4xl sm:text-5xl font-extrabold text-white font-sans tracking-tight">
+                    <span className="text-4xl sm:text-5xl font-extrabold text-slate-900 dark:text-white font-sans tracking-tight">
                       {tier.price}
                     </span>
                     {tier.price !== "Custom" && (
-                      <span className="text-xs text-slate-400 font-mono">
+                      <span className="text-xs text-slate-500 dark:text-slate-400 font-mono">
                         / month
                       </span>
                     )}
@@ -156,10 +156,10 @@ export const LandingPricing: React.FC = () => {
                     {tier.cadence}
                   </p>
 
-                  <div className="space-y-3 mb-8 border-t border-slate-800/80 pt-6">
+                  <div className="space-y-3 mb-8 border-t border-slate-200 dark:border-slate-800/80 pt-6">
                     {tier.features.map((feat) => (
-                      <div key={feat} className="flex items-start gap-2.5 text-xs text-slate-300">
-                        <Check className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
+                      <div key={feat} className="flex items-start gap-2.5 text-xs text-slate-700 dark:text-slate-300">
+                        <Check className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
                         <span>{feat}</span>
                       </div>
                     ))}
@@ -171,7 +171,7 @@ export const LandingPricing: React.FC = () => {
                   className={`w-full flex items-center justify-center gap-2 py-3.5 rounded-2xl font-semibold text-xs transition-all ${
                     tier.popular
                       ? "bg-gradient-to-r from-indigo-600 via-indigo-500 to-cyan-500 hover:from-indigo-500 hover:to-cyan-400 text-white shadow-lg shadow-indigo-600/30 hover:scale-[1.01]"
-                      : "bg-slate-800 hover:bg-slate-700 text-white border border-slate-700"
+                      : "bg-slate-900 hover:bg-slate-800 text-white dark:bg-slate-800 dark:hover:bg-slate-700 border border-slate-900 dark:border-slate-700 shadow-sm"
                   }`}
                 >
                   <span>{tier.cta}</span>

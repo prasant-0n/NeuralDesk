@@ -39,14 +39,14 @@ export const LandingFAQ: React.FC = () => {
     <section id="faq" className="relative py-24 md:py-32 overflow-hidden">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-xs font-semibold mb-4">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-50 dark:bg-indigo-500/10 border border-indigo-200 dark:border-indigo-500/20 text-indigo-700 dark:text-indigo-400 text-xs font-semibold mb-4">
             <HelpCircle className="w-3.5 h-3.5" />
             <span>Frequently Asked Questions</span>
           </div>
-          <h2 className="text-3xl sm:text-5xl font-extrabold tracking-tight text-white mb-4">
+          <h2 className="text-3xl sm:text-5xl font-extrabold tracking-tight text-slate-900 dark:text-white mb-4">
             Got Questions? We Have Answers.
           </h2>
-          <p className="text-base sm:text-lg text-slate-400">
+          <p className="text-base sm:text-lg text-slate-600 dark:text-slate-400">
             Everything you need to know about deterministic DAG execution, BYOK security, and deployment.
           </p>
         </div>
@@ -58,18 +58,18 @@ export const LandingFAQ: React.FC = () => {
             return (
               <div
                 key={faq.q}
-                className="rounded-2xl border border-slate-800 bg-slate-950/80 overflow-hidden transition-all duration-200"
+                className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950/80 overflow-hidden shadow-sm dark:shadow-none transition-all duration-200"
               >
                 <button
                   onClick={() => toggle(idx)}
-                  className="w-full flex items-center justify-between p-6 text-left hover:bg-slate-900/40 transition-colors"
+                  className="w-full flex items-center justify-between p-6 text-left hover:bg-slate-50 dark:hover:bg-slate-900/40 transition-colors"
                 >
-                  <span className="text-base font-semibold text-slate-200">
+                  <span className="text-base font-semibold text-slate-900 dark:text-slate-200">
                     {faq.q}
                   </span>
                   <div
-                    className={`w-7 h-7 rounded-lg bg-slate-900 border border-slate-800 flex items-center justify-center text-slate-400 shrink-0 ml-4 transition-transform duration-200 ${
-                      isOpen ? "rotate-180 text-indigo-400 border-indigo-500/40" : ""
+                    className={`w-7 h-7 rounded-lg bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 flex items-center justify-center text-slate-500 dark:text-slate-400 shrink-0 ml-4 transition-transform duration-200 ${
+                      isOpen ? "rotate-180 text-indigo-600 dark:text-indigo-400 border-indigo-500/40" : ""
                     }`}
                   >
                     <ChevronDown className="w-4 h-4" />
@@ -77,7 +77,7 @@ export const LandingFAQ: React.FC = () => {
                 </button>
 
                 {isOpen && (
-                  <div className="px-6 pb-6 pt-1 text-sm text-slate-400 leading-relaxed border-t border-slate-800/80 bg-slate-900/20 font-normal">
+                  <div className="px-6 pb-6 pt-1 text-sm text-slate-600 dark:text-slate-400 leading-relaxed border-t border-slate-100 dark:border-slate-800/80 bg-slate-50/50 dark:bg-slate-900/20 font-normal">
                     {faq.a}
                   </div>
                 )}

@@ -19,7 +19,7 @@ export const LandingPage: React.FC = () => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-slate-950 dark:bg-charcoal-950 text-slate-100 selection:bg-indigo-500 selection:text-white font-sans antialiased overflow-x-hidden">
+    <div className="min-h-screen bg-white dark:bg-charcoal-950 text-slate-900 dark:text-slate-100 selection:bg-indigo-500 selection:text-white font-sans antialiased overflow-x-hidden transition-colors duration-200">
       {/* Floating Header */}
       <LandingNavbar />
 

@@ -18,13 +18,13 @@ export const LandingCTA: React.FC = () => {
   return (
     <section className="relative py-24 md:py-32 overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="relative rounded-3xl p-10 sm:p-16 md:p-20 border border-indigo-500/30 bg-gradient-to-b from-indigo-950/60 via-slate-950/90 to-slate-950 shadow-2xl shadow-indigo-950/80 backdrop-blur-2xl text-center overflow-hidden">
+        <div className="relative rounded-3xl p-10 sm:p-16 md:p-20 border border-indigo-500/30 bg-gradient-to-b from-indigo-950 via-slate-950 to-slate-950 shadow-2xl shadow-indigo-500/15 dark:shadow-indigo-950/80 backdrop-blur-2xl text-center overflow-hidden">
           {/* Ambient Lighting Gradients */}
           <div className="absolute top-0 left-1/2 -translate-x-1/2 w-96 h-96 bg-gradient-to-tr from-indigo-500/20 via-cyan-500/20 to-purple-500/20 rounded-full blur-[100px] pointer-events-none" />
 
           <div className="relative z-10 max-w-3xl mx-auto">
             {/* Pill */}
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-slate-900/90 border border-indigo-500/30 text-indigo-400 text-xs font-semibold mb-6 shadow-md">
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-slate-900/90 border border-indigo-500/30 text-indigo-300 text-xs font-semibold mb-6 shadow-md">
               <Sparkles className="w-3.5 h-3.5 text-cyan-300" />
               <span>Get Started in Under 30 Seconds</span>
             </div>
