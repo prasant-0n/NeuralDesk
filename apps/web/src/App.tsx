@@ -13,6 +13,7 @@ import { SettingsModal } from "./components/views/SettingsModal";
 import { AuthModal } from "./components/auth/AuthModal";
 import { SignInPage } from "./pages/SignInPage";
 import { SignUpPage } from "./pages/SignUpPage";
+import { LandingPage } from "./pages/LandingPage";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -68,10 +69,13 @@ export const App: React.FC = () => {
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
         <Routes>
-          {/* Root Workspace */}
-          <Route path="/" element={<StudioWorkspace />} />
+          {/* Landing Page (World-Class Conversion Showcase) */}
+          <Route path="/" element={<LandingPage />} />
+
+          {/* Primary Studio Workspace (Canvas, Workflows, Agents, Executions) */}
           <Route path="/studio" element={<StudioWorkspace />} />
           <Route path="/workspace" element={<StudioWorkspace />} />
+          <Route path="/canvas" element={<StudioWorkspace />} />
 
           {/* Dedicated Production Authentication Routes */}
           <Route path="/signin" element={<SignInPage />} />
