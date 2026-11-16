@@ -59,26 +59,10 @@ export const SignInPage: React.FC = () => {
       });
 
       if (res.error) {
-        if (
-          (res.error as any)?.code === "email_not_confirmed" ||
-          res.error.message?.includes("Email verification required")
-        ) {
-          setErrorMessage(
-            "Email verification required: Please verify your account via the verification email sent to your inbox before signing in."
-          );
-        } else if (
-          res.error.message?.includes("Email and password") ||
-          (res.error as any)?.code === "validation_failed"
-        ) {
-          setErrorMessage(
-            "Neon Auth Notice: Email and password sign-in is not enabled in your Neon Console. Please enable 'Email / Password' under Authentication in your Neon Console, or sign in via Google above."
-          );
-        } else {
-          setErrorMessage(
-            res.error.message ||
-              "Invalid email or password. Please check your credentials."
-          );
-        }
+        setErrorMessage(
+          res.error.message ||
+            "Invalid email or password. Please check your credentials."
+        );
       } else {
         setSuccessMessage("Authentication successful! Redirecting to workspace...");
         setTimeout(() => {
@@ -86,19 +70,9 @@ export const SignInPage: React.FC = () => {
         }, 600);
       }
     } catch (err: any) {
-      if (
-        err.message === "Failed to fetch" ||
-        err.message?.toLowerCase().includes("failed to fetch") ||
-        err.message?.includes("NetworkError")
-      ) {
-        setErrorMessage(
-          "Network / DNS Error (Failed to fetch): Unable to reach Neon Auth. If your Wi-Fi or ISP blocks AWS Neon subdomains, please enable 'Use Secure DNS (Google Public DNS 8.8.8.8)' in Chrome Settings (chrome://settings/security) or try on another network."
-        );
-      } else {
-        setErrorMessage(
-          err.message || "Unable to reach authentication gateway. Please retry."
-        );
-      }
+      setErrorMessage(
+        err.message || "Unable to reach authentication gateway. Please retry."
+      );
     } finally {
       setIsLoading(false);
     }
@@ -117,27 +91,12 @@ export const SignInPage: React.FC = () => {
 
       if (res?.error) {
         if (
-          res.error.message?.includes("Invalid callbackURL") ||
-          (res.error as any)?.code === "INVALID_CALLBACKURL"
-        ) {
-          setErrorMessage(
-            "Neon Domain Restriction: Please add '" +
-              window.location.origin +
-              "' under 'Domains' in your Neon Console to authorize OAuth redirects."
-          );
-        } else if (
           res.error.message?.includes("Provider not found") ||
+          (res.error as any)?.code === "PROVIDER_NOT_FOUND" ||
           res.error.message?.toLowerCase().includes("not found")
         ) {
           setErrorMessage(
-            "Google OAuth is not enabled in Neon Auth. Under 'OAuth providers' in your Neon Console, toggle on Google Shared keys."
-          );
-        } else if (
-          res.error.message?.includes("Failed to fetch") ||
-          res.error.message?.toLowerCase().includes("failed to fetch")
-        ) {
-          setErrorMessage(
-            "Network / DNS Error (Failed to fetch): Unable to reach Neon Auth. If your Wi-Fi or ISP blocks AWS Neon subdomains, please enable 'Use Secure DNS (Google Public DNS 8.8.8.8)' in Chrome Settings (chrome://settings/security) or try on another network."
+            "Google OAuth configuration: Please configure GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET in the Render backend environment variables to enable Google Workspace login."
           );
         } else {
           setErrorMessage(
@@ -146,18 +105,9 @@ export const SignInPage: React.FC = () => {
         }
       }
     } catch (err: any) {
-      if (
-        err.message === "Failed to fetch" ||
-        err.message?.toLowerCase().includes("failed to fetch")
-      ) {
-        setErrorMessage(
-          "Network / DNS Error (Failed to fetch): Unable to reach Neon Auth. If your Wi-Fi or ISP blocks AWS Neon subdomains, please enable 'Use Secure DNS (Google Public DNS 8.8.8.8)' in Chrome Settings (chrome://settings/security) or try on another network."
-        );
-      } else {
-        setErrorMessage(
-          "Google OAuth integration requires active OAuth credentials or Neon Managed Auth enabled. Use Work Email or the 1-Click Evaluation persona below."
-        );
-      }
+      setErrorMessage(
+        err.message || "Failed to initiate Google OAuth login."
+      );
     } finally {
       setIsLoading(false);
     }
