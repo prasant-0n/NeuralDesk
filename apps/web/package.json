@@ -9,6 +9,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@neondatabase/auth": "0.7.0-beta",
     "@neuraldesk/shared": "workspace:*",
     "@tanstack/react-query": "^5.60.5",
     "@xyflow/react": "^12.3.6",
