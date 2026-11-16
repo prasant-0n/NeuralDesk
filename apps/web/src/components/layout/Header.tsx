@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 import {
   Zap,
   Key,
@@ -9,6 +10,8 @@ import {
   Moon,
   Sun,
   LogOut,
+  LogIn,
+  UserPlus,
 } from "lucide-react";
 import { useSettingsStore } from "../../store/settingsStore";
 import { useAuthStore } from "../../store/authStore";
@@ -114,7 +117,7 @@ export const Header: React.FC<HeaderProps> = ({ activeView }) => {
         </button>
 
         {/* User Account / Better Auth Status */}
-        {activeUser && (
+        {activeUser ? (
           <div className="flex items-center gap-1.5">
             <button
               onClick={() => setIsAuthModalOpen(true)}
@@ -136,6 +139,23 @@ export const Header: React.FC<HeaderProps> = ({ activeView }) => {
             >
               <LogOut className="w-3.5 h-3.5" />
             </button>
+          </div>
+        ) : (
+          <div className="flex items-center gap-2">
+            <Link
+              to="/signin"
+              className="px-2.5 py-1 text-xs font-semibold text-slate-700 dark:text-charcoal-200 hover:text-indigo-600 dark:hover:text-indigo-400 rounded-lg hover:bg-slate-100 dark:hover:bg-charcoal-800 transition-colors flex items-center gap-1.5"
+            >
+              <LogIn className="w-3.5 h-3.5" />
+              <span>Sign In</span>
+            </Link>
+            <Link
+              to="/signup"
+              className="px-3 py-1 text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-500 rounded-lg shadow-sm shadow-indigo-600/20 transition-all flex items-center gap-1.5"
+            >
+              <UserPlus className="w-3.5 h-3.5" />
+              <span>Sign Up</span>
+            </Link>
           </div>
         )}
       </div>
