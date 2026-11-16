@@ -11,9 +11,21 @@ export default defineConfig({
   },
   server: {
     port: 3000,
+    host: true,
     proxy: {
       "/api": {
-        target: "http://localhost:3001",
+        target: process.env.VITE_API_URL || "https://neuraldesk-api.onrender.com",
+        changeOrigin: true,
+        secure: false,
+      },
+    },
+  },
+  preview: {
+    port: 3000,
+    host: true,
+    proxy: {
+      "/api": {
+        target: process.env.VITE_API_URL || "https://neuraldesk-api.onrender.com",
         changeOrigin: true,
         secure: false,
       },

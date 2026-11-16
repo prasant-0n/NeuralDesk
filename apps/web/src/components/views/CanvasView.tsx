@@ -137,74 +137,77 @@ export const CanvasView: React.FC = () => {
 
   return (
     <div className="flex-1 flex flex-col h-full overflow-hidden relative">
-      {/* Top Workflow Control Bar */}
-      <div className="h-13 bg-white dark:bg-charcoal-900 border-b border-slate-200 dark:border-charcoal-800 px-4 py-2 flex items-center justify-between z-20 select-none transition-colors duration-150">
+      {/* Top Workflow Control Bar - Responsive Layout across Mobile, Tablet, Laptop, and Ultrawide */}
+      <div className="h-13 bg-white dark:bg-charcoal-900 border-b border-slate-200 dark:border-charcoal-800 px-2 sm:px-4 py-2 flex items-center justify-between z-20 select-none transition-colors duration-150 gap-2 shrink-0">
         {/* Title & Status Badges */}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-1.5 sm:gap-2 min-w-0 shrink">
           <input
             type="text"
             value={workflowTitle}
             onChange={(e) => setWorkflowTitle(e.target.value)}
-            className="bg-transparent text-sm font-bold text-slate-900 dark:text-white hover:bg-slate-100 dark:hover:bg-charcoal-800/60 focus:bg-white dark:focus:bg-charcoal-950 px-2 py-1 rounded-lg border border-transparent focus:border-indigo-500 focus:outline-none transition-colors max-w-xs sm:max-w-sm truncate"
+            className="bg-transparent text-xs sm:text-sm font-bold text-slate-900 dark:text-white hover:bg-slate-100 dark:hover:bg-charcoal-800/60 focus:bg-white dark:focus:bg-charcoal-950 px-1.5 py-1 sm:px-2 rounded-lg border border-transparent focus:border-indigo-500 focus:outline-none transition-colors min-w-0 max-w-[120px] sm:max-w-[170px] md:max-w-[210px] lg:max-w-xs truncate"
             title="Click to edit workflow name"
           />
 
-          <span className="px-2 py-0.5 rounded text-[10px] font-semibold uppercase tracking-wider bg-indigo-50 dark:bg-indigo-500/10 text-indigo-700 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-500/20">
+          <span className="hidden sm:inline-block px-1.5 sm:px-2 py-0.5 rounded text-[9px] sm:text-[10px] font-semibold uppercase tracking-wider bg-indigo-50 dark:bg-indigo-500/10 text-indigo-700 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-500/20 shrink-0">
             DRAFT
           </span>
 
           {/* SSE Live Streaming Pulse Badge */}
           {isStreaming && (
-            <span className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-indigo-50 text-indigo-700 border border-indigo-200 dark:bg-indigo-500/10 dark:text-indigo-400 dark:border-indigo-500/20 animate-pulse">
+            <span className="inline-flex items-center gap-1.5 px-2 sm:px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-indigo-50 text-indigo-700 border border-indigo-200 dark:bg-indigo-500/10 dark:text-indigo-400 dark:border-indigo-500/20 animate-pulse shrink-0">
               <Radio className="w-3 h-3 text-indigo-600 dark:text-indigo-400 animate-spin" />
-              <span>SSE Stream Live</span>
+              <span className="hidden md:inline">SSE Stream Live</span>
             </span>
           )}
 
           {executionStatus === "completed" && !isStreaming && (
-            <span className="hidden sm:inline-flex items-center gap-1 text-[11px] text-emerald-600 dark:text-emerald-400 font-mono">
+            <span className="hidden sm:inline-flex items-center gap-1 text-[11px] text-emerald-600 dark:text-emerald-400 font-mono shrink-0">
               <CheckCircle2 className="w-3.5 h-3.5" />
-              <span>Executed</span>
+              <span className="hidden md:inline">Executed</span>
             </span>
           )}
           {executionStatus === "failed" && !isStreaming && (
-            <span className="hidden sm:inline-flex items-center gap-1 text-[11px] text-rose-600 dark:text-rose-400 font-mono">
+            <span className="hidden sm:inline-flex items-center gap-1 text-[11px] text-rose-600 dark:text-rose-400 font-mono shrink-0">
               <AlertCircle className="w-3.5 h-3.5" />
-              <span>Failed</span>
+              <span className="hidden md:inline">Failed</span>
             </span>
           )}
         </div>
 
-        {/* Center / Right Control Actions */}
-        <div className="flex items-center gap-2">
+        {/* Center / Right Control Actions: Responsive Adaptive Groups */}
+        <div className="flex items-center gap-1 sm:gap-2 shrink-0">
           {/* Undo / Redo */}
-          <div className="flex items-center bg-slate-100/90 dark:bg-charcoal-950/80 border border-slate-200 dark:border-charcoal-800 rounded-lg p-0.5">
+          <div className="flex items-center bg-slate-100/90 dark:bg-charcoal-950/80 border border-slate-200 dark:border-charcoal-800 rounded-lg p-0.5 shrink-0">
             <button
               onClick={undo}
               disabled={!canUndo}
-              className="p-1.5 rounded hover:bg-slate-200 dark:hover:bg-charcoal-800 text-slate-500 dark:text-charcoal-400 hover:text-slate-900 dark:hover:text-white disabled:opacity-30 disabled:pointer-events-none transition-opacity"
+              className="p-1 sm:p-1.5 rounded hover:bg-slate-200 dark:hover:bg-charcoal-800 text-slate-500 dark:text-charcoal-400 hover:text-slate-900 dark:hover:text-white disabled:opacity-30 disabled:pointer-events-none transition-opacity"
               title="Undo (Ctrl+Z)"
+              aria-label="Undo"
             >
               <RotateCcw className="w-3.5 h-3.5" />
             </button>
             <button
               onClick={redo}
               disabled={!canRedo}
-              className="p-1.5 rounded hover:bg-slate-200 dark:hover:bg-charcoal-800 text-slate-500 dark:text-charcoal-400 hover:text-slate-900 dark:hover:text-white disabled:opacity-30 disabled:pointer-events-none transition-opacity"
+              className="p-1 sm:p-1.5 rounded hover:bg-slate-200 dark:hover:bg-charcoal-800 text-slate-500 dark:text-charcoal-400 hover:text-slate-900 dark:hover:text-white disabled:opacity-30 disabled:pointer-events-none transition-opacity"
               title="Redo (Ctrl+Y)"
+              aria-label="Redo"
             >
               <RotateCw className="w-3.5 h-3.5" />
             </button>
           </div>
 
           {/* Templates Dropdown */}
-          <div className="relative">
+          <div className="relative shrink-0">
             <button
               onClick={() => setTemplateDropdownOpen(!templateDropdownOpen)}
-              className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-slate-100/90 hover:bg-slate-200 dark:bg-charcoal-950/80 dark:hover:bg-charcoal-800 border border-slate-200 dark:border-charcoal-800 text-xs text-slate-700 dark:text-charcoal-300 hover:text-slate-900 dark:hover:text-white transition-colors"
+              className="flex items-center gap-1 px-2 py-1.5 sm:px-2.5 rounded-lg bg-slate-100/90 hover:bg-slate-200 dark:bg-charcoal-950/80 dark:hover:bg-charcoal-800 border border-slate-200 dark:border-charcoal-800 text-xs text-slate-700 dark:text-charcoal-300 hover:text-slate-900 dark:hover:text-white transition-colors"
+              title="Load Pre-Built DAG Template"
             >
               <LayoutTemplate className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
-              <span className="hidden sm:inline">Templates</span>
+              <span className="hidden lg:inline">Templates</span>
             </button>
 
             {templateDropdownOpen && (
@@ -245,7 +248,7 @@ export const CanvasView: React.FC = () => {
             onClick={handleSaveToApi}
             disabled={isSaving}
             className={cn(
-              "flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border text-xs font-medium transition-all shadow-sm",
+              "flex items-center gap-1 sm:gap-1.5 px-2 py-1.5 sm:px-2.5 rounded-lg border text-xs font-medium transition-all shadow-sm shrink-0",
               saveSuccess
                 ? "bg-emerald-50 text-emerald-700 border-emerald-300 dark:bg-emerald-950/40 dark:text-emerald-400 dark:border-emerald-700/50"
                 : "bg-slate-100/90 hover:bg-slate-200 dark:bg-charcoal-950/80 dark:hover:bg-charcoal-800 border-slate-200 dark:border-charcoal-800 text-slate-700 dark:text-charcoal-300 hover:text-slate-900 dark:hover:text-white"
@@ -255,17 +258,17 @@ export const CanvasView: React.FC = () => {
             {isSaving ? (
               <>
                 <Loader2 className="w-3.5 h-3.5 animate-spin text-indigo-600 dark:text-indigo-400" />
-                <span className="hidden sm:inline">Saving...</span>
+                <span className="hidden lg:inline">Saving...</span>
               </>
             ) : saveSuccess ? (
               <>
                 <Check className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
-                <span className="hidden sm:inline">Saved</span>
+                <span className="hidden lg:inline">Saved</span>
               </>
             ) : (
               <>
                 <Cloud className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
-                <span className="hidden sm:inline">Save API</span>
+                <span className="hidden lg:inline">Save API</span>
               </>
             )}
           </button>
@@ -280,15 +283,17 @@ export const CanvasView: React.FC = () => {
           />
           <button
             onClick={() => fileInputRef.current?.click()}
-            className="p-1.5 rounded-lg bg-slate-100/90 hover:bg-slate-200 dark:bg-charcoal-950/80 dark:hover:bg-charcoal-800 border border-slate-200 dark:border-charcoal-800 text-slate-600 dark:text-charcoal-400 hover:text-slate-900 dark:hover:text-white transition-colors"
+            className="p-1.5 rounded-lg bg-slate-100/90 hover:bg-slate-200 dark:bg-charcoal-950/80 dark:hover:bg-charcoal-800 border border-slate-200 dark:border-charcoal-800 text-slate-600 dark:text-charcoal-400 hover:text-slate-900 dark:hover:text-white transition-colors shrink-0"
             title="Import Workflow JSON"
+            aria-label="Import Workflow"
           >
             <Upload className="w-3.5 h-3.5" />
           </button>
           <button
             onClick={handleExport}
-            className="p-1.5 rounded-lg bg-slate-100/90 hover:bg-slate-200 dark:bg-charcoal-950/80 dark:hover:bg-charcoal-800 border border-slate-200 dark:border-charcoal-800 text-slate-600 dark:text-charcoal-400 hover:text-slate-900 dark:hover:text-white transition-colors"
+            className="p-1.5 rounded-lg bg-slate-100/90 hover:bg-slate-200 dark:bg-charcoal-950/80 dark:hover:bg-charcoal-800 border border-slate-200 dark:border-charcoal-800 text-slate-600 dark:text-charcoal-400 hover:text-slate-900 dark:hover:text-white transition-colors shrink-0"
             title="Export Workflow JSON"
+            aria-label="Export Workflow"
           >
             {exportSuccess ? <Check className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" /> : <Download className="w-3.5 h-3.5" />}
           </button>
@@ -300,28 +305,29 @@ export const CanvasView: React.FC = () => {
                 clearCanvas();
               }
             }}
-            className="p-1.5 rounded-lg hover:bg-rose-50 dark:hover:bg-rose-950/50 text-slate-500 hover:text-rose-600 dark:text-charcoal-400 dark:hover:text-rose-400 transition-colors"
+            className="p-1.5 rounded-lg hover:bg-rose-50 dark:hover:bg-rose-950/50 text-slate-500 hover:text-rose-600 dark:text-charcoal-400 dark:hover:text-rose-400 transition-colors shrink-0"
             title="Clear Canvas"
+            aria-label="Clear Canvas"
           >
             <Trash2 className="w-3.5 h-3.5" />
           </button>
 
           {/* Execution Mode Selector Dropdown */}
-          <div className="relative">
+          <div className="relative shrink-0">
             <button
               onClick={() => setModeDropdownOpen(!modeDropdownOpen)}
               disabled={isRunning}
               className={cn(
-                "flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border text-xs font-semibold transition-all shadow-sm",
+                "flex items-center gap-1 sm:gap-1.5 px-2 py-1.5 sm:px-2.5 rounded-lg border text-xs font-semibold transition-all shadow-sm",
                 "bg-slate-100/90 hover:bg-slate-200 dark:bg-charcoal-950/80 dark:hover:bg-charcoal-800 border-slate-200 dark:border-charcoal-800 text-slate-800 dark:text-charcoal-200",
                 isRunning && "opacity-50 cursor-not-allowed"
               )}
               title="Select DAG Execution Runtime & Telemetry Target"
             >
-              <ActiveModeIcon className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
-              <span className="hidden md:inline">{activeModeOption.label}</span>
-              <span className="md:hidden">{activeModeOption.badge}</span>
-              <ChevronDown className="w-3 h-3 text-slate-400 dark:text-charcoal-500" />
+              <ActiveModeIcon className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400 shrink-0" />
+              <span className="hidden xl:inline">{activeModeOption.label}</span>
+              <span className="hidden md:inline xl:hidden">{activeModeOption.badge}</span>
+              <ChevronDown className="w-3 h-3 text-slate-400 dark:text-charcoal-500 ml-0.5" />
             </button>
 
             {modeDropdownOpen && (
@@ -371,21 +377,23 @@ export const CanvasView: React.FC = () => {
           <button
             onClick={handleRun}
             className={cn(
-              "flex items-center gap-2 px-4 py-1.5 rounded-lg text-xs font-bold transition-all shadow-md",
+              "flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 rounded-lg text-xs font-bold transition-all shadow-md shrink-0 cursor-pointer",
               isRunning
                 ? "bg-rose-600 hover:bg-rose-500 text-white shadow-rose-600/30 animate-pulse"
-                : "bg-indigo-600 hover:bg-indigo-500 text-white shadow-indigo-600/30"
+                : "bg-indigo-600 hover:bg-indigo-500 text-white shadow-indigo-600/30 hover:scale-[1.02] active:scale-[0.98]"
             )}
           >
             {isRunning ? (
               <>
-                <Square className="w-3.5 h-3.5 fill-white" />
-                <span>Stop Execution</span>
+                <Square className="w-3.5 h-3.5 fill-white shrink-0" />
+                <span className="hidden lg:inline">Stop Execution</span>
+                <span className="lg:hidden">Stop</span>
               </>
             ) : (
               <>
-                <Play className="w-3.5 h-3.5 fill-white" />
-                <span>Run Workflow</span>
+                <Play className="w-3.5 h-3.5 fill-white shrink-0" />
+                <span className="hidden lg:inline">Run Workflow</span>
+                <span className="lg:hidden">Run</span>
               </>
             )}
           </button>

@@ -42,7 +42,8 @@ export const LandingNavbar: React.FC = () => {
     { label: "Features", href: "#features" },
     { label: "Interactive Demo", href: "#playground" },
     { label: "Architecture", href: "#architecture" },
-    { label: "Pricing", href: "#pricing" },
+    { label: "Security & BYOK", href: "#security" },
+    { label: "Comparison", href: "#comparison" },
     { label: "FAQ", href: "#faq" },
   ];
 

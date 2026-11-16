@@ -281,7 +281,7 @@ export const DashboardView: React.FC<{ onNavigateToCanvas?: () => void }> = ({ o
       </div>
 
       {/* 5 Primary Operational KPI Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4">
         {/* Active DAGs */}
         <div className="p-4 rounded-2xl bg-white dark:bg-charcoal-900 border border-slate-200 dark:border-charcoal-800 shadow-sm dark:shadow-lg space-y-2">
           <div className="flex items-center justify-between text-slate-500 dark:text-charcoal-400">

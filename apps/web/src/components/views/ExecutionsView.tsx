@@ -125,7 +125,7 @@ export const ExecutionsView: React.FC = () => {
   };
 
   return (
-    <div className="flex-1 overflow-y-auto p-6 space-y-5 bg-slate-50 dark:bg-charcoal-950 flex flex-col select-none transition-colors duration-150">
+    <div className="flex-1 overflow-y-auto p-3 sm:p-6 space-y-4 sm:space-y-5 bg-slate-50 dark:bg-charcoal-950 flex flex-col select-none transition-colors duration-150">
       {/* Title & Refresh Control */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
@@ -361,7 +361,7 @@ export const ExecutionsView: React.FC = () => {
           onClick={() => setSelectedExec(null)}
         >
           <div
-            className="w-full max-w-2xl bg-white dark:bg-charcoal-900 border border-slate-200 dark:border-charcoal-800 rounded-2xl shadow-2xl overflow-hidden select-none"
+            className="w-full max-w-2xl bg-white dark:bg-charcoal-900 border border-slate-200 dark:border-charcoal-800 rounded-2xl shadow-2xl overflow-hidden select-none max-h-[90vh] flex flex-col"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="p-4 border-b border-slate-200 dark:border-charcoal-800 flex items-center justify-between bg-slate-50 dark:bg-charcoal-950/60">

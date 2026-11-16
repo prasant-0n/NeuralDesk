@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Zap,
   Sparkles,
@@ -12,6 +12,7 @@ import {
   ChevronRight,
   Search,
   Plus,
+  X,
 } from "lucide-react";
 import { type NodeKind } from "@neuraldesk/shared";
 import { useWorkflowStore } from "../../store/workflowStore";
@@ -112,9 +113,32 @@ const PALETTE_ITEMS: PaletteItem[] = [
 ];
 
 export const NodePalette: React.FC = () => {
-  const [isCollapsed, setIsCollapsed] = useState(false);
+  // Default to collapsed on screens <= 1024px (tablets & mobiles) to maximize canvas area
+  const [isCollapsed, setIsCollapsed] = useState(() => {
+    if (typeof window !== "undefined") {
+      return window.innerWidth <= 1024;
+    }
+    return false;
+  });
+
+  const [isTabletOrMobile, setIsTabletOrMobile] = useState(() => {
+    if (typeof window !== "undefined") {
+      return window.innerWidth <= 1024;
+    }
+    return false;
+  });
+
   const [searchQuery, setSearchQuery] = useState("");
   const addNode = useWorkflowStore((state) => state.addNode);
+
+  useEffect(() => {
+    const handleResize = () => {
+      const isTablet = window.innerWidth <= 1024;
+      setIsTabletOrMobile(isTablet);
+    };
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   const filteredItems = PALETTE_ITEMS.filter(
     (item) =>
@@ -128,100 +152,135 @@ export const NodePalette: React.FC = () => {
     event.dataTransfer.effectAllowed = "move";
   };
 
+  const handleAddAndCloseOnMobile = (kind: NodeKind) => {
+    addNode(kind);
+    if (isTabletOrMobile) {
+      setIsCollapsed(true);
+    }
+  };
+
   return (
-    <aside
-      className={cn(
-        "relative flex flex-col bg-white/95 dark:bg-charcoal-900/90 border-r border-slate-200 dark:border-charcoal-800 backdrop-blur-md transition-all duration-300 z-10 select-none",
-        isCollapsed ? "w-14" : "w-72"
+    <>
+      {/* Semi-transparent backdrop overlay when expanded on tablet/mobile (< 1024px) */}
+      {isTabletOrMobile && !isCollapsed && (
+        <div
+          className="fixed inset-0 bg-black/40 dark:bg-black/60 backdrop-blur-xs z-30 transition-opacity animate-in fade-in duration-150"
+          onClick={() => setIsCollapsed(true)}
+          aria-hidden="true"
+        />
       )}
-    >
-      {/* Header & Collapse Toggle */}
-      <div className="flex items-center justify-between p-3 border-b border-slate-200 dark:border-charcoal-800">
+
+      <aside
+        className={cn(
+          "flex flex-col bg-white/95 dark:bg-charcoal-900/95 border-r border-slate-200 dark:border-charcoal-800 backdrop-blur-md select-none transition-all duration-300",
+          // On tablets (< 1024px) when expanded, render as a slide-over overlay so canvas remains wide
+          isTabletOrMobile && !isCollapsed
+            ? "fixed top-14 bottom-0 left-14 sm:left-16 z-40 w-72 max-w-[calc(100vw-4.5rem)] shadow-2xl animate-in slide-in-from-left duration-200"
+            : isCollapsed
+            ? "w-14 relative z-10"
+            : "w-72 relative z-10"
+        )}
+      >
+        {/* Header & Collapse Toggle */}
+        <div className="flex items-center justify-between p-3 border-b border-slate-200 dark:border-charcoal-800">
+          {!isCollapsed && (
+            <div className="min-w-0 pr-2">
+              <h3 className="text-xs font-bold uppercase tracking-wider text-slate-800 dark:text-charcoal-200 truncate">
+                Node Library
+              </h3>
+              <p className="text-[10px] text-slate-500 dark:text-charcoal-400 truncate">
+                Drag to canvas or click to add
+              </p>
+            </div>
+          )}
+
+          <button
+            onClick={() => setIsCollapsed(!isCollapsed)}
+            className="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-charcoal-800 text-slate-500 dark:text-charcoal-400 hover:text-slate-900 dark:hover:text-white transition-colors ml-auto shrink-0"
+            title={isCollapsed ? "Expand Node Library" : "Collapse Node Library"}
+            aria-label={isCollapsed ? "Expand Palette" : "Collapse Palette"}
+          >
+            {isCollapsed ? (
+              <ChevronRight className="w-4 h-4" />
+            ) : isTabletOrMobile ? (
+              <X className="w-4 h-4" />
+            ) : (
+              <ChevronLeft className="w-4 h-4" />
+            )}
+          </button>
+        </div>
+
+        {/* Search Bar (When Expanded) */}
         {!isCollapsed && (
-          <div>
-            <h3 className="text-xs font-bold uppercase tracking-wider text-slate-800 dark:text-charcoal-200">
-              Node Library
-            </h3>
-            <p className="text-[10px] text-slate-500 dark:text-charcoal-400">Drag to canvas or click to add</p>
+          <div className="p-2.5 border-b border-slate-200 dark:border-charcoal-800/60">
+            <div className="relative">
+              <Search className="w-3.5 h-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400 dark:text-charcoal-400" />
+              <input
+                type="text"
+                placeholder="Search nodes..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full bg-slate-100 dark:bg-charcoal-950/80 border border-slate-200 dark:border-charcoal-800 rounded-lg pl-8 pr-2.5 py-1.5 text-xs text-slate-800 dark:text-charcoal-100 placeholder-slate-400 dark:placeholder-charcoal-500 focus:outline-none focus:border-indigo-500 transition-colors"
+              />
+            </div>
           </div>
         )}
-        <button
-          onClick={() => setIsCollapsed(!isCollapsed)}
-          className="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-charcoal-800 text-slate-500 dark:text-charcoal-400 hover:text-slate-900 dark:hover:text-white transition-colors ml-auto"
-          title={isCollapsed ? "Expand Palette" : "Collapse Palette"}
-        >
-          {isCollapsed ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
-        </button>
-      </div>
 
-      {/* Search Bar (When Expanded) */}
-      {!isCollapsed && (
-        <div className="p-2.5 border-b border-slate-200 dark:border-charcoal-800/60">
-          <div className="relative">
-            <Search className="w-3.5 h-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400 dark:text-charcoal-400" />
-            <input
-              type="text"
-              placeholder="Search nodes..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-slate-100 dark:bg-charcoal-950/80 border border-slate-200 dark:border-charcoal-800 rounded-lg pl-8 pr-2.5 py-1.5 text-xs text-slate-800 dark:text-charcoal-100 placeholder-slate-400 dark:placeholder-charcoal-500 focus:outline-none focus:border-indigo-500 transition-colors"
-            />
-          </div>
-        </div>
-      )}
-
-      {/* Palette Items List */}
-      <div className="flex-1 overflow-y-auto p-2 space-y-1.5">
-        {filteredItems.map((item) => {
-          const Icon = item.icon;
-          return (
-            <div
-              key={item.kind}
-              draggable
-              onDragStart={(e) => onDragStart(e, item.kind)}
-              onClick={() => addNode(item.kind)}
-              title={isCollapsed ? `${item.label} - ${item.description}` : undefined}
-              className={cn(
-                "group flex items-center gap-3 p-2 rounded-xl border border-slate-200 dark:border-charcoal-800/80 bg-white dark:bg-charcoal-950/50 hover:bg-slate-50 dark:hover:bg-charcoal-850 hover:shadow-sm cursor-grab active:cursor-grabbing transition-all duration-150",
-                item.borderHover,
-                isCollapsed && "justify-center p-2.5"
-              )}
-            >
-              <div className="p-1.5 rounded-lg bg-slate-100 dark:bg-charcoal-900 border border-slate-200 dark:border-charcoal-800 group-hover:scale-105 transition-transform shrink-0">
-                <Icon className={cn("w-4 h-4", item.color)} />
-              </div>
-
-              {!isCollapsed && (
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs font-semibold text-slate-800 dark:text-charcoal-200 group-hover:text-indigo-600 dark:group-hover:text-white truncate">
-                      {item.label}
-                    </span>
-                    <span className="text-[9px] uppercase font-mono px-1 rounded bg-slate-100 dark:bg-charcoal-900 border border-slate-200 dark:border-charcoal-800 text-slate-600 dark:text-charcoal-400">
-                      {item.badge}
-                    </span>
-                  </div>
-                  <p className="text-[10px] text-slate-500 dark:text-charcoal-400 truncate mt-0.5">{item.description}</p>
+        {/* Palette Items List */}
+        <div className="flex-1 overflow-y-auto p-2 space-y-1.5">
+          {filteredItems.map((item) => {
+            const Icon = item.icon;
+            return (
+              <div
+                key={item.kind}
+                draggable
+                onDragStart={(e) => onDragStart(e, item.kind)}
+                onClick={() => handleAddAndCloseOnMobile(item.kind)}
+                title={isCollapsed ? `${item.label} - ${item.description}` : undefined}
+                className={cn(
+                  "group flex items-center gap-3 p-2 rounded-xl border border-slate-200 dark:border-charcoal-800/80 bg-white dark:bg-charcoal-950/50 hover:bg-slate-50 dark:hover:bg-charcoal-850 hover:shadow-sm cursor-grab active:cursor-grabbing transition-all duration-150",
+                  item.borderHover,
+                  isCollapsed && "justify-center p-2.5"
+                )}
+              >
+                <div className="p-1.5 rounded-lg bg-slate-100 dark:bg-charcoal-900 border border-slate-200 dark:border-charcoal-800 group-hover:scale-105 transition-transform shrink-0">
+                  <Icon className={cn("w-4 h-4", item.color)} />
                 </div>
-              )}
 
-              {!isCollapsed && (
-                <button
-                  type="button"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    addNode(item.kind);
-                  }}
-                  className="opacity-0 group-hover:opacity-100 p-1 hover:bg-slate-200 dark:hover:bg-charcoal-800 rounded text-slate-500 dark:text-charcoal-400 hover:text-slate-900 dark:hover:text-white transition-opacity"
-                  title="Add node to canvas"
-                >
-                  <Plus className="w-3.5 h-3.5" />
-                </button>
-              )}
-            </div>
-          );
-        })}
-      </div>
-    </aside>
+                {!isCollapsed && (
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-semibold text-slate-800 dark:text-charcoal-200 group-hover:text-indigo-600 dark:group-hover:text-white truncate">
+                        {item.label}
+                      </span>
+                      <span className="text-[9px] uppercase font-mono px-1 rounded bg-slate-100 dark:bg-charcoal-900 border border-slate-200 dark:border-charcoal-800 text-slate-600 dark:text-charcoal-400 shrink-0">
+                        {item.badge}
+                      </span>
+                    </div>
+                    <p className="text-[10px] text-slate-500 dark:text-charcoal-400 truncate mt-0.5">
+                      {item.description}
+                    </p>
+                  </div>
+                )}
+
+                {!isCollapsed && (
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleAddAndCloseOnMobile(item.kind);
+                    }}
+                    className="opacity-0 group-hover:opacity-100 p-1 hover:bg-slate-200 dark:hover:bg-charcoal-800 rounded text-slate-500 dark:text-charcoal-400 hover:text-slate-900 dark:hover:text-white transition-opacity shrink-0"
+                    title="Add node to canvas"
+                  >
+                    <Plus className="w-3.5 h-3.5" />
+                  </button>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      </aside>
+    </>
   );
 };

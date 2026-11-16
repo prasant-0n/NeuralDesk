@@ -64,11 +64,11 @@ export const SettingsModal: React.FC = () => {
       onClick={() => setIsSettingsOpen(false)}
     >
       <div
-        className="w-full max-w-lg bg-white dark:bg-charcoal-900 border border-slate-200 dark:border-charcoal-800 rounded-2xl shadow-2xl overflow-hidden select-none transition-colors duration-150"
+        className="w-full max-w-lg bg-white dark:bg-charcoal-900 border border-slate-200 dark:border-charcoal-800 rounded-2xl shadow-2xl overflow-hidden select-none transition-colors duration-150 max-h-[90vh] flex flex-col"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="p-5 border-b border-slate-200 dark:border-charcoal-800 flex items-center justify-between bg-slate-50 dark:bg-charcoal-950/60">
+        <div className="p-4 sm:p-5 border-b border-slate-200 dark:border-charcoal-800 flex items-center justify-between bg-slate-50 dark:bg-charcoal-950/60 shrink-0">
           <div className="flex items-center gap-2.5">
             <div className="p-2 rounded-xl bg-indigo-50 dark:bg-indigo-500/10 border border-indigo-200 dark:border-indigo-500/20 text-indigo-600 dark:text-indigo-400">
               <Key className="w-5 h-5" />
@@ -87,7 +87,7 @@ export const SettingsModal: React.FC = () => {
         </div>
 
         {/* Body */}
-        <div className="p-5 space-y-5 text-xs">
+        <div className="p-4 sm:p-5 space-y-5 text-xs overflow-y-auto flex-1">
           {/* Execution Mode */}
           <div className="space-y-2">
             <label className="text-xs font-semibold text-slate-800 dark:text-charcoal-200">Execution Engine Mode</label>

@@ -5,9 +5,8 @@ import { LandingMetrics } from "../components/landing/LandingMetrics";
 import { LandingBentoGrid } from "../components/landing/LandingBentoGrid";
 import { LandingPlayground } from "../components/landing/LandingPlayground";
 import { LandingCodeShowcase } from "../components/landing/LandingCodeShowcase";
+import { LandingSecurity } from "../components/landing/LandingSecurity";
 import { LandingComparisonTable } from "../components/landing/LandingComparisonTable";
-import { LandingTestimonials } from "../components/landing/LandingTestimonials";
-import { LandingPricing } from "../components/landing/LandingPricing";
 import { LandingFAQ } from "../components/landing/LandingFAQ";
 import { LandingCTA } from "../components/landing/LandingCTA";
 import { LandingFooter } from "../components/landing/LandingFooter";
@@ -38,14 +37,11 @@ export const LandingPage: React.FC = () => {
       {/* Developer-First Code & API Showcase */}
       <LandingCodeShowcase />
 
+      {/* Zero-Knowledge BYOK & Enterprise Security Architecture */}
+      <LandingSecurity />
+
       {/* Architectural Comparison Matrix */}
       <LandingComparisonTable />
-
-      {/* Customer Proof & Testimonials */}
-      <LandingTestimonials />
-
-      {/* Transparent Developer & Team Pricing */}
-      <LandingPricing />
 
       {/* Interactive FAQ Accordion */}
       <LandingFAQ />

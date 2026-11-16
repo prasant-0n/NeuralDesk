@@ -12,6 +12,7 @@ import {
   Workflow,
   Check,
   ChevronDown,
+  X,
 } from "lucide-react";
 import { formatTokens, cn } from "../../lib/utils";
 import { useSettingsStore } from "../../store/settingsStore";
@@ -94,6 +95,7 @@ export const AgentsView: React.FC = () => {
   const [isTyping, setIsTyping] = useState(false);
   const [showConfig, setShowConfig] = useState(false);
   const [insertedToCanvas, setInsertedToCanvas] = useState(false);
+  const [mobileShowList, setMobileShowList] = useState(false);
 
   const geminiApiKey = useSettingsStore((state) => state.geminiApiKey);
   const addNode = useWorkflowStore((state) => state.addNode);
@@ -202,16 +204,30 @@ export const AgentsView: React.FC = () => {
 
   return (
     <div className="flex-1 overflow-hidden flex bg-slate-50 dark:bg-charcoal-950 select-none transition-colors duration-150">
-      {/* Left Agent Personas List */}
-      <div className="w-80 border-r border-slate-200 dark:border-charcoal-800 bg-white dark:bg-charcoal-900 flex flex-col">
-        <div className="p-4 border-b border-slate-200 dark:border-charcoal-800">
-          <div className="flex items-center gap-2">
-            <Bot className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
-            <h2 className="text-sm font-bold text-slate-900 dark:text-white">AI Agent Studio</h2>
+      {/* Left Agent Personas List - Responsive Drawer / Column on Tablet */}
+      <div
+        className={cn(
+          "w-full lg:w-80 border-r border-slate-200 dark:border-charcoal-800 bg-white dark:bg-charcoal-900 flex flex-col shrink-0 transition-all",
+          mobileShowList ? "flex" : "hidden lg:flex"
+        )}
+      >
+        <div className="p-4 border-b border-slate-200 dark:border-charcoal-800 flex items-center justify-between">
+          <div>
+            <div className="flex items-center gap-2">
+              <Bot className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+              <h2 className="text-sm font-bold text-slate-900 dark:text-white">AI Agent Studio</h2>
+            </div>
+            <p className="text-xs text-slate-500 dark:text-charcoal-400 mt-0.5">
+              Autonomous agent personas with Gemini function calling
+            </p>
           </div>
-          <p className="text-xs text-slate-500 dark:text-charcoal-400 mt-0.5">
-            Autonomous agent personas with Gemini function calling
-          </p>
+          <button
+            onClick={() => setMobileShowList(false)}
+            className="lg:hidden p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-charcoal-800 text-slate-500 hover:text-slate-900 dark:hover:text-white transition-colors"
+            title="Close Agent List"
+          >
+            <X className="w-4 h-4" />
+          </button>
         </div>
 
         <div className="flex-1 overflow-y-auto p-3 space-y-2">
@@ -220,6 +236,7 @@ export const AgentsView: React.FC = () => {
               key={agent.id}
               onClick={() => {
                 setSelectedAgent(agent);
+                setMobileShowList(false);
                 setMessages([
                   {
                     sender: "agent",
@@ -258,25 +275,40 @@ export const AgentsView: React.FC = () => {
       </div>
 
       {/* Right Interactive Chat / Playground */}
-      <div className="flex-1 flex flex-col bg-slate-50 dark:bg-charcoal-950">
+      <div
+        className={cn(
+          "flex-1 flex flex-col bg-slate-50 dark:bg-charcoal-950 min-w-0",
+          mobileShowList ? "hidden lg:flex" : "flex"
+        )}
+      >
         {/* Playground Header */}
-        <div className="border-b border-slate-200 dark:border-charcoal-800 bg-white/80 dark:bg-charcoal-900/60 px-5 py-3 flex flex-wrap items-center justify-between gap-3">
-          <div className="flex items-center gap-3">
-            <div className="p-1.5 rounded-lg bg-indigo-50 dark:bg-indigo-500/10 border border-indigo-200 dark:border-indigo-500/20 text-indigo-600 dark:text-indigo-400">
+        <div className="border-b border-slate-200 dark:border-charcoal-800 bg-white/80 dark:bg-charcoal-900/60 px-3 sm:px-5 py-3 flex flex-wrap items-center justify-between gap-2 sm:gap-3">
+          <div className="flex items-center gap-2 sm:gap-3">
+            {/* Tablet/Mobile Toggle Button to Open Agent Selector */}
+            <button
+              onClick={() => setMobileShowList(true)}
+              className="lg:hidden flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl border border-slate-200 dark:border-charcoal-800 bg-white dark:bg-charcoal-900 text-xs font-semibold text-indigo-600 dark:text-indigo-400 shadow-sm shrink-0"
+              title="Switch Agent Persona"
+            >
+              <Bot className="w-3.5 h-3.5" />
+              <span>Agents ({agents.length})</span>
+            </button>
+
+            <div className="hidden sm:flex p-1.5 rounded-lg bg-indigo-50 dark:bg-indigo-500/10 border border-indigo-200 dark:border-indigo-500/20 text-indigo-600 dark:text-indigo-400 shrink-0">
               <Sparkles className="w-4 h-4" />
             </div>
             <div>
-              <div className="flex items-center gap-2">
-                <h3 className="text-xs font-bold text-slate-900 dark:text-white">{selectedAgent.name}</h3>
-                <span className="text-[10px] px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-800 dark:bg-emerald-500/20 dark:text-emerald-300 font-mono">
+              <div className="flex items-center gap-1.5 sm:gap-2">
+                <h3 className="text-xs font-bold text-slate-900 dark:text-white truncate">{selectedAgent.name}</h3>
+                <span className="text-[10px] px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-800 dark:bg-emerald-500/20 dark:text-emerald-300 font-mono shrink-0">
                   Online
                 </span>
-                <span className="hidden md:inline-flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded bg-slate-100 dark:bg-charcoal-800 text-slate-600 dark:text-charcoal-400 font-mono">
+                <span className="hidden xl:inline-flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded bg-slate-100 dark:bg-charcoal-800 text-slate-600 dark:text-charcoal-400 font-mono">
                   <Terminal className="w-3 h-3 text-emerald-500" />
                   Interactive Test Bench
                 </span>
               </div>
-              <p className="text-[10px] text-slate-500 dark:text-charcoal-400 font-mono mt-0.5">
+              <p className="text-[10px] text-slate-500 dark:text-charcoal-400 font-mono mt-0.5 truncate">
                 {selectedAgent.role}
               </p>
             </div>

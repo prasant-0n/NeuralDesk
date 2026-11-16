@@ -39,10 +39,17 @@ export const NodeInspectorDrawer: React.FC = () => {
   };
 
   return (
-    <aside
-      className="fixed right-0 top-0 bottom-0 w-96 bg-white dark:bg-charcoal-900 border-l border-slate-200 dark:border-charcoal-800 shadow-2xl z-30 flex flex-col backdrop-blur-xl animate-in slide-in-from-right duration-200 select-none transition-colors duration-150"
-      aria-label="Node Inspector"
-    >
+    <>
+      {/* Backdrop overlay on tablet/mobile (< 1024px) for easy touch dismissal */}
+      <div
+        className="fixed inset-0 bg-black/40 dark:bg-black/60 backdrop-blur-xs z-30 lg:hidden transition-opacity animate-in fade-in duration-150"
+        onClick={() => selectNode(null)}
+        aria-hidden="true"
+      />
+      <aside
+        className="fixed right-0 top-0 bottom-0 w-full max-w-sm sm:max-w-md lg:w-96 bg-white dark:bg-charcoal-900 border-l border-slate-200 dark:border-charcoal-800 shadow-2xl z-40 flex flex-col backdrop-blur-xl animate-in slide-in-from-right duration-200 select-none transition-colors duration-150"
+        aria-label="Node Inspector"
+      >
       {/* Header */}
       <div className="p-4 border-b border-slate-200 dark:border-charcoal-800 flex items-center justify-between bg-slate-50/90 dark:bg-charcoal-950/60">
         <div className="flex items-center gap-2.5 overflow-hidden">
@@ -422,5 +429,6 @@ export const NodeInspectorDrawer: React.FC = () => {
         )}
       </div>
     </aside>
+    </>
   );
 };

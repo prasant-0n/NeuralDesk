@@ -59,8 +59,13 @@ export const LandingFooter: React.FC = () => {
                 </a>
               </li>
               <li>
-                <a href="#pricing" className="hover:text-slate-900 dark:hover:text-white transition-colors">
-                  Pricing & Tiers
+                <a href="#security" className="hover:text-slate-900 dark:hover:text-white transition-colors">
+                  Enterprise Security & BYOK
+                </a>
+              </li>
+              <li>
+                <a href="#comparison" className="hover:text-slate-900 dark:hover:text-white transition-colors">
+                  Architecture Matrix
                 </a>
               </li>
             </ul>

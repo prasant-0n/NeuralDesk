@@ -32,7 +32,7 @@ const NAV_ITEMS: NavItem[] = [
 export const Sidebar: React.FC<SidebarProps> = ({ activeView, onSelectView }) => {
   return (
     <nav
-      className="w-16 bg-white dark:bg-charcoal-900 border-r border-slate-200 dark:border-charcoal-800 flex flex-col items-center py-4 space-y-3 z-20 select-none transition-colors duration-150"
+      className="w-14 sm:w-16 bg-white dark:bg-charcoal-900 border-r border-slate-200 dark:border-charcoal-800 flex flex-col items-center py-3 sm:py-4 space-y-2.5 sm:space-y-3 z-20 select-none transition-all duration-150 shrink-0"
       aria-label="Primary Navigation"
     >
       {NAV_ITEMS.map((item) => {
@@ -43,17 +43,19 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeView, onSelectView }) =>
             key={item.id}
             onClick={() => onSelectView(item.id)}
             className={cn(
-              "group relative w-11 h-11 rounded-xl flex items-center justify-center transition-all duration-150",
+              "group relative w-10 h-10 sm:w-11 sm:h-11 rounded-xl flex items-center justify-center transition-all duration-150 cursor-pointer",
               isActive
-                ? "bg-indigo-600 text-white shadow-md shadow-indigo-600/30"
+                ? "bg-indigo-600 text-white shadow-md shadow-indigo-600/30 scale-105"
                 : "text-slate-500 hover:text-slate-900 hover:bg-slate-100 dark:text-charcoal-400 dark:hover:text-charcoal-200 dark:hover:bg-charcoal-800/80"
             )}
             title={item.label}
+            aria-label={item.label}
+            aria-current={isActive ? "page" : undefined}
           >
-            <Icon className="w-5 h-5 transition-transform group-hover:scale-105" />
+            <Icon className="w-4 h-4 sm:w-5 sm:h-5 transition-transform group-hover:scale-110" />
 
-            {/* Hover Tooltip */}
-            <span className="absolute left-16 px-2.5 py-1 rounded-md bg-slate-900 text-white border border-slate-800 dark:bg-charcoal-950 dark:border-charcoal-800 dark:text-charcoal-200 text-xs whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none shadow-xl z-50">
+            {/* Hover Tooltip (Shown on Laptops & Desktops) */}
+            <span className="hidden sm:block absolute left-14 sm:left-16 px-2.5 py-1 rounded-md bg-slate-900 text-white border border-slate-800 dark:bg-charcoal-950 dark:border-charcoal-800 dark:text-charcoal-200 text-xs whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none shadow-xl z-50">
               {item.label}
             </span>
           </button>

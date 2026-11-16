@@ -23,7 +23,11 @@ export const LandingFAQ: React.FC = () => {
     },
     {
       q: "Can NeuralDesk be deployed self-hosted or in a private cloud VPC?",
-      a: "Yes. The entire platform (Hono API backend, PostgreSQL database, and Vite React frontend) is 100% containerized with Docker and Kubernetes manifests. Enterprise plans include private VPC deployment, air-gapped on-prem installations, and custom SAML SSO.",
+      a: "Yes. The entire platform (Hono API backend, PostgreSQL database, and Vite React frontend) is 100% containerized with Docker and Kubernetes manifests. Self-hosted deployments support private VPC configurations, air-gapped on-prem installations, and custom SAML SSO.",
+    },
+    {
+      q: "How do I get started with NeuralDesk?",
+      a: "You can launch the visual studio and build immediately for free with your own model API keys (BYOK). The core Kahn topological DAG engine, zero-knowledge encryption, and multi-agent orchestration features are accessible directly without credit cards or surprise token markups.",
     },
     {
       q: "Which LLM model providers are supported out-of-the-box?",

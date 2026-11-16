@@ -10,43 +10,44 @@ export const LandingCTA: React.FC = () => {
         provider: "google",
         callbackURL: window.location.origin + "/studio",
       });
-    } catch (e) {
+    } catch {
       window.location.href = "/signin";
     }
   };
 
   return (
-    <section className="relative py-24 md:py-32 overflow-hidden">
+    <section id="cta" className="relative py-24 md:py-32 overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="relative rounded-3xl p-10 sm:p-16 md:p-20 border border-indigo-500/30 bg-gradient-to-b from-indigo-950 via-slate-950 to-slate-950 shadow-2xl shadow-indigo-500/15 dark:shadow-indigo-950/80 backdrop-blur-2xl text-center overflow-hidden">
+        <div className="relative rounded-3xl p-10 sm:p-16 md:p-20 border border-indigo-200/90 dark:border-indigo-500/30 bg-gradient-to-b from-indigo-50/80 via-white to-slate-50/90 dark:bg-gradient-to-b dark:from-indigo-950/80 dark:via-charcoal-950 dark:to-charcoal-950 shadow-2xl shadow-indigo-500/10 dark:shadow-indigo-950/80 backdrop-blur-2xl text-center overflow-hidden">
           {/* Ambient Lighting Gradients */}
-          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-96 h-96 bg-gradient-to-tr from-indigo-500/20 via-cyan-500/20 to-purple-500/20 rounded-full blur-[100px] pointer-events-none" />
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[550px] h-[350px] bg-gradient-to-tr from-indigo-300/35 via-cyan-200/25 to-purple-300/25 dark:from-indigo-500/20 dark:via-cyan-500/20 dark:to-purple-500/20 rounded-full blur-[100px] pointer-events-none" />
 
           <div className="relative z-10 max-w-3xl mx-auto">
-            {/* Pill */}
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-slate-900/90 border border-indigo-500/30 text-indigo-300 text-xs font-semibold mb-6 shadow-md">
-              <Sparkles className="w-3.5 h-3.5 text-cyan-300" />
+            {/* Pill Badge */}
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-indigo-50/90 dark:bg-charcoal-900/90 border border-indigo-200 dark:border-indigo-500/30 text-indigo-700 dark:text-indigo-300 text-xs font-semibold mb-6 shadow-sm">
+              <Sparkles className="w-3.5 h-3.5 text-cyan-600 dark:text-cyan-300" />
               <span>Get Started in Under 30 Seconds</span>
             </div>
 
             {/* Headline */}
-            <h2 className="text-3xl sm:text-5xl md:text-6xl font-extrabold tracking-tight text-white mb-6 leading-tight">
+            <h2 className="text-3xl sm:text-5xl md:text-6xl font-extrabold tracking-tight text-slate-900 dark:text-white mb-6 leading-tight font-sans">
               Ready to Automate with{" "}
-              <span className="bg-gradient-to-r from-indigo-400 via-cyan-400 to-indigo-400 bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-indigo-600 via-cyan-600 to-indigo-600 dark:from-indigo-400 dark:via-cyan-400 dark:to-indigo-400 bg-clip-text text-transparent">
                 Mathematical Precision?
               </span>
             </h2>
 
-            <p className="text-base sm:text-lg text-slate-300 max-w-2xl mx-auto mb-10 leading-relaxed font-normal">
+            {/* Subtitle */}
+            <p className="text-base sm:text-lg text-slate-600 dark:text-slate-300 max-w-2xl mx-auto mb-10 leading-relaxed font-normal">
               Join thousands of engineers orchestrating autonomous multi-agent pipelines
               with guaranteed cycle-free execution, zero-knowledge BYOK, and real-time telemetry.
             </p>
 
-            {/* Buttons */}
+            {/* Action Buttons */}
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-10">
               <button
                 onClick={handleGoogleSignIn}
-                className="w-full sm:w-auto flex items-center justify-center gap-3 px-6 py-3.5 rounded-2xl bg-white hover:bg-slate-100 text-slate-900 font-semibold text-xs shadow-xl transition-all duration-200 hover:scale-[1.02]"
+                className="w-full sm:w-auto flex items-center justify-center gap-3 px-7 py-3.5 rounded-2xl bg-white hover:bg-slate-50 dark:bg-white dark:hover:bg-slate-100 text-slate-800 dark:text-slate-900 font-semibold text-xs sm:text-sm border border-slate-300/90 dark:border-transparent shadow-md hover:shadow-lg transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
               >
                 <svg className="w-4 h-4" viewBox="0 0 24 24">
                   <path
@@ -71,25 +72,25 @@ export const LandingCTA: React.FC = () => {
 
               <Link
                 to="/signup"
-                className="w-full sm:w-auto flex items-center justify-center gap-2 px-6 py-3.5 rounded-2xl bg-gradient-to-r from-indigo-600 to-cyan-500 hover:from-indigo-500 hover:to-cyan-400 text-white font-semibold text-xs shadow-lg shadow-indigo-600/30 transition-all duration-200 hover:scale-[1.02]"
+                className="w-full sm:w-auto group flex items-center justify-center gap-2 px-7 py-3.5 rounded-2xl bg-gradient-to-r from-indigo-600 via-indigo-500 to-cyan-500 hover:from-indigo-500 hover:to-cyan-400 text-white font-semibold text-xs sm:text-sm shadow-xl shadow-indigo-600/25 hover:shadow-indigo-600/40 transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
               >
                 <span>Sign Up with Email</span>
-                <ArrowRight className="w-4 h-4" />
+                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
               </Link>
             </div>
 
             {/* Reassurance pills */}
-            <div className="flex flex-wrap items-center justify-center gap-6 text-xs text-slate-400">
+            <div className="flex flex-wrap items-center justify-center gap-6 text-xs text-slate-600 dark:text-slate-400 font-medium">
               <div className="flex items-center gap-1.5">
-                <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
                 <span>No Credit Card Required</span>
               </div>
               <div className="flex items-center gap-1.5">
-                <ShieldCheck className="w-4 h-4 text-indigo-400" />
+                <ShieldCheck className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
                 <span>Zero-Knowledge BYOK Security</span>
               </div>
               <div className="flex items-center gap-1.5">
-                <Zap className="w-4 h-4 text-cyan-400" />
+                <Zap className="w-4 h-4 text-cyan-600 dark:text-cyan-400" />
                 <span>Instant Workspace Provisioning</span>
               </div>
             </div>

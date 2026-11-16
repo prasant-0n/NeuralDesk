@@ -85,6 +85,7 @@ export const PromptsView: React.FC = () => {
   const [selectedPrompt, setSelectedPrompt] = useState<PromptTemplate>(DEFAULT_PROMPTS[0]);
   const [searchQuery, setSearchQuery] = useState("");
   const [activeCategory, setActiveCategory] = useState("all");
+  const [mobileShowList, setMobileShowList] = useState(false);
 
   const [variableValues, setVariableValues] = useState<Record<string, string>>({
     customer_message: "Our checkout API is timing out on charge #9382 and we are losing sales immediately!",
@@ -300,8 +301,13 @@ export const PromptsView: React.FC = () => {
 
   return (
     <div className="flex-1 overflow-hidden flex bg-slate-50 dark:bg-charcoal-950 select-none transition-colors duration-150">
-      {/* Left List */}
-      <div className="w-80 border-r border-slate-200 dark:border-charcoal-800 bg-white dark:bg-charcoal-900 flex flex-col">
+      {/* Left List - Responsive Drawer / Column on Tablet */}
+      <div
+        className={cn(
+          "w-full lg:w-80 border-r border-slate-200 dark:border-charcoal-800 bg-white dark:bg-charcoal-900 flex flex-col shrink-0 transition-all",
+          mobileShowList ? "flex" : "hidden lg:flex"
+        )}
+      >
         {/* Header */}
         <div className="p-4 border-b border-slate-200 dark:border-charcoal-800 space-y-3">
           <div className="flex items-center justify-between">
@@ -309,14 +315,23 @@ export const PromptsView: React.FC = () => {
               <FileCode className="w-5 h-5 text-sky-600 dark:text-sky-400" />
               <h2 className="text-sm font-bold text-slate-900 dark:text-white">Prompt Template Library</h2>
             </div>
-            <button
-              onClick={() => setShowCreateModal(true)}
-              className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-[11px] font-semibold transition-all shadow-sm"
-              title="Create new reusable prompt template"
-            >
-              <Plus className="w-3.5 h-3.5" />
-              <span>New</span>
-            </button>
+            <div className="flex items-center gap-1.5">
+              <button
+                onClick={() => setShowCreateModal(true)}
+                className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-[11px] font-semibold transition-all shadow-sm"
+                title="Create new reusable prompt template"
+              >
+                <Plus className="w-3.5 h-3.5" />
+                <span>New</span>
+              </button>
+              <button
+                onClick={() => setMobileShowList(false)}
+                className="lg:hidden p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-charcoal-800 text-slate-500 hover:text-slate-900 dark:hover:text-white transition-colors"
+                title="Close List"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
           </div>
           <p className="text-xs text-slate-500 dark:text-charcoal-400">
             Reusable Mustache templates with live dynamic bindings
@@ -363,7 +378,10 @@ export const PromptsView: React.FC = () => {
             filteredPrompts.map((p) => (
               <div
                 key={p.id}
-                onClick={() => setSelectedPrompt(p)}
+                onClick={() => {
+                  setSelectedPrompt(p);
+                  setMobileShowList(false);
+                }}
                 className={`p-3 rounded-xl border transition-all cursor-pointer group relative ${
                   selectedPrompt.id === p.id
                     ? "bg-sky-50 border-sky-500 ring-1 ring-sky-500 dark:bg-sky-500/10 dark:border-sky-500"
@@ -406,13 +424,28 @@ export const PromptsView: React.FC = () => {
       </div>
 
       {/* Right Editor & Compiler */}
-      <div className="flex-1 overflow-y-auto p-6 space-y-6 bg-slate-50 dark:bg-charcoal-950">
+      <div
+        className={cn(
+          "flex-1 overflow-y-auto p-4 sm:p-6 space-y-6 bg-slate-50 dark:bg-charcoal-950 min-w-0",
+          mobileShowList ? "hidden lg:block" : "block"
+        )}
+      >
         {/* Header with Actions */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
             <div className="flex items-center gap-2">
-              <h2 className="text-base font-bold text-slate-900 dark:text-white">{selectedPrompt.title}</h2>
-              <span className="text-[10px] font-mono uppercase px-2 py-0.5 rounded bg-sky-100 text-sky-800 dark:bg-sky-500/20 dark:text-sky-300">
+              {/* Tablet/Mobile Toggle Button to Open Prompt Template Selector */}
+              <button
+                onClick={() => setMobileShowList(true)}
+                className="lg:hidden flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl border border-slate-200 dark:border-charcoal-800 bg-white dark:bg-charcoal-900 text-xs font-semibold text-sky-600 dark:text-sky-400 shadow-sm shrink-0"
+                title="Switch Prompt Template"
+              >
+                <FileCode className="w-3.5 h-3.5" />
+                <span>Templates ({prompts.length})</span>
+              </button>
+
+              <h2 className="text-base font-bold text-slate-900 dark:text-white truncate">{selectedPrompt.title}</h2>
+              <span className="text-[10px] font-mono uppercase px-2 py-0.5 rounded bg-sky-100 text-sky-800 dark:bg-sky-500/20 dark:text-sky-300 shrink-0">
                 {selectedPrompt.category}
               </span>
             </div>
