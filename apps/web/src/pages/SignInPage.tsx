@@ -90,10 +90,19 @@ export const SignInPage: React.FC = () => {
       });
 
       if (res?.error) {
-        setErrorMessage(
-          res.error.message ||
-            "Google Workspace OAuth is not configured with client credentials. Provide GOOGLE_CLIENT_ID / GOOGLE_CLIENT_SECRET or use Work Email below."
-        );
+        if (
+          res.error.message?.includes("Provider not found") ||
+          res.error.message?.toLowerCase().includes("not found")
+        ) {
+          setErrorMessage(
+            "Google OAuth is not yet configured on this environment (GOOGLE_CLIENT_ID & GOOGLE_CLIENT_SECRET are not set in the server environment). Please use Work Email or click a 1-Click Instant Evaluation persona below."
+          );
+        } else {
+          setErrorMessage(
+            res.error.message ||
+              "Google Workspace OAuth is not configured with client credentials. Provide GOOGLE_CLIENT_ID / GOOGLE_CLIENT_SECRET or use Work Email below."
+          );
+        }
       }
     } catch (err: any) {
       setErrorMessage(
