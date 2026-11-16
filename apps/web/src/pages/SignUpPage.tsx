@@ -101,10 +101,19 @@ export const SignUpPage: React.FC = () => {
       });
 
       if (res.error) {
-        setErrorMessage(
-          res.error.message ||
-            "Failed to create account. User might already exist."
-        );
+        if (
+          res.error.message?.includes("Email and password") ||
+          (res.error as any)?.code === "validation_failed"
+        ) {
+          setErrorMessage(
+            "Neon Auth Notice: Email and password sign-up is not enabled in your Neon Console. Please enable 'Email / Password' under Authentication in your Neon Console, or sign up via Google above."
+          );
+        } else {
+          setErrorMessage(
+            res.error.message ||
+              "Failed to create account. User might already exist."
+          );
+        }
       } else {
         setSuccessMessage("Account created successfully! Loading workspace...");
         setTimeout(() => {
@@ -133,22 +142,30 @@ export const SignUpPage: React.FC = () => {
 
       if (res?.error) {
         if (
+          res.error.message?.includes("Invalid callbackURL") ||
+          (res.error as any)?.code === "INVALID_CALLBACKURL"
+        ) {
+          setErrorMessage(
+            "Neon Domain Restriction: Please add '" +
+              window.location.origin +
+              "' under 'Domains' in your Neon Console to authorize OAuth redirects."
+          );
+        } else if (
           res.error.message?.includes("Provider not found") ||
           res.error.message?.toLowerCase().includes("not found")
         ) {
           setErrorMessage(
-            "Google OAuth is not yet configured on this environment (GOOGLE_CLIENT_ID & GOOGLE_CLIENT_SECRET are not set in the server environment). Please use Work Email registration or a 1-Click Instant Evaluation persona below."
+            "Google OAuth is not enabled in Neon Auth. Under 'OAuth providers' in your Neon Console, toggle on Google Shared keys."
           );
         } else {
           setErrorMessage(
-            res.error.message ||
-              "Google Workspace OAuth is not configured with client credentials. Provide GOOGLE_CLIENT_ID / GOOGLE_CLIENT_SECRET or use registration below."
+            res.error.message || "Failed to initiate Google OAuth registration."
           );
         }
       }
     } catch (err: any) {
       setErrorMessage(
-        "Google OAuth integration requires active OAuth credentials or Neon Managed Auth enabled. Use standard registration or 1-Click Evaluation below."
+        err.message || "Failed to initiate Google OAuth registration."
       );
     } finally {
       setIsLoading(false);

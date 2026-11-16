@@ -59,10 +59,19 @@ export const SignInPage: React.FC = () => {
       });
 
       if (res.error) {
-        setErrorMessage(
-          res.error.message ||
-            "Invalid email or password. Please check your credentials."
-        );
+        if (
+          res.error.message?.includes("Email and password") ||
+          (res.error as any)?.code === "validation_failed"
+        ) {
+          setErrorMessage(
+            "Neon Auth Notice: Email and password sign-in is not enabled in your Neon Console. Please enable 'Email / Password' under Authentication in your Neon Console, or sign in via Google above."
+          );
+        } else {
+          setErrorMessage(
+            res.error.message ||
+              "Invalid email or password. Please check your credentials."
+          );
+        }
       } else {
         setSuccessMessage("Authentication successful! Redirecting to workspace...");
         setTimeout(() => {
@@ -91,16 +100,24 @@ export const SignInPage: React.FC = () => {
 
       if (res?.error) {
         if (
+          res.error.message?.includes("Invalid callbackURL") ||
+          (res.error as any)?.code === "INVALID_CALLBACKURL"
+        ) {
+          setErrorMessage(
+            "Neon Domain Restriction: Please add '" +
+              window.location.origin +
+              "' under 'Domains' in your Neon Console to authorize OAuth redirects."
+          );
+        } else if (
           res.error.message?.includes("Provider not found") ||
           res.error.message?.toLowerCase().includes("not found")
         ) {
           setErrorMessage(
-            "Google OAuth is not yet configured on this environment (GOOGLE_CLIENT_ID & GOOGLE_CLIENT_SECRET are not set in the server environment). Please use Work Email or click a 1-Click Instant Evaluation persona below."
+            "Google OAuth is not enabled in Neon Auth. Under 'OAuth providers' in your Neon Console, toggle on Google Shared keys."
           );
         } else {
           setErrorMessage(
-            res.error.message ||
-              "Google Workspace OAuth is not configured with client credentials. Provide GOOGLE_CLIENT_ID / GOOGLE_CLIENT_SECRET or use Work Email below."
+            res.error.message || "Failed to initiate Google OAuth login."
           );
         }
       }
