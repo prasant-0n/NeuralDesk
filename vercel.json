@@ -4,7 +4,6 @@
   "buildCommand": "pnpm --filter @neuraldesk/shared build && pnpm --filter @neuraldesk/web build",
   "outputDirectory": "apps/web/dist",
   "installCommand": "pnpm install",
-  "cleanUrls": true,
   "rewrites": [
     {
       "source": "/api/(.*)",
