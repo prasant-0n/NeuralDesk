@@ -95,7 +95,7 @@ function formatUptime(seconds: number): string {
   if (seconds < 60) return `${seconds}s`;
   const mins = Math.floor(seconds / 60);
   if (mins < 60) return `${mins}m`;
-  const hours = Math.floor(mins / 60);
+  const hours = Math.floor(seconds / 60);
   return `${hours}h ${mins % 60}m`;
 }
 
@@ -152,43 +152,43 @@ export const DashboardView: React.FC<{ onNavigateToCanvas?: () => void }> = ({ o
   const latency = stats.latencySLA;
   const system = stats.systemHealth;
 
-  const gridStroke = isDark ? "#1e293b" : "#e2e8f0";
-  const axisStroke = isDark ? "#64748b" : "#94a3b8";
-  const tooltipBg = isDark ? "#090d16" : "#ffffff";
-  const tooltipBorder = isDark ? "#1e293b" : "#cbd5e1";
-  const tooltipColor = isDark ? "#f8fafc" : "#0f172a";
+  const gridStroke = isDark ? "rgba(238, 240, 245, 0.06)" : "#e2e8f0";
+  const axisStroke = isDark ? "#7a8296" : "#94a3b8";
+  const tooltipBg = isDark ? "#11141c" : "#ffffff";
+  const tooltipBorder = isDark ? "rgba(238, 240, 245, 0.08)" : "#cbd5e1";
+  const tooltipColor = isDark ? "#eef0f5" : "#111827";
 
   return (
-    <div className="flex-1 overflow-y-auto p-6 space-y-6 bg-slate-50 dark:bg-charcoal-950 transition-colors duration-150">
+    <div className="flex-1 overflow-y-auto p-6 space-y-6 bg-[#f5f7fa] dark:bg-[#0b0d14] transition-colors duration-150">
       {/* Title & Action Controls */}
       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2.5">
-            <h1 className="text-xl font-extrabold text-slate-900 dark:text-white tracking-tight">
+            <h1 className="text-xl font-medium text-slate-900 dark:text-[#eef0f5] tracking-tight">
               Intelligence Operations & Telemetry
             </h1>
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+            <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[11px] font-mono bg-emerald-50 text-emerald-700 dark:bg-[#11141c] dark:text-[#4cc38a] border border-emerald-200 dark:border-emerald-900/60">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
               Live Telemetry
             </span>
           </div>
-          <p className="text-xs text-slate-500 dark:text-charcoal-400 mt-0.5">
-            Real-time throughput, token economics, and latency SLA metrics • Refreshed {lastRefreshed.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" })}
+          <p className="text-xs text-slate-500 dark:text-[#7a8296] mt-0.5 font-mono">
+            Throughput, token economics, and SLA metrics • Refreshed {lastRefreshed.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" })}
           </p>
         </div>
 
-        <div className="flex flex-wrap items-center gap-2.5">
-          {/* Timeframe Selector Pills */}
-          <div className="flex items-center bg-white dark:bg-charcoal-900 border border-slate-200 dark:border-charcoal-800 rounded-xl p-1 shadow-sm">
+        <div className="flex flex-wrap items-center gap-2">
+          {/* Timeframe Selector */}
+          <div className="flex items-center bg-white dark:bg-[#11141c] border border-slate-200 dark:border-[rgba(238,240,245,0.08)] rounded-md p-0.5 font-mono text-xs">
             {TIMEFRAME_OPTIONS.map((opt) => (
               <button
                 key={opt.id}
                 onClick={() => setTimeframe(opt.id)}
                 className={cn(
-                  "px-2.5 py-1 text-xs font-semibold rounded-lg transition-all",
+                  "px-2.5 py-1 rounded transition-colors cursor-pointer",
                   timeframe === opt.id
-                    ? "bg-indigo-600 text-white shadow-sm"
-                    : "text-slate-600 dark:text-charcoal-400 hover:text-slate-900 dark:hover:text-white"
+                    ? "bg-slate-900 text-white dark:bg-[#eef0f5] dark:text-[#0b0d14] font-medium"
+                    : "text-slate-600 dark:text-[#7a8296] hover:text-slate-900 dark:hover:text-[#eef0f5]"
                 )}
               >
                 {opt.label}
@@ -200,27 +200,27 @@ export const DashboardView: React.FC<{ onNavigateToCanvas?: () => void }> = ({ o
           <button
             onClick={handleRefresh}
             disabled={isRefreshing}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-slate-200 dark:border-charcoal-800 bg-white dark:bg-charcoal-900 hover:bg-slate-100 dark:hover:bg-charcoal-800 text-slate-700 dark:text-charcoal-300 text-xs font-medium transition-colors shadow-sm disabled:opacity-50"
+            className="flex items-center gap-1.5 h-8 px-3 rounded-md border border-slate-200 dark:border-[rgba(238,240,245,0.08)] bg-white dark:bg-[#11141c] hover:bg-slate-50 dark:hover:bg-[#1a1e28] text-slate-700 dark:text-[#a3a9b8] text-xs font-mono transition-colors disabled:opacity-50 cursor-pointer"
             title="Refresh metrics from backend"
           >
-            <RefreshCw className={cn("w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400", isRefreshing && "animate-spin")} />
+            <RefreshCw className={cn("w-3.5 h-3.5", isRefreshing && "animate-spin")} />
             <span className="hidden sm:inline">Refresh</span>
           </button>
 
           {/* Export Telemetry */}
           <button
             onClick={handleExportTelemetry}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-slate-200 dark:border-charcoal-800 bg-white dark:bg-charcoal-900 hover:bg-slate-100 dark:hover:bg-charcoal-800 text-slate-700 dark:text-charcoal-300 text-xs font-medium transition-colors shadow-sm"
+            className="flex items-center gap-1.5 h-8 px-3 rounded-md border border-slate-200 dark:border-[rgba(238,240,245,0.08)] bg-white dark:bg-[#11141c] hover:bg-slate-50 dark:hover:bg-[#1a1e28] text-slate-700 dark:text-[#a3a9b8] text-xs font-mono transition-colors cursor-pointer"
             title="Download full telemetry report as JSON"
           >
-            <Download className="w-3.5 h-3.5 text-slate-500 dark:text-charcoal-400" />
+            <Download className="w-3.5 h-3.5" />
             <span className="hidden sm:inline">Export JSON</span>
           </button>
 
           {/* Open Canvas CTA */}
           <button
             onClick={onNavigateToCanvas}
-            className="flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold shadow-md shadow-indigo-600/30 transition-all"
+            className="flex items-center gap-1.5 h-8 px-3.5 rounded-md bg-slate-900 hover:bg-slate-800 text-white dark:bg-[#eef0f5] dark:hover:bg-white dark:text-[#0b0d14] text-xs font-medium transition-colors cursor-pointer"
           >
             <span>Open Canvas</span>
             <ArrowUpRight className="w-3.5 h-3.5" />
@@ -228,15 +228,15 @@ export const DashboardView: React.FC<{ onNavigateToCanvas?: () => void }> = ({ o
         </div>
       </div>
 
-      {/* System Health & Orchestrator Concurrency Strip */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 p-3.5 rounded-2xl bg-white dark:bg-charcoal-900 border border-slate-200 dark:border-charcoal-800 shadow-sm text-xs">
+      {/* System Health Strip */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 p-3 rounded-xl bg-white dark:bg-[#11141c] border border-slate-200 dark:border-[rgba(238,240,245,0.08)] text-xs">
         <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-600 dark:text-emerald-400">
-            <Server className="w-4 h-4" />
+          <div className="w-7 h-7 rounded bg-slate-100 dark:bg-[#1a1e28] flex items-center justify-center text-slate-700 dark:text-[#a3a9b8]">
+            <Server className="w-3.5 h-3.5" />
           </div>
           <div>
-            <p className="font-semibold text-slate-800 dark:text-slate-200">Execution Engine</p>
-            <p className="text-[11px] text-slate-500 dark:text-charcoal-400 flex items-center gap-1">
+            <p className="font-medium text-slate-800 dark:text-[#eef0f5]">Execution Engine</p>
+            <p className="text-[11px] text-slate-500 dark:text-[#7a8296] font-mono flex items-center gap-1">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
               <span>Healthy • Uptime {formatUptime(system.uptimeSeconds)}</span>
             </p>
@@ -244,37 +244,37 @@ export const DashboardView: React.FC<{ onNavigateToCanvas?: () => void }> = ({ o
         </div>
 
         <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-xl bg-indigo-500/10 flex items-center justify-center text-indigo-600 dark:text-indigo-400">
-            <Zap className="w-4 h-4" />
+          <div className="w-7 h-7 rounded bg-slate-100 dark:bg-[#1a1e28] flex items-center justify-center text-slate-700 dark:text-[#a3a9b8]">
+            <Zap className="w-3.5 h-3.5" />
           </div>
           <div>
-            <p className="font-semibold text-slate-800 dark:text-slate-200">DAG Concurrency</p>
-            <p className="text-[11px] text-slate-500 dark:text-charcoal-400">
-              <span className="font-mono font-medium text-slate-700 dark:text-slate-300">{system.activeRuns}</span> / {system.maxConcurrency} Active Slots
+            <p className="font-medium text-slate-800 dark:text-[#eef0f5]">DAG Concurrency</p>
+            <p className="text-[11px] text-slate-500 dark:text-[#7a8296] font-mono">
+              <span>{system.activeRuns}</span> / {system.maxConcurrency} Active Slots
             </p>
           </div>
         </div>
 
         <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-xl bg-sky-500/10 flex items-center justify-center text-sky-600 dark:text-sky-400">
-            <Database className="w-4 h-4" />
+          <div className="w-7 h-7 rounded bg-slate-100 dark:bg-[#1a1e28] flex items-center justify-center text-slate-700 dark:text-[#a3a9b8]">
+            <Database className="w-3.5 h-3.5" />
           </div>
           <div>
-            <p className="font-semibold text-slate-800 dark:text-slate-200">Database Pool</p>
-            <p className="text-[11px] text-slate-500 dark:text-charcoal-400">
+            <p className="font-medium text-slate-800 dark:text-[#eef0f5]">Database Pool</p>
+            <p className="text-[11px] text-slate-500 dark:text-[#7a8296] font-mono">
               PostgreSQL • {system.dbLatencyMs}ms ping
             </p>
           </div>
         </div>
 
         <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-xl bg-purple-500/10 flex items-center justify-center text-purple-600 dark:text-purple-400">
-            <Gauge className="w-4 h-4" />
+          <div className="w-7 h-7 rounded bg-slate-100 dark:bg-[#1a1e28] flex items-center justify-center text-slate-700 dark:text-[#a3a9b8]">
+            <Gauge className="w-3.5 h-3.5" />
           </div>
           <div>
-            <p className="font-semibold text-slate-800 dark:text-slate-200">SLA Median (P50)</p>
-            <p className="text-[11px] text-slate-500 dark:text-charcoal-400">
-              <span className="font-mono font-medium text-emerald-600 dark:text-emerald-400">{latency.p50}ms</span> (Target &lt;500ms)
+            <p className="font-medium text-slate-800 dark:text-[#eef0f5]">SLA Median (P50)</p>
+            <p className="text-[11px] text-slate-500 dark:text-[#7a8296] font-mono">
+              <span className="text-emerald-600 dark:text-[#4cc38a] font-medium">{latency.p50}ms</span> (&lt;500ms target)
             </p>
           </div>
         </div>
@@ -283,233 +283,194 @@ export const DashboardView: React.FC<{ onNavigateToCanvas?: () => void }> = ({ o
       {/* 5 Primary Operational KPI Cards */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4">
         {/* Active DAGs */}
-        <div className="p-4 rounded-2xl bg-white dark:bg-charcoal-900 border border-slate-200 dark:border-charcoal-800 shadow-sm dark:shadow-lg space-y-2">
-          <div className="flex items-center justify-between text-slate-500 dark:text-charcoal-400">
+        <div className="p-4 rounded-xl bg-white dark:bg-[#11141c] border border-slate-200 dark:border-[rgba(238,240,245,0.08)] space-y-2">
+          <div className="flex items-center justify-between text-slate-500 dark:text-[#7a8296]">
             <span className="text-xs font-medium">Active DAGs</span>
-            <Workflow className="w-4 h-4 text-indigo-500 dark:text-indigo-400" />
+            <Workflow className="w-3.5 h-3.5" />
           </div>
-          <p className="text-2xl font-black text-slate-900 dark:text-white">
+          <p className="text-2xl font-mono font-medium text-slate-900 dark:text-[#eef0f5] tabular-nums">
             {kpis.activeWorkflows}
           </p>
-          <p className="text-[10px] text-slate-500 dark:text-charcoal-400 flex items-center gap-1">
-            <span className="text-emerald-600 dark:text-emerald-400 font-semibold">{nodes.length} nodes</span> on active canvas
+          <p className="text-[11px] text-slate-500 dark:text-[#7a8296] font-mono">
+            {nodes.length} nodes on canvas
           </p>
         </div>
 
         {/* Total Runs */}
-        <div className="p-4 rounded-2xl bg-white dark:bg-charcoal-900 border border-slate-200 dark:border-charcoal-800 shadow-sm dark:shadow-lg space-y-2">
-          <div className="flex items-center justify-between text-slate-500 dark:text-charcoal-400">
+        <div className="p-4 rounded-xl bg-white dark:bg-[#11141c] border border-slate-200 dark:border-[rgba(238,240,245,0.08)] space-y-2">
+          <div className="flex items-center justify-between text-slate-500 dark:text-[#7a8296]">
             <span className="text-xs font-medium">Total Runs</span>
-            <Activity className="w-4 h-4 text-sky-500 dark:text-sky-400" />
+            <Activity className="w-3.5 h-3.5" />
           </div>
-          <p className="text-2xl font-black text-slate-900 dark:text-white">
+          <p className="text-2xl font-mono font-medium text-slate-900 dark:text-[#eef0f5] tabular-nums">
             {kpis.totalRuns}
           </p>
-          <p className="text-[10px] text-emerald-600 dark:text-emerald-400 flex items-center gap-1 font-semibold">
+          <p className="text-[11px] text-emerald-600 dark:text-[#4cc38a] font-mono inline-flex items-center gap-1">
             <TrendingUp className="w-3 h-3" /> +14.2% today
           </p>
         </div>
 
         {/* Success Rate */}
-        <div className="p-4 rounded-2xl bg-white dark:bg-charcoal-900 border border-slate-200 dark:border-charcoal-800 shadow-sm dark:shadow-lg space-y-2">
-          <div className="flex items-center justify-between text-slate-500 dark:text-charcoal-400">
+        <div className="p-4 rounded-xl bg-white dark:bg-[#11141c] border border-slate-200 dark:border-[rgba(238,240,245,0.08)] space-y-2">
+          <div className="flex items-center justify-between text-slate-500 dark:text-[#7a8296]">
             <span className="text-xs font-medium">Success Rate</span>
-            <CheckCircle2 className="w-4 h-4 text-emerald-500 dark:text-emerald-400" />
+            <CheckCircle2 className="w-3.5 h-3.5" />
           </div>
-          <p className="text-2xl font-black text-emerald-600 dark:text-emerald-400">
+          <p className="text-2xl font-mono font-medium text-slate-900 dark:text-[#eef0f5] tabular-nums">
             {kpis.successRate}%
           </p>
-          <p className="text-[10px] text-slate-500 dark:text-charcoal-400">
-            {kpis.failedRuns === 0 ? "Zero unhandled exceptions" : `${kpis.failedRuns} failed runs captured`}
+          <p className="text-[11px] text-slate-500 dark:text-[#7a8296] font-mono">
+            {kpis.failedRuns === 0 ? "0 exceptions" : `${kpis.failedRuns} failed runs`}
           </p>
         </div>
 
         {/* Tokens Consumed */}
-        <div className="p-4 rounded-2xl bg-white dark:bg-charcoal-900 border border-slate-200 dark:border-charcoal-800 shadow-sm dark:shadow-lg space-y-2">
-          <div className="flex items-center justify-between text-slate-500 dark:text-charcoal-400">
+        <div className="p-4 rounded-xl bg-white dark:bg-[#11141c] border border-slate-200 dark:border-[rgba(238,240,245,0.08)] space-y-2">
+          <div className="flex items-center justify-between text-slate-500 dark:text-[#7a8296]">
             <span className="text-xs font-medium">Tokens Consumed</span>
-            <Cpu className="w-4 h-4 text-purple-500 dark:text-purple-400" />
+            <Cpu className="w-3.5 h-3.5" />
           </div>
-          <p className="text-2xl font-black text-slate-900 dark:text-white">
+          <p className="text-2xl font-mono font-medium text-slate-900 dark:text-[#eef0f5] tabular-nums">
             {formatTokens(kpis.totalTokens)}
           </p>
-          <p className="text-[10px] text-slate-500 dark:text-charcoal-400">
-            Prompt & completion blend
+          <p className="text-[11px] text-slate-500 dark:text-[#7a8296] font-mono">
+            Prompt + completion
           </p>
         </div>
 
         {/* Total Spend */}
-        <div className="p-4 rounded-2xl bg-white dark:bg-charcoal-900 border border-slate-200 dark:border-charcoal-800 shadow-sm dark:shadow-lg space-y-2">
-          <div className="flex items-center justify-between text-slate-500 dark:text-charcoal-400">
+        <div className="p-4 rounded-xl bg-white dark:bg-[#11141c] border border-slate-200 dark:border-[rgba(238,240,245,0.08)] space-y-2">
+          <div className="flex items-center justify-between text-slate-500 dark:text-[#7a8296]">
             <span className="text-xs font-medium">Total Spend (USD)</span>
-            <Coins className="w-4 h-4 text-amber-500 dark:text-amber-400" />
+            <Coins className="w-3.5 h-3.5" />
           </div>
-          <p className="text-2xl font-black text-emerald-600 dark:text-emerald-400">
+          <p className="text-2xl font-mono font-medium text-slate-900 dark:text-[#eef0f5] tabular-nums">
             {formatCost(kpis.totalCostUsd)}
           </p>
-          <p className="text-[10px] text-slate-500 dark:text-charcoal-400">
-            92% cheaper than legacy LLM
+          <p className="text-[11px] text-slate-500 dark:text-[#7a8296] font-mono">
+            Standard rate billing
           </p>
         </div>
       </div>
 
-      {/* SLA Latency Waterfall Grid */}
-      <div className="p-5 rounded-2xl bg-white dark:bg-charcoal-900 border border-slate-200 dark:border-charcoal-800 shadow-sm dark:shadow-lg space-y-4">
+      {/* SLA Latency Percentiles */}
+      <div className="p-4 rounded-xl bg-white dark:bg-[#11141c] border border-slate-200 dark:border-[rgba(238,240,245,0.08)] space-y-3">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-          <div>
-            <div className="flex items-center gap-2">
-              <Clock className="w-4 h-4 text-indigo-500" />
-              <h3 className="text-sm font-bold text-slate-900 dark:text-white">
-                SLA Latency Percentiles & Processing Waterfall
-              </h3>
-            </div>
-            <p className="text-xs text-slate-500 dark:text-charcoal-400">
-              Distribution percentiles for end-to-end DAG execution completion
-            </p>
+          <div className="flex items-center gap-2">
+            <Clock className="w-3.5 h-3.5 text-slate-500 dark:text-[#7a8296]" />
+            <h3 className="text-xs font-medium text-slate-900 dark:text-[#eef0f5]">
+              SLA Latency Percentiles
+            </h3>
           </div>
-
-          <div className="flex items-center gap-3 text-xs font-mono text-slate-500 dark:text-charcoal-400">
-            <span>Average: <strong className="text-slate-800 dark:text-white">{kpis.avgLatencyMs}ms</strong></span>
+          <div className="flex items-center gap-3 text-xs font-mono text-slate-500 dark:text-[#7a8296]">
+            <span>Average: <strong className="text-slate-800 dark:text-[#eef0f5]">{kpis.avgLatencyMs}ms</strong></span>
             <span>•</span>
-            <span>Min: <strong className="text-slate-800 dark:text-white">{latency.min}ms</strong></span>
+            <span>Min: <strong className="text-slate-800 dark:text-[#eef0f5]">{latency.min}ms</strong></span>
             <span>•</span>
-            <span>Max: <strong className="text-slate-800 dark:text-white">{latency.max}ms</strong></span>
+            <span>Max: <strong className="text-slate-800 dark:text-[#eef0f5]">{latency.max}ms</strong></span>
           </div>
         </div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-          <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-charcoal-950 border border-slate-200 dark:border-charcoal-800">
-            <span className="text-[11px] font-medium text-slate-500 dark:text-charcoal-400 uppercase tracking-wider">
-              P50 Median
-            </span>
-            <p className="text-xl font-bold font-mono text-slate-900 dark:text-white mt-1">
-              {latency.p50} <span className="text-xs font-normal text-slate-500">ms</span>
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          <div className="p-3 rounded-lg bg-slate-50 dark:bg-[#07080d] border border-slate-200 dark:border-[rgba(238,240,245,0.06)]">
+            <span className="text-[10px] font-mono text-slate-500 dark:text-[#7a8296]">P50 Median</span>
+            <p className="text-lg font-mono font-medium text-slate-900 dark:text-[#eef0f5] mt-0.5 tabular-nums">
+              {latency.p50} <span className="text-xs text-slate-400">ms</span>
             </p>
-            <span className="inline-block mt-1 text-[10px] px-1.5 py-0.5 rounded bg-emerald-50 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400 font-medium">
-              Optimal (&lt;500ms)
-            </span>
           </div>
-
-          <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-charcoal-950 border border-slate-200 dark:border-charcoal-800">
-            <span className="text-[11px] font-medium text-slate-500 dark:text-charcoal-400 uppercase tracking-wider">
-              P90 Percentile
-            </span>
-            <p className="text-xl font-bold font-mono text-slate-900 dark:text-white mt-1">
-              {latency.p90} <span className="text-xs font-normal text-slate-500">ms</span>
+          <div className="p-3 rounded-lg bg-slate-50 dark:bg-[#07080d] border border-slate-200 dark:border-[rgba(238,240,245,0.06)]">
+            <span className="text-[10px] font-mono text-slate-500 dark:text-[#7a8296]">P90 Latency</span>
+            <p className="text-lg font-mono font-medium text-slate-900 dark:text-[#eef0f5] mt-0.5 tabular-nums">
+              {latency.p90} <span className="text-xs text-slate-400">ms</span>
             </p>
-            <span className="inline-block mt-1 text-[10px] px-1.5 py-0.5 rounded bg-indigo-50 text-indigo-700 dark:bg-indigo-500/10 dark:text-indigo-400 font-medium">
-              Normal Band
-            </span>
           </div>
-
-          <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-charcoal-950 border border-slate-200 dark:border-charcoal-800">
-            <span className="text-[11px] font-medium text-slate-500 dark:text-charcoal-400 uppercase tracking-wider">
-              P95 Tail Latency
-            </span>
-            <p className="text-xl font-bold font-mono text-slate-900 dark:text-white mt-1">
-              {latency.p95} <span className="text-xs font-normal text-slate-500">ms</span>
+          <div className="p-3 rounded-lg bg-slate-50 dark:bg-[#07080d] border border-slate-200 dark:border-[rgba(238,240,245,0.06)]">
+            <span className="text-[10px] font-mono text-slate-500 dark:text-[#7a8296]">P95 Latency</span>
+            <p className="text-lg font-mono font-medium text-slate-900 dark:text-[#eef0f5] mt-0.5 tabular-nums">
+              {latency.p95} <span className="text-xs text-slate-400">ms</span>
             </p>
-            <span className="inline-block mt-1 text-[10px] px-1.5 py-0.5 rounded bg-amber-50 text-amber-700 dark:bg-amber-500/10 dark:text-amber-400 font-medium">
-              SLA Target (&lt;1.2s)
-            </span>
           </div>
-
-          <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-charcoal-950 border border-slate-200 dark:border-charcoal-800">
-            <span className="text-[11px] font-medium text-slate-500 dark:text-charcoal-400 uppercase tracking-wider">
-              P99 Worst Case
-            </span>
-            <p className="text-xl font-bold font-mono text-slate-900 dark:text-white mt-1">
-              {latency.p99} <span className="text-xs font-normal text-slate-500">ms</span>
+          <div className="p-3 rounded-lg bg-slate-50 dark:bg-[#07080d] border border-slate-200 dark:border-[rgba(238,240,245,0.06)]">
+            <span className="text-[10px] font-mono text-slate-500 dark:text-[#7a8296]">P99 Worst Case</span>
+            <p className="text-lg font-mono font-medium text-slate-900 dark:text-[#eef0f5] mt-0.5 tabular-nums">
+              {latency.p99} <span className="text-xs text-slate-400">ms</span>
             </p>
-            <span className="inline-block mt-1 text-[10px] px-1.5 py-0.5 rounded bg-purple-50 text-purple-700 dark:bg-purple-500/10 dark:text-purple-400 font-medium">
-              Within SLA Limit
-            </span>
           </div>
         </div>
       </div>
 
       {/* Analytics Charts */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Left: Execution Throughput & Latency Over Time */}
-        <div className="lg:col-span-2 p-5 rounded-2xl bg-white dark:bg-charcoal-900 border border-slate-200 dark:border-charcoal-800 shadow-sm dark:shadow-lg space-y-4">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
+        {/* Left: Execution Throughput & Volume */}
+        <div className="lg:col-span-2 p-4 rounded-xl bg-white dark:bg-[#11141c] border border-slate-200 dark:border-[rgba(238,240,245,0.08)] space-y-3">
           <div className="flex items-center justify-between">
             <div>
-              <h3 className="text-sm font-bold text-slate-900 dark:text-white">
-                Execution Throughput &amp; Volume ({timeframe.toUpperCase()})
+              <h3 className="text-xs font-medium text-slate-900 dark:text-[#eef0f5]">
+                Execution Throughput & Volume ({timeframe.toUpperCase()})
               </h3>
-              <p className="text-xs text-slate-500 dark:text-charcoal-400">
-                Workflow run frequency and token processing volume over selected window
+              <p className="text-[11px] text-slate-500 dark:text-[#7a8296]">
+                Workflow run frequency and token volume over selected window
               </p>
             </div>
-            <div className="flex items-center gap-3 text-xs font-mono">
-              <span className="flex items-center gap-1.5 text-indigo-600 dark:text-indigo-400">
-                <span className="w-2.5 h-2.5 rounded-full bg-indigo-500" /> Runs
+            <div className="flex items-center gap-3 text-[11px] font-mono">
+              <span className="flex items-center gap-1.5 text-slate-700 dark:text-[#eef0f5]">
+                <span className="w-2 h-2 rounded bg-slate-900 dark:bg-[#eef0f5]" /> Runs
               </span>
-              <span className="flex items-center gap-1.5 text-sky-600 dark:text-sky-400">
-                <span className="w-2.5 h-2.5 rounded-full bg-sky-500" /> Tokens (/100)
+              <span className="flex items-center gap-1.5 text-slate-500 dark:text-[#7a8296]">
+                <span className="w-2 h-2 rounded bg-slate-400 dark:bg-[#7a8296]" /> Tokens (/100)
               </span>
             </div>
           </div>
 
-          <div className="h-64 w-full">
+          <div className="h-60 w-full">
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={stats.throughput} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                <defs>
-                  <linearGradient id="colorExec" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#6366f1" stopOpacity={0.4} />
-                    <stop offset="95%" stopColor="#6366f1" stopOpacity={0} />
-                  </linearGradient>
-                  <linearGradient id="colorTokens" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#38bdf8" stopOpacity={0.3} />
-                    <stop offset="95%" stopColor="#38bdf8" stopOpacity={0} />
-                  </linearGradient>
-                </defs>
                 <CartesianGrid strokeDasharray="3 3" stroke={gridStroke} />
-                <XAxis dataKey="time" stroke={axisStroke} fontSize={11} />
-                <YAxis stroke={axisStroke} fontSize={11} />
+                <XAxis dataKey="time" stroke={axisStroke} fontSize={10} fontStyle="mono" />
+                <YAxis stroke={axisStroke} fontSize={10} fontStyle="mono" />
                 <Tooltip
                   contentStyle={{
                     backgroundColor: tooltipBg,
                     borderColor: tooltipBorder,
                     color: tooltipColor,
-                    borderRadius: "0.75rem",
-                    fontSize: "12px",
-                    boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.1)",
+                    borderRadius: "0.5rem",
+                    fontSize: "11px",
+                    fontFamily: "monospace",
                   }}
                 />
-                <Area type="monotone" dataKey="executions" name="Executions" stroke="#6366f1" strokeWidth={2} fillOpacity={1} fill="url(#colorExec)" />
-                <Area type="monotone" dataKey="tokens" name="Tokens (/100)" stroke="#38bdf8" strokeWidth={1.5} fillOpacity={1} fill="url(#colorTokens)" />
+                <Area type="monotone" dataKey="executions" name="Executions" stroke={isDark ? "#eef0f5" : "#111827"} strokeWidth={1.5} fill="none" />
+                <Area type="monotone" dataKey="tokens" name="Tokens (/100)" stroke={isDark ? "#7a8296" : "#94a3b8"} strokeWidth={1} fill="none" />
               </AreaChart>
             </ResponsiveContainer>
           </div>
         </div>
 
         {/* Right: Model Invocations Distribution */}
-        <div className="p-5 rounded-2xl bg-white dark:bg-charcoal-900 border border-slate-200 dark:border-charcoal-800 shadow-sm dark:shadow-lg space-y-4">
+        <div className="p-4 rounded-xl bg-white dark:bg-[#11141c] border border-slate-200 dark:border-[rgba(238,240,245,0.08)] space-y-3">
           <div>
-            <h3 className="text-sm font-bold text-slate-900 dark:text-white">Model Invocations</h3>
-            <p className="text-xs text-slate-500 dark:text-charcoal-400">
+            <h3 className="text-xs font-medium text-slate-900 dark:text-[#eef0f5]">Model Invocations</h3>
+            <p className="text-[11px] text-slate-500 dark:text-[#7a8296]">
               Requests dispatched by Gemini model family
             </p>
           </div>
 
-          <div className="h-64 w-full">
+          <div className="h-60 w-full">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={stats.modelBreakdown} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke={gridStroke} />
-                <XAxis dataKey="model" stroke={axisStroke} fontSize={10} tickFormatter={(v) => v.replace("gemini-", "")} />
-                <YAxis stroke={axisStroke} fontSize={11} />
+                <XAxis dataKey="model" stroke={axisStroke} fontSize={10} tickFormatter={(v) => v.replace("gemini-", "")} fontStyle="mono" />
+                <YAxis stroke={axisStroke} fontSize={10} fontStyle="mono" />
                 <Tooltip
                   contentStyle={{
                     backgroundColor: tooltipBg,
                     borderColor: tooltipBorder,
                     color: tooltipColor,
-                    borderRadius: "0.75rem",
-                    fontSize: "12px",
-                    boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.1)",
+                    borderRadius: "0.5rem",
+                    fontSize: "11px",
+                    fontFamily: "monospace",
                   }}
                 />
-                <Bar dataKey="requests" name="Invocations" fill="#6366f1" radius={[6, 6, 0, 0]} />
+                <Bar dataKey="requests" name="Invocations" fill={isDark ? "#a3a9b8" : "#475569"} radius={[4, 4, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </div>

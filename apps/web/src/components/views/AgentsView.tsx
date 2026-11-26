@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import {
   Bot,
-  Sparkles,
   Send,
   Loader2,
   Terminal,
@@ -203,112 +202,114 @@ export const AgentsView: React.FC = () => {
   };
 
   return (
-    <div className="flex-1 overflow-hidden flex bg-slate-50 dark:bg-charcoal-950 select-none transition-colors duration-150">
-      {/* Left Agent Personas List - Responsive Drawer / Column on Tablet */}
+    <div className="flex-1 overflow-hidden flex bg-slate-50 dark:bg-ink-950 select-none transition-colors duration-150">
+      {/* Left Agent Personas List - Responsive Column */}
       <div
         className={cn(
-          "w-full lg:w-80 border-r border-slate-200 dark:border-charcoal-800 bg-white dark:bg-charcoal-900 flex flex-col shrink-0 transition-all",
+          "w-full lg:w-80 border-r border-slate-200 dark:border-ink-800 bg-white dark:bg-ink-900 flex flex-col shrink-0 transition-all",
           mobileShowList ? "flex" : "hidden lg:flex"
         )}
       >
-        <div className="p-4 border-b border-slate-200 dark:border-charcoal-800 flex items-center justify-between">
+        <div className="p-4 border-b border-slate-200 dark:border-ink-800 flex items-center justify-between">
           <div>
             <div className="flex items-center gap-2">
-              <Bot className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
-              <h2 className="text-sm font-bold text-slate-900 dark:text-white">AI Agent Studio</h2>
+              <Bot className="w-4 h-4 text-slate-700 dark:text-ink-300" />
+              <h2 className="text-sm font-semibold text-slate-900 dark:text-white">AI Agent Studio</h2>
             </div>
-            <p className="text-xs text-slate-500 dark:text-charcoal-400 mt-0.5">
+            <p className="text-xs text-slate-500 dark:text-ink-400 mt-0.5">
               Autonomous agent personas with Gemini function calling
             </p>
           </div>
           <button
             onClick={() => setMobileShowList(false)}
-            className="lg:hidden p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-charcoal-800 text-slate-500 hover:text-slate-900 dark:hover:text-white transition-colors"
+            className="lg:hidden p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-ink-800 text-slate-500 hover:text-slate-900 dark:hover:text-white transition-colors"
             title="Close Agent List"
           >
             <X className="w-4 h-4" />
           </button>
         </div>
 
-        <div className="flex-1 overflow-y-auto p-3 space-y-2">
-          {agents.map((agent) => (
-            <div
-              key={agent.id}
-              onClick={() => {
-                setSelectedAgent(agent);
-                setMobileShowList(false);
-                setMessages([
-                  {
-                    sender: "agent",
-                    text: `Switched to ${agent.name}. Configured model: ${agent.model}. Ready for prompts.`,
-                    timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
-                  },
-                ]);
-              }}
-              className={`p-3 rounded-xl border transition-all cursor-pointer ${
-                selectedAgent.id === agent.id
-                  ? "bg-indigo-50 border-indigo-500 text-indigo-950 dark:bg-indigo-500/10 dark:border-indigo-500 dark:text-white ring-1 ring-indigo-500"
-                  : "bg-slate-50/80 border-slate-200 hover:border-slate-300 dark:bg-charcoal-950/60 dark:border-charcoal-800 dark:hover:border-charcoal-700"
-              }`}
-            >
-              <div className="flex items-center justify-between">
-                <span className="font-bold text-xs text-slate-900 dark:text-white">{agent.name}</span>
-                <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-indigo-100 text-indigo-800 dark:bg-indigo-500/20 dark:text-indigo-300">
-                  {agent.model.replace("gemini-", "")}
-                </span>
-              </div>
-              <p className="text-[11px] text-slate-600 dark:text-charcoal-400 mt-1">{agent.role}</p>
+        <div className="flex-1 overflow-y-auto p-3 space-y-1.5">
+          {agents.map((agent) => {
+            const isSelected = selectedAgent.id === agent.id;
+            return (
+              <div
+                key={agent.id}
+                onClick={() => {
+                  setSelectedAgent(agent);
+                  setMobileShowList(false);
+                  setMessages([
+                    {
+                      sender: "agent",
+                      text: `Switched to ${agent.name}. Configured model: ${agent.model}. Ready for prompts.`,
+                      timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+                    },
+                  ]);
+                }}
+                className={cn(
+                  "p-3 rounded-lg border transition-colors cursor-pointer",
+                  isSelected
+                    ? "bg-slate-100 border-slate-900 text-slate-950 dark:bg-ink-800 dark:border-ink-600 dark:text-ink-50"
+                    : "bg-white border-slate-200 hover:border-slate-300 dark:bg-ink-950/60 dark:border-ink-800 dark:hover:border-ink-700 text-slate-700 dark:text-ink-300"
+                )}
+              >
+                <div className="flex items-center justify-between">
+                  <span className="font-medium text-xs text-slate-900 dark:text-white">{agent.name}</span>
+                  <span className="text-[10px] font-mono px-1.5 py-0.5 rounded border border-slate-200 dark:border-ink-700 bg-slate-100 text-slate-600 dark:bg-ink-900 dark:text-ink-300">
+                    {agent.model.replace("gemini-", "")}
+                  </span>
+                </div>
+                <p className="text-[11px] text-slate-500 dark:text-ink-400 mt-1">{agent.role}</p>
 
-              <div className="flex items-center gap-3 mt-2 text-[10px] text-slate-500 dark:text-charcoal-500 font-mono">
-                <span className="flex items-center gap-1">
-                  <Thermometer className="w-3 h-3 text-slate-400 dark:text-charcoal-600" />
-                  {agent.temperature}
-                </span>
-                <span className="flex items-center gap-1">
-                  <Cpu className="w-3 h-3 text-slate-400 dark:text-charcoal-600" />
-                  {formatTokens(agent.tokensProcessed)} tk
-                </span>
+                <div className="flex items-center gap-3 mt-2 text-[10px] text-slate-400 dark:text-ink-500 font-mono">
+                  <span className="flex items-center gap-1">
+                    <Thermometer className="w-3 h-3 text-slate-400 dark:text-ink-500" />
+                    {agent.temperature}
+                  </span>
+                  <span className="flex items-center gap-1">
+                    <Cpu className="w-3 h-3 text-slate-400 dark:text-ink-500" />
+                    {formatTokens(agent.tokensProcessed)} tk
+                  </span>
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
 
       {/* Right Interactive Chat / Playground */}
       <div
         className={cn(
-          "flex-1 flex flex-col bg-slate-50 dark:bg-charcoal-950 min-w-0",
+          "flex-1 flex flex-col bg-slate-50 dark:bg-ink-950 min-w-0",
           mobileShowList ? "hidden lg:flex" : "flex"
         )}
       >
         {/* Playground Header */}
-        <div className="border-b border-slate-200 dark:border-charcoal-800 bg-white/80 dark:bg-charcoal-900/60 px-3 sm:px-5 py-3 flex flex-wrap items-center justify-between gap-2 sm:gap-3">
+        <div className="border-b border-slate-200 dark:border-ink-800 bg-white dark:bg-ink-900 px-3 sm:px-5 py-3 flex flex-wrap items-center justify-between gap-2 sm:gap-3">
           <div className="flex items-center gap-2 sm:gap-3">
             {/* Tablet/Mobile Toggle Button to Open Agent Selector */}
             <button
               onClick={() => setMobileShowList(true)}
-              className="lg:hidden flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl border border-slate-200 dark:border-charcoal-800 bg-white dark:bg-charcoal-900 text-xs font-semibold text-indigo-600 dark:text-indigo-400 shadow-sm shrink-0"
+              className="lg:hidden flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-slate-200 dark:border-ink-800 bg-white dark:bg-ink-900 text-xs font-medium text-slate-800 dark:text-ink-200 shrink-0"
               title="Switch Agent Persona"
             >
               <Bot className="w-3.5 h-3.5" />
               <span>Agents ({agents.length})</span>
             </button>
 
-            <div className="hidden sm:flex p-1.5 rounded-lg bg-indigo-50 dark:bg-indigo-500/10 border border-indigo-200 dark:border-indigo-500/20 text-indigo-600 dark:text-indigo-400 shrink-0">
-              <Sparkles className="w-4 h-4" />
-            </div>
             <div>
               <div className="flex items-center gap-1.5 sm:gap-2">
-                <h3 className="text-xs font-bold text-slate-900 dark:text-white truncate">{selectedAgent.name}</h3>
-                <span className="text-[10px] px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-800 dark:bg-emerald-500/20 dark:text-emerald-300 font-mono shrink-0">
+                <h3 className="text-xs font-semibold text-slate-900 dark:text-white truncate">{selectedAgent.name}</h3>
+                <span className="inline-flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded border border-emerald-500/20 bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 font-mono shrink-0">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
                   Online
                 </span>
-                <span className="hidden xl:inline-flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded bg-slate-100 dark:bg-charcoal-800 text-slate-600 dark:text-charcoal-400 font-mono">
-                  <Terminal className="w-3 h-3 text-emerald-500" />
+                <span className="hidden xl:inline-flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded border border-slate-200 dark:border-ink-800 bg-slate-100 dark:bg-ink-950 text-slate-600 dark:text-ink-400 font-mono">
+                  <Terminal className="w-3 h-3 text-slate-400 dark:text-ink-400" />
                   Interactive Test Bench
                 </span>
               </div>
-              <p className="text-[10px] text-slate-500 dark:text-charcoal-400 font-mono mt-0.5 truncate">
+              <p className="text-[10px] text-slate-500 dark:text-ink-400 font-mono mt-0.5 truncate">
                 {selectedAgent.role}
               </p>
             </div>
@@ -321,7 +322,7 @@ export const AgentsView: React.FC = () => {
               <select
                 value={selectedAgent.model}
                 onChange={(e) => handleUpdateAgentConfig({ model: e.target.value })}
-                className="appearance-none bg-white dark:bg-charcoal-900 border border-slate-200 dark:border-charcoal-800 rounded-xl px-2.5 py-1.5 pr-7 text-xs font-mono text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-1 focus:ring-indigo-500 cursor-pointer shadow-sm"
+                className="appearance-none bg-white dark:bg-ink-900 border border-slate-200 dark:border-ink-800 rounded-lg px-2.5 py-1.5 pr-7 text-xs font-mono text-slate-800 dark:text-ink-200 focus:outline-none focus:border-slate-400 dark:focus:border-ink-600 cursor-pointer"
               >
                 {AVAILABLE_MODELS.map((m) => (
                   <option key={m} value={m}>
@@ -336,10 +337,10 @@ export const AgentsView: React.FC = () => {
             <button
               onClick={() => setShowConfig(!showConfig)}
               className={cn(
-                "flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-slate-200 dark:border-charcoal-800 text-xs font-medium transition-colors shadow-sm",
+                "flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs font-medium transition-colors",
                 showConfig
-                  ? "bg-indigo-600 text-white"
-                  : "bg-white dark:bg-charcoal-900 hover:bg-slate-100 dark:hover:bg-charcoal-800 text-slate-700 dark:text-charcoal-300"
+                  ? "bg-slate-900 text-white border-slate-900 dark:bg-ink-100 dark:text-ink-950 dark:border-ink-100"
+                  : "border-slate-200 dark:border-ink-800 bg-white dark:bg-ink-900 hover:bg-slate-100 dark:hover:bg-ink-800 text-slate-700 dark:text-ink-300"
               )}
               title="Tune system prompt and temperature"
             >
@@ -350,13 +351,13 @@ export const AgentsView: React.FC = () => {
             {/* Insert to Canvas Action */}
             <button
               onClick={handleInsertToCanvas}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-indigo-200 dark:border-indigo-500/30 bg-indigo-50 dark:bg-indigo-500/10 hover:bg-indigo-100 dark:hover:bg-indigo-500/20 text-indigo-700 dark:text-indigo-300 text-xs font-medium transition-colors shadow-sm"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-200 dark:border-ink-800 bg-white dark:bg-ink-900 hover:bg-slate-100 dark:hover:bg-ink-800 text-slate-700 dark:text-ink-300 text-xs font-medium transition-colors"
               title="Add this configured agent as an LLM node to the canvas"
             >
               {insertedToCanvas ? (
                 <>
                   <Check className="w-3.5 h-3.5 text-emerald-500" />
-                  <span>Added!</span>
+                  <span>Added</span>
                 </>
               ) : (
                 <>
@@ -369,7 +370,7 @@ export const AgentsView: React.FC = () => {
             {/* Clear Chat */}
             <button
               onClick={handleClearChat}
-              className="p-1.5 rounded-xl border border-slate-200 dark:border-charcoal-800 bg-white dark:bg-charcoal-900 hover:bg-slate-100 dark:hover:bg-charcoal-800 text-slate-500 dark:text-charcoal-400 hover:text-rose-600 transition-colors shadow-sm"
+              className="p-1.5 rounded-lg border border-slate-200 dark:border-ink-800 bg-white dark:bg-ink-900 hover:bg-slate-100 dark:hover:bg-ink-800 text-slate-500 dark:text-ink-400 hover:text-rose-600 transition-colors"
               title="Reset conversation"
             >
               <Trash2 className="w-3.5 h-3.5" />
@@ -379,14 +380,14 @@ export const AgentsView: React.FC = () => {
 
         {/* Expandable Agent Tuning Drawer */}
         {showConfig && (
-          <div className="p-4 bg-slate-100/90 dark:bg-charcoal-900/90 border-b border-slate-200 dark:border-charcoal-800 space-y-3 animate-in slide-in-from-top duration-150">
+          <div className="p-4 bg-slate-100/70 dark:bg-ink-900/90 border-b border-slate-200 dark:border-ink-800 space-y-3">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-              <label className="text-xs font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wider">
+              <label className="text-xs font-medium text-slate-800 dark:text-ink-200">
                 System Prompt Persona
               </label>
 
               <div className="flex items-center gap-3">
-                <span className="text-xs font-mono text-slate-600 dark:text-charcoal-400">
+                <span className="text-xs font-mono text-slate-600 dark:text-ink-400">
                   Temperature: <strong>{selectedAgent.temperature}</strong>
                 </span>
                 <input
@@ -396,7 +397,7 @@ export const AgentsView: React.FC = () => {
                   step="0.05"
                   value={selectedAgent.temperature}
                   onChange={(e) => handleUpdateAgentConfig({ temperature: parseFloat(e.target.value) })}
-                  className="w-28 accent-indigo-600 cursor-pointer"
+                  className="w-28 accent-slate-800 dark:accent-ink-200 cursor-pointer"
                 />
               </div>
             </div>
@@ -405,46 +406,46 @@ export const AgentsView: React.FC = () => {
               rows={3}
               value={selectedAgent.systemPrompt}
               onChange={(e) => handleUpdateAgentConfig({ systemPrompt: e.target.value })}
-              className="w-full text-xs font-mono p-3 rounded-xl border border-slate-200 dark:border-charcoal-800 bg-white dark:bg-charcoal-950 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+              className="w-full text-xs font-mono p-3 rounded-lg border border-slate-200 dark:border-ink-800 bg-white dark:bg-ink-950 text-slate-900 dark:text-ink-100 focus:outline-none focus:border-slate-400 dark:focus:border-ink-600"
               placeholder="System prompt guidelines..."
             />
           </div>
         )}
 
         {/* Messages Stream */}
-        <div className="flex-1 overflow-y-auto p-6 space-y-4 font-mono text-xs">
+        <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4 font-mono text-xs">
           {messages.map((m, idx) => (
             <div
               key={idx}
               className={`flex flex-col ${m.sender === "user" ? "items-end" : "items-start"}`}
             >
-              <div className="text-[10px] text-slate-400 dark:text-charcoal-500 mb-1 px-1">
+              <div className="text-[10px] text-slate-400 dark:text-ink-500 mb-1 px-1">
                 {m.sender === "user" ? "Client Operator" : selectedAgent.name} • {m.timestamp}
-                {m.tokensUsed && <span className="ml-1 text-slate-400">({m.tokensUsed} tokens)</span>}
+                {m.tokensUsed && <span className="ml-1 text-slate-400 dark:text-ink-500">({m.tokensUsed} tokens)</span>}
               </div>
 
               <div
-                className={`max-w-xl p-3.5 rounded-2xl whitespace-pre-wrap leading-relaxed shadow-md ${
+                className={`max-w-xl p-3.5 rounded-lg whitespace-pre-wrap leading-relaxed ${
                   m.sender === "user"
-                    ? "bg-indigo-600 text-white rounded-tr-none"
-                    : "bg-white border border-slate-200 text-slate-800 dark:bg-charcoal-900 dark:border-charcoal-800 dark:text-charcoal-200 rounded-tl-none font-mono"
+                    ? "bg-slate-900 text-white dark:bg-ink-800 dark:text-ink-100"
+                    : "bg-white border border-slate-200 text-slate-800 dark:bg-ink-900 dark:border-ink-800 dark:text-ink-200 font-mono"
                 }`}
               >
                 {m.text}
 
                 {/* Visible Function / Tool Calling Card */}
                 {m.toolCall && (
-                  <div className="mt-3 p-2.5 rounded-xl border border-indigo-200 dark:border-indigo-500/20 bg-indigo-50/80 dark:bg-indigo-500/5 text-xs font-mono">
-                    <div className="flex items-center justify-between text-indigo-700 dark:text-indigo-300 font-bold">
+                  <div className="mt-3 p-2.5 rounded-md border border-slate-200 dark:border-ink-800 bg-slate-50 dark:bg-ink-950 text-xs font-mono">
+                    <div className="flex items-center justify-between text-slate-800 dark:text-ink-200 font-medium">
                       <span className="flex items-center gap-1.5">
-                        <Terminal className="w-3.5 h-3.5" />
+                        <Terminal className="w-3.5 h-3.5 text-slate-500 dark:text-ink-400" />
                         Tool Invocation: {m.toolCall.name}
                       </span>
-                      <span className="text-[10px] px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-800 dark:bg-emerald-500/20 dark:text-emerald-300 font-semibold">
+                      <span className="text-[10px] px-1.5 py-0.5 rounded border border-emerald-500/20 bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 font-medium">
                         {m.toolCall.status}
                       </span>
                     </div>
-                    <div className="mt-1 text-[11px] text-slate-600 dark:text-charcoal-400">
+                    <div className="mt-1 text-[11px] text-slate-600 dark:text-ink-400">
                       Payload: {JSON.stringify(m.toolCall.args)}
                     </div>
                   </div>
@@ -454,27 +455,27 @@ export const AgentsView: React.FC = () => {
           ))}
 
           {isTyping && (
-            <div className="flex items-center gap-2 text-slate-500 dark:text-charcoal-400 text-xs font-mono">
-              <Loader2 className="w-3.5 h-3.5 animate-spin text-indigo-600 dark:text-indigo-400" />
+            <div className="flex items-center gap-2 text-slate-500 dark:text-ink-400 text-xs font-mono">
+              <Loader2 className="w-3.5 h-3.5 animate-spin text-slate-700 dark:text-ink-300" />
               <span>{selectedAgent.name} is evaluating with {selectedAgent.model}...</span>
             </div>
           )}
         </div>
 
         {/* Input Bar */}
-        <form onSubmit={handleSend} className="p-4 border-t border-slate-200 dark:border-charcoal-800 bg-white dark:bg-charcoal-900">
+        <form onSubmit={handleSend} className="p-4 border-t border-slate-200 dark:border-ink-800 bg-white dark:bg-ink-900">
           <div className="flex items-center gap-2">
             <input
               type="text"
               value={inputText}
               onChange={(e) => setInputText(e.target.value)}
               placeholder={`Send test prompt to ${selectedAgent.name}...`}
-              className="flex-1 bg-slate-100 dark:bg-charcoal-950 border border-slate-200 dark:border-charcoal-800 rounded-xl px-4 py-2.5 text-xs text-slate-900 dark:text-charcoal-100 placeholder-slate-400 dark:placeholder-charcoal-500 focus:outline-none focus:border-indigo-500"
+              className="flex-1 bg-slate-100 dark:bg-ink-950 border border-slate-200 dark:border-ink-800 rounded-lg px-4 py-2.5 text-xs text-slate-900 dark:text-ink-100 placeholder-slate-400 dark:placeholder-ink-500 focus:outline-none focus:border-slate-400 dark:focus:border-ink-600 font-mono"
             />
             <button
               type="submit"
               disabled={isTyping || !inputText.trim()}
-              className="px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-xs disabled:opacity-40 transition-all flex items-center gap-1.5 shadow-md shadow-indigo-600/30"
+              className="px-4 py-2.5 rounded-lg bg-slate-900 dark:bg-ink-100 text-white dark:text-ink-950 font-medium text-xs hover:bg-slate-800 dark:hover:bg-white disabled:opacity-40 transition-colors flex items-center gap-1.5"
             >
               <Send className="w-3.5 h-3.5" />
               <span>Dispatch</span>

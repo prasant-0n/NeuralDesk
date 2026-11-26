@@ -11,7 +11,6 @@ import {
   Sun,
   LogOut,
   LogIn,
-  UserPlus,
 } from "lucide-react";
 import { useSettingsStore } from "../../store/settingsStore";
 import { useAuthStore } from "../../store/authStore";
@@ -39,67 +38,64 @@ export const Header: React.FC<HeaderProps> = ({ activeView }) => {
   };
 
   return (
-    <header className="h-14 border-b border-slate-200 dark:border-charcoal-800 bg-white/95 dark:bg-charcoal-900/95 px-3 sm:px-4 flex items-center justify-between z-20 backdrop-blur-md select-none transition-colors duration-150">
+    <header className="h-13 border-b border-slate-200 dark:border-[rgba(238,240,245,0.08)] bg-white dark:bg-[#07080d] px-3 sm:px-4 flex items-center justify-between z-20 select-none transition-colors duration-150 shrink-0">
       {/* Brand & Workspace Switcher */}
-      <div className="flex items-center gap-2 sm:gap-3 md:gap-4 min-w-0 shrink">
-        <Link to="/" className="flex items-center gap-2 sm:gap-2.5 shrink-0 group">
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-indigo-600 to-indigo-400 flex items-center justify-center shadow-md shadow-indigo-500/20 group-hover:scale-105 transition-transform">
-            <Zap className="w-4 h-4 text-white fill-white" />
+      <div className="flex items-center gap-2 sm:gap-3 min-w-0 shrink">
+        <Link to="/" className="flex items-center gap-2.5 shrink-0">
+          <div className="w-7 h-7 rounded-lg bg-slate-900 dark:bg-[#eef0f5] text-white dark:text-[#0b0d14] flex items-center justify-center transition-opacity hover:opacity-90">
+            <Zap className="w-3.5 h-3.5 fill-current" />
           </div>
           <div>
             <div className="flex items-center gap-1.5">
-              <span className="font-extrabold text-xs sm:text-sm tracking-tight text-slate-900 dark:text-white">
+              <span className="font-semibold text-xs sm:text-sm tracking-tight text-slate-900 dark:text-[#eef0f5]">
                 NeuralDesk
               </span>
-              <span className="text-[9px] uppercase font-bold tracking-widest px-1 rounded bg-indigo-500/10 dark:bg-indigo-500/20 text-indigo-600 dark:text-indigo-300 border border-indigo-500/20 dark:border-indigo-500/30">
-                PROD
+              <span className="text-[9px] uppercase font-mono px-1 rounded bg-slate-100 dark:bg-[#1a1e28] text-slate-600 dark:text-[#a3a9b8] border border-slate-200 dark:border-[rgba(238,240,245,0.08)]">
+                Studio
               </span>
             </div>
-            <p className="hidden md:block text-[10px] text-slate-500 dark:text-charcoal-400 font-mono">
-              Enterprise AI DAG Studio
-            </p>
           </div>
         </Link>
 
-        {/* Workspace Switcher - Shown on >= md screens with compact truncation */}
-        <div className="hidden md:flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-100/90 dark:bg-charcoal-950/80 border border-slate-200 dark:border-charcoal-800 text-xs shrink-0 max-w-[110px] lg:max-w-[140px] xl:max-w-[180px]">
-          <Layers className="w-3.5 h-3.5 text-indigo-500 dark:text-indigo-400 shrink-0" />
-          <span className="text-slate-700 dark:text-charcoal-200 font-medium truncate">
+        {/* Workspace Switcher */}
+        <div className="hidden md:flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-[#11141c] border border-slate-200 dark:border-[rgba(238,240,245,0.08)] text-xs shrink-0 max-w-[140px] lg:max-w-[180px]">
+          <Layers className="w-3.5 h-3.5 text-slate-500 dark:text-[#7a8296] shrink-0" />
+          <span className="text-slate-700 dark:text-[#a3a9b8] font-mono truncate">
             {workspaceId}
           </span>
-          <ChevronDown className="w-3 h-3 text-slate-400 dark:text-charcoal-500 ml-0.5 shrink-0" />
+          <ChevronDown className="w-3 h-3 text-slate-400 dark:text-[#7a8296] ml-0.5 shrink-0" />
         </div>
       </div>
 
-      {/* Center Breadcrumb (Visible on Laptops & Desktops >= 1280px) */}
-      <div className="hidden xl:flex items-center gap-2 text-xs text-slate-500 dark:text-charcoal-400 font-mono">
+      {/* Center Breadcrumb */}
+      <div className="hidden xl:flex items-center gap-2 text-xs text-slate-500 dark:text-[#7a8296] font-mono">
         <span>Workspace</span>
         <span>/</span>
-        <span className="text-slate-800 dark:text-charcoal-200 font-semibold capitalize">{activeView}</span>
+        <span className="text-slate-800 dark:text-[#eef0f5] font-medium capitalize">{activeView}</span>
       </div>
 
-      {/* Right Controls: BYOK Status, Settings, Theme, Auth */}
+      {/* Right Controls */}
       <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
         {/* Mode & BYOK Badge */}
         <button
           onClick={() => setIsSettingsOpen(true)}
           className={cn(
-            "flex items-center gap-1 sm:gap-1.5 px-2 sm:px-2.5 py-1 rounded-full text-xs font-mono border transition-all cursor-pointer shrink-0",
+            "flex items-center gap-1 sm:gap-1.5 px-2.5 py-1 rounded-md text-xs font-mono border transition-colors cursor-pointer shrink-0",
             geminiApiKey
-              ? "bg-emerald-50 text-emerald-700 border-emerald-300 dark:bg-emerald-950/40 dark:text-emerald-400 dark:border-emerald-700/50 hover:bg-emerald-100 dark:hover:bg-emerald-950/70"
-              : "bg-slate-100 text-slate-600 border-slate-200 hover:border-slate-300 dark:bg-charcoal-950 dark:text-charcoal-400 dark:border-charcoal-800 dark:hover:border-charcoal-700"
+              ? "bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-[#11141c] dark:text-[#4cc38a] dark:border-emerald-900/60"
+              : "bg-slate-100 text-slate-600 border-slate-200 hover:border-slate-300 dark:bg-[#11141c] dark:text-[#a3a9b8] dark:border-[rgba(238,240,245,0.08)]"
           )}
           title="Manage BYOK Gemini API Key and Runtime Execution Mode"
         >
           {geminiApiKey ? (
             <>
-              <ShieldCheck className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 shrink-0" />
+              <ShieldCheck className="w-3.5 h-3.5 text-emerald-600 dark:text-[#4cc38a] shrink-0" />
               <span className="hidden sm:inline">BYOK Active</span>
               <span className="sm:hidden">BYOK</span>
             </>
           ) : (
             <>
-              <Key className="w-3.5 h-3.5 text-slate-500 dark:text-charcoal-400 shrink-0" />
+              <Key className="w-3.5 h-3.5 text-slate-500 dark:text-[#7a8296] shrink-0" />
               <span className="hidden xl:inline">
                 {executionMode === "live" ? "Live API" : "Simulated Engine"}
               </span>
@@ -113,7 +109,7 @@ export const Header: React.FC<HeaderProps> = ({ activeView }) => {
         {/* Settings Dialog Trigger */}
         <button
           onClick={() => setIsSettingsOpen(true)}
-          className="p-1.5 sm:p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-charcoal-800 text-slate-500 dark:text-charcoal-400 hover:text-slate-900 dark:hover:text-white transition-colors shrink-0"
+          className="p-1.5 sm:p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-[#1a1e28] text-slate-500 dark:text-[#7a8296] hover:text-slate-900 dark:hover:text-[#eef0f5] transition-colors shrink-0"
           title="Studio Settings"
           aria-label="Settings"
         >
@@ -123,29 +119,29 @@ export const Header: React.FC<HeaderProps> = ({ activeView }) => {
         {/* Theme Toggle */}
         <button
           onClick={toggleTheme}
-          className="p-1.5 sm:p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-charcoal-800 text-slate-500 dark:text-charcoal-400 hover:text-slate-900 dark:hover:text-white transition-colors shrink-0"
+          className="p-1.5 sm:p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-[#1a1e28] text-slate-500 dark:text-[#7a8296] hover:text-slate-900 dark:hover:text-[#eef0f5] transition-colors shrink-0"
           title={`Switch to ${theme === "dark" ? "Light" : "Dark"} Mode`}
           aria-label="Toggle Theme"
         >
           {theme === "dark" ? (
             <Sun className="w-4 h-4 text-amber-400" />
           ) : (
-            <Moon className="w-4 h-4 text-indigo-600" />
+            <Moon className="w-4 h-4 text-slate-700" />
           )}
         </button>
 
-        {/* User Account / Better Auth Status */}
+        {/* User Account */}
         {activeUser ? (
           <div className="flex items-center gap-1 sm:gap-1.5 shrink-0">
             <button
               onClick={() => setIsAuthModalOpen(true)}
-              className="flex items-center gap-1.5 pl-1 sm:pl-1.5 pr-2 sm:pr-2.5 py-1 rounded-full border border-indigo-200 dark:border-indigo-900/60 bg-indigo-50/70 dark:bg-indigo-950/40 text-indigo-700 dark:text-indigo-300 hover:bg-indigo-100 dark:hover:bg-indigo-950/70 transition-all text-xs cursor-pointer shadow-sm"
-              title={`Logged in as ${activeUser.name || activeUser.email} - Click to manage session`}
+              className="flex items-center gap-1.5 pl-1 pr-2 py-1 rounded-md border border-slate-200 dark:border-[rgba(238,240,245,0.08)] bg-slate-50 dark:bg-[#11141c] text-slate-800 dark:text-[#eef0f5] text-xs transition-colors"
+              title={`Logged in as ${activeUser.name || activeUser.email}`}
             >
-              <div className="w-5 h-5 rounded-full bg-indigo-600 text-white font-bold text-[10px] flex items-center justify-center shrink-0">
+              <div className="w-5 h-5 rounded bg-slate-900 text-white dark:bg-[#eef0f5] dark:text-[#0b0d14] font-medium text-[10px] flex items-center justify-center shrink-0">
                 {activeUser.name ? activeUser.name.charAt(0).toUpperCase() : "U"}
               </div>
-              <span className="font-semibold max-w-[70px] sm:max-w-[100px] truncate">
+              <span className="font-mono text-xs max-w-[80px] truncate">
                 {activeUser.name || "User"}
               </span>
             </button>
@@ -154,7 +150,7 @@ export const Header: React.FC<HeaderProps> = ({ activeView }) => {
                 await authClient.signOut();
                 useAuthStore.getState().signOut();
               }}
-              className="p-1 sm:p-1.5 rounded-lg hover:bg-rose-50 dark:hover:bg-rose-950/40 text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 transition-colors border border-transparent hover:border-rose-200 dark:hover:border-rose-900/50 cursor-pointer shrink-0"
+              className="p-1.5 rounded-lg hover:bg-rose-50 dark:hover:bg-rose-950/40 text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 transition-colors"
               title="Sign Out of NeuralDesk"
               aria-label="Sign Out"
             >
@@ -162,20 +158,13 @@ export const Header: React.FC<HeaderProps> = ({ activeView }) => {
             </button>
           </div>
         ) : (
-          <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+          <div className="flex items-center gap-1.5 shrink-0">
             <Link
               to="/signin"
-              className="px-2 sm:px-2.5 py-1 text-xs font-semibold text-slate-700 dark:text-charcoal-200 hover:text-indigo-600 dark:hover:text-indigo-400 rounded-lg hover:bg-slate-100 dark:hover:bg-charcoal-800 transition-colors flex items-center gap-1"
+              className="px-2.5 py-1 text-xs font-medium text-slate-600 dark:text-[#a3a9b8] hover:text-slate-900 dark:hover:text-[#eef0f5] rounded-md transition-colors inline-flex items-center gap-1"
             >
               <LogIn className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">Sign In</span>
-            </Link>
-            <Link
-              to="/signup"
-              className="px-2.5 sm:px-3 py-1 text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-500 rounded-lg shadow-sm shadow-indigo-600/20 transition-all flex items-center gap-1"
-            >
-              <UserPlus className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">Sign Up</span>
+              <span>Sign In</span>
             </Link>
           </div>
         )}

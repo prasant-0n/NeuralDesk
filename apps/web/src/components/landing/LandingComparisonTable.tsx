@@ -1,5 +1,5 @@
 import React from "react";
-import { Check, X, Sparkles, Shield, Cpu, Lock, Radio, Layers } from "lucide-react";
+import { Check, X, Layers, Lock, Radio, Cpu } from "lucide-react";
 
 export const LandingComparisonTable: React.FC = () => {
   const categories = [
@@ -94,103 +94,115 @@ export const LandingComparisonTable: React.FC = () => {
   ];
 
   return (
-    <section id="comparison" className="relative py-24 md:py-32 bg-slate-50/50 dark:bg-charcoal-950/60 border-t border-slate-200 dark:border-slate-800/80">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center max-w-3xl mx-auto mb-16">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 text-emerald-700 dark:text-emerald-400 text-xs font-semibold mb-4">
-            <Shield className="w-3.5 h-3.5" />
-            <span>Architectural Comparison Matrix</span>
+    <section id="comparison" className="py-20 md:py-28 bg-[#fafafa] dark:bg-[#07080d] border-b border-slate-200/70 dark:border-[rgba(238,240,245,0.06)]">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-2xl mb-12">
+          <div className="text-xs font-mono text-slate-500 dark:text-[#7a8296] mb-2">
+            Competitive Architecture
           </div>
-          <h2 className="text-3xl sm:text-5xl font-extrabold tracking-tight text-slate-900 dark:text-white mb-4">
-            Why Systems Engineers Choose NeuralDesk
+          <h2 className="text-2xl sm:text-3xl font-medium tracking-tight text-slate-900 dark:text-[#eef0f5] mb-3">
+            Why lead architects build on NeuralDesk
           </h2>
-          <p className="text-base sm:text-lg text-slate-600 dark:text-slate-400">
-            Compare NeuralDesk's mathematical determinism against ad-hoc agent loops and legacy visual automation tools.
+          <p className="text-sm sm:text-base text-slate-600 dark:text-[#a3a9b8] leading-relaxed">
+            Comparing architectural guarantees across graph determinism, client-side encryption, and live telemetry.
           </p>
         </div>
 
-        {/* Table Container */}
-        <div className="rounded-3xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950/90 shadow-xl dark:shadow-2xl overflow-x-auto">
-          <table className="w-full text-left border-collapse min-w-[720px]">
-            <thead>
-              <tr className="border-b border-slate-200 dark:border-slate-800 text-xs font-mono uppercase text-slate-600 dark:text-slate-400 bg-slate-100/80 dark:bg-slate-900/60">
-                <th className="py-4 px-6 w-2/5">Capability / Architecture</th>
-                <th className="py-4 px-6 text-center text-indigo-600 dark:text-indigo-400 font-bold bg-indigo-50/70 dark:bg-indigo-950/20 border-x border-indigo-200 dark:border-indigo-500/20">
-                  <span className="flex items-center justify-center gap-1.5">
-                    <Sparkles className="w-3.5 h-3.5" />
-                    <span>NeuralDesk 2.0</span>
-                  </span>
-                </th>
-                <th className="py-4 px-6 text-center text-slate-600 dark:text-slate-400">LangGraph / Code</th>
-                <th className="py-4 px-6 text-center text-slate-600 dark:text-slate-400">n8n / Zapier</th>
-                <th className="py-4 px-6 text-center text-slate-600 dark:text-slate-400">Ad-Hoc Scripts</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-200 dark:divide-slate-800/80 text-sm">
-              {categories.map((cat) => (
-                <React.Fragment key={cat.category}>
-                  {/* Category Header Row */}
-                  <tr className="bg-slate-50/70 dark:bg-slate-900/40">
-                    <td colSpan={5} className="py-2.5 px-6 font-mono text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider flex items-center gap-2">
-                      <cat.icon className="w-3.5 h-3.5 text-indigo-500" />
-                      <span>{cat.category}</span>
-                    </td>
-                  </tr>
-
-                  {cat.items.map((row) => (
-                    <tr key={row.feature} className="hover:bg-slate-50/80 dark:hover:bg-slate-900/40 transition-colors">
-                      <td className="py-4 px-6">
-                        <div className="font-semibold text-slate-900 dark:text-slate-200">{row.feature}</div>
-                        <div className="text-xs text-slate-600 dark:text-slate-400 mt-0.5 leading-relaxed">{row.note}</div>
-                      </td>
-
-                      {/* NeuralDesk Column */}
-                      <td className="py-4 px-6 text-center bg-indigo-50/40 dark:bg-indigo-950/15 border-x border-indigo-200 dark:border-indigo-500/20">
-                        <div className="flex items-center justify-center">
-                          <div className="w-6 h-6 rounded-full bg-emerald-100 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shadow-sm">
-                            <Check className="w-4 h-4 stroke-[2.5]" />
-                          </div>
-                        </div>
-                      </td>
-
-                      {/* LangGraph */}
-                      <td className="py-4 px-6 text-center text-slate-600 dark:text-slate-400 text-xs font-mono font-medium">
-                        {row.langgraph === true ? (
-                          <Check className="w-4 h-4 text-emerald-600 dark:text-emerald-400 mx-auto" />
-                        ) : row.langgraph === false ? (
-                          <X className="w-4 h-4 text-rose-500/70 mx-auto" />
-                        ) : (
-                          <span>{row.langgraph}</span>
-                        )}
-                      </td>
-
-                      {/* n8n */}
-                      <td className="py-4 px-6 text-center text-slate-600 dark:text-slate-400 text-xs font-mono font-medium">
-                        {row.n8n === true ? (
-                          <Check className="w-4 h-4 text-emerald-600 dark:text-emerald-400 mx-auto" />
-                        ) : row.n8n === false ? (
-                          <X className="w-4 h-4 text-rose-500/70 mx-auto" />
-                        ) : (
-                          <span>{row.n8n}</span>
-                        )}
-                      </td>
-
-                      {/* Ad-Hoc Scripts */}
-                      <td className="py-4 px-6 text-center text-slate-600 dark:text-slate-400 text-xs font-mono font-medium">
-                        {row.scripts === true ? (
-                          <Check className="w-4 h-4 text-emerald-600 dark:text-emerald-400 mx-auto" />
-                        ) : row.scripts === false ? (
-                          <X className="w-4 h-4 text-rose-500/70 mx-auto" />
-                        ) : (
-                          <span>{row.scripts}</span>
-                        )}
+        {/* Comparison Table */}
+        <div className="rounded-xl border border-slate-200 dark:border-[rgba(238,240,245,0.08)] bg-white dark:bg-[#11141c] overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="w-full text-left border-collapse text-xs">
+              <thead>
+                <tr className="border-b border-slate-200 dark:border-[rgba(238,240,245,0.08)] bg-slate-50 dark:bg-[#07080d]">
+                  <th className="py-3 px-4 font-mono font-medium text-slate-500 dark:text-[#7a8296] w-2/5">
+                    Architectural capability
+                  </th>
+                  <th className="py-3 px-4 font-mono font-medium text-slate-900 dark:text-[#eef0f5] w-1/5 bg-slate-100/70 dark:bg-[#1a1e28]/50">
+                    NeuralDesk
+                  </th>
+                  <th className="py-3 px-4 font-mono font-medium text-slate-500 dark:text-[#7a8296] w-1/5">
+                    LangGraph
+                  </th>
+                  <th className="py-3 px-4 font-mono font-medium text-slate-500 dark:text-[#7a8296] w-1/5">
+                    n8n / DIY
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {categories.map((cat, catIdx) => (
+                  <React.Fragment key={cat.category}>
+                    <tr className="border-b border-slate-200/70 dark:border-[rgba(238,240,245,0.06)] bg-slate-50/50 dark:bg-[#0b0d14]/40">
+                      <td colSpan={4} className="py-2.5 px-4 font-mono text-[11px] font-medium text-slate-700 dark:text-[#a3a9b8]">
+                        <span className="flex items-center gap-1.5">
+                          <cat.icon className="w-3.5 h-3.5 text-slate-500 dark:text-[#7a8296]" />
+                          <span>{cat.category}</span>
+                        </span>
                       </td>
                     </tr>
-                  ))}
-                </React.Fragment>
-              ))}
-            </tbody>
-          </table>
+                    {cat.items.map((item, itemIdx) => (
+                      <tr
+                        key={item.feature}
+                        className={`border-b border-slate-100 dark:border-[rgba(238,240,245,0.04)] ${
+                          itemIdx === cat.items.length - 1 && catIdx !== categories.length - 1
+                            ? "border-b-slate-200 dark:border-b-[rgba(238,240,245,0.08)]"
+                            : ""
+                        }`}
+                      >
+                        <td className="py-3 px-4">
+                          <div className="font-medium text-slate-900 dark:text-[#eef0f5] mb-0.5">
+                            {item.feature}
+                          </div>
+                          <div className="text-[11px] text-slate-500 dark:text-[#7a8296] leading-relaxed">
+                            {item.note}
+                          </div>
+                        </td>
+                        <td className="py-3 px-4 bg-slate-100/40 dark:bg-[#1a1e28]/30">
+                          {item.neuraldesk === true ? (
+                            <span className="inline-flex items-center gap-1 font-mono text-emerald-600 dark:text-[#4cc38a]">
+                              <Check className="w-3.5 h-3.5" />
+                              <span>Enforced</span>
+                            </span>
+                          ) : (
+                            <span className="text-slate-500 dark:text-[#7a8296]">{item.neuraldesk}</span>
+                          )}
+                        </td>
+                        <td className="py-3 px-4 text-slate-500 dark:text-[#7a8296]">
+                          {item.langgraph === true ? (
+                            <span className="inline-flex items-center gap-1 text-slate-700 dark:text-[#a3a9b8]">
+                              <Check className="w-3.5 h-3.5" />
+                              <span>Supported</span>
+                            </span>
+                          ) : item.langgraph === false ? (
+                            <span className="inline-flex items-center gap-1 text-slate-400 dark:text-[#7a8296]">
+                              <X className="w-3.5 h-3.5" />
+                              <span>None</span>
+                            </span>
+                          ) : (
+                            <span className="font-mono text-[11px]">{item.langgraph}</span>
+                          )}
+                        </td>
+                        <td className="py-3 px-4 text-slate-500 dark:text-[#7a8296]">
+                          {item.n8n === true ? (
+                            <span className="inline-flex items-center gap-1 text-slate-700 dark:text-[#a3a9b8]">
+                              <Check className="w-3.5 h-3.5" />
+                              <span>Supported</span>
+                            </span>
+                          ) : item.n8n === false ? (
+                            <span className="inline-flex items-center gap-1 text-slate-400 dark:text-[#7a8296]">
+                              <X className="w-3.5 h-3.5" />
+                              <span>None</span>
+                            </span>
+                          ) : (
+                            <span className="font-mono text-[11px]">{item.n8n}</span>
+                          )}
+                        </td>
+                      </tr>
+                    ))}
+                  </React.Fragment>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
     </section>

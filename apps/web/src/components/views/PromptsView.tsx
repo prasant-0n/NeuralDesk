@@ -4,7 +4,6 @@ import {
   Copy,
   Check,
   Variable,
-  Sparkles,
   Plus,
   Play,
   Loader2,
@@ -300,25 +299,25 @@ export const PromptsView: React.FC = () => {
   };
 
   return (
-    <div className="flex-1 overflow-hidden flex bg-slate-50 dark:bg-charcoal-950 select-none transition-colors duration-150">
-      {/* Left List - Responsive Drawer / Column on Tablet */}
+    <div className="flex-1 overflow-hidden flex bg-slate-50 dark:bg-ink-950 select-none transition-colors duration-150">
+      {/* Left List - Responsive Column */}
       <div
         className={cn(
-          "w-full lg:w-80 border-r border-slate-200 dark:border-charcoal-800 bg-white dark:bg-charcoal-900 flex flex-col shrink-0 transition-all",
+          "w-full lg:w-80 border-r border-slate-200 dark:border-ink-800 bg-white dark:bg-ink-900 flex flex-col shrink-0 transition-all",
           mobileShowList ? "flex" : "hidden lg:flex"
         )}
       >
         {/* Header */}
-        <div className="p-4 border-b border-slate-200 dark:border-charcoal-800 space-y-3">
+        <div className="p-4 border-b border-slate-200 dark:border-ink-800 space-y-3">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <FileCode className="w-5 h-5 text-sky-600 dark:text-sky-400" />
-              <h2 className="text-sm font-bold text-slate-900 dark:text-white">Prompt Template Library</h2>
+              <FileCode className="w-4 h-4 text-slate-700 dark:text-ink-300" />
+              <h2 className="text-sm font-semibold text-slate-900 dark:text-white">Prompt Template Library</h2>
             </div>
             <div className="flex items-center gap-1.5">
               <button
                 onClick={() => setShowCreateModal(true)}
-                className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-[11px] font-semibold transition-all shadow-sm"
+                className="flex items-center gap-1 px-2.5 py-1 rounded-md bg-slate-900 dark:bg-ink-100 text-white dark:text-ink-950 hover:bg-slate-800 dark:hover:bg-white text-[11px] font-medium transition-colors"
                 title="Create new reusable prompt template"
               >
                 <Plus className="w-3.5 h-3.5" />
@@ -326,14 +325,14 @@ export const PromptsView: React.FC = () => {
               </button>
               <button
                 onClick={() => setMobileShowList(false)}
-                className="lg:hidden p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-charcoal-800 text-slate-500 hover:text-slate-900 dark:hover:text-white transition-colors"
+                className="lg:hidden p-1.5 rounded-md hover:bg-slate-100 dark:hover:bg-ink-800 text-slate-500 hover:text-slate-900 dark:hover:text-white transition-colors"
                 title="Close List"
               >
                 <X className="w-4 h-4" />
               </button>
             </div>
           </div>
-          <p className="text-xs text-slate-500 dark:text-charcoal-400">
+          <p className="text-xs text-slate-500 dark:text-ink-400">
             Reusable Mustache templates with live dynamic bindings
           </p>
 
@@ -345,80 +344,87 @@ export const PromptsView: React.FC = () => {
               placeholder="Search templates or variables..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-8 pr-2.5 py-1.5 text-xs rounded-xl border border-slate-200 dark:border-charcoal-800 bg-slate-50 dark:bg-charcoal-950 text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-1 focus:ring-sky-500 font-mono"
+              className="w-full pl-8 pr-2.5 py-1.5 text-xs rounded-lg border border-slate-200 dark:border-ink-800 bg-slate-100/60 dark:bg-ink-950 text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:border-slate-400 dark:focus:border-ink-600 font-mono"
             />
           </div>
 
-          {/* Category Pills */}
+          {/* Category Tabs */}
           <div className="flex flex-wrap gap-1 pt-1">
-            {CATEGORY_TABS.map((cat) => (
-              <button
-                key={cat.id}
-                onClick={() => setActiveCategory(cat.id)}
-                className={cn(
-                  "px-2 py-0.5 text-[10px] font-semibold rounded-md transition-all uppercase tracking-wider",
-                  activeCategory === cat.id
-                    ? "bg-sky-600 text-white shadow-sm"
-                    : "text-slate-600 dark:text-charcoal-400 hover:bg-slate-100 dark:hover:bg-charcoal-800"
-                )}
-              >
-                {cat.label}
-              </button>
-            ))}
+            {CATEGORY_TABS.map((cat) => {
+              const isActive = activeCategory === cat.id;
+              return (
+                <button
+                  key={cat.id}
+                  onClick={() => setActiveCategory(cat.id)}
+                  className={cn(
+                    "px-2 py-0.5 text-[10px] font-medium rounded transition-colors uppercase tracking-wider",
+                    isActive
+                      ? "bg-slate-900 text-white dark:bg-ink-100 dark:text-ink-950"
+                      : "text-slate-600 dark:text-ink-400 hover:bg-slate-100 dark:hover:bg-ink-800"
+                  )}
+                >
+                  {cat.label}
+                </button>
+              );
+            })}
           </div>
         </div>
 
         {/* Template List Items */}
-        <div className="flex-1 overflow-y-auto p-3 space-y-2">
+        <div className="flex-1 overflow-y-auto p-3 space-y-1.5">
           {filteredPrompts.length === 0 ? (
-            <div className="p-4 text-center text-slate-400 dark:text-charcoal-500 italic text-xs">
+            <div className="p-4 text-center text-slate-400 dark:text-ink-500 italic text-xs font-mono">
               No matching prompt templates found.
             </div>
           ) : (
-            filteredPrompts.map((p) => (
-              <div
-                key={p.id}
-                onClick={() => {
-                  setSelectedPrompt(p);
-                  setMobileShowList(false);
-                }}
-                className={`p-3 rounded-xl border transition-all cursor-pointer group relative ${
-                  selectedPrompt.id === p.id
-                    ? "bg-sky-50 border-sky-500 ring-1 ring-sky-500 dark:bg-sky-500/10 dark:border-sky-500"
-                    : "bg-slate-50/80 border-slate-200 hover:border-slate-300 dark:bg-charcoal-950/60 dark:border-charcoal-800 dark:hover:border-charcoal-700"
-                }`}
-              >
-                <div className="flex items-center justify-between">
-                  <span className="text-xs font-bold text-slate-900 dark:text-white truncate max-w-[180px]">
-                    {p.title}
-                  </span>
-                  <span className="text-[9px] font-mono uppercase px-1.5 py-0.5 rounded bg-slate-100 text-slate-600 dark:bg-charcoal-800 dark:text-charcoal-400">
-                    {p.category}
-                  </span>
-                </div>
-
-                <div className="flex items-center justify-between mt-2">
-                  <div className="flex items-center gap-1.5 text-[10px] text-sky-600 dark:text-sky-400 font-mono">
-                    <Variable className="w-3 h-3" />
-                    <span>{p.variables.length} variables</span>
+            filteredPrompts.map((p) => {
+              const isSelected = selectedPrompt.id === p.id;
+              return (
+                <div
+                  key={p.id}
+                  onClick={() => {
+                    setSelectedPrompt(p);
+                    setMobileShowList(false);
+                  }}
+                  className={cn(
+                    "p-3 rounded-lg border transition-colors cursor-pointer group relative",
+                    isSelected
+                      ? "bg-slate-100 border-slate-900 dark:bg-ink-800 dark:border-ink-600"
+                      : "bg-white border-slate-200 hover:border-slate-300 dark:bg-ink-950/60 dark:border-ink-800 dark:hover:border-ink-700"
+                  )}
+                >
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="text-xs font-medium text-slate-900 dark:text-white truncate max-w-[180px]">
+                      {p.title}
+                    </span>
+                    <span className="text-[9px] font-mono uppercase px-1.5 py-0.5 rounded border border-slate-200 dark:border-ink-700 bg-slate-100 text-slate-600 dark:bg-ink-900 dark:text-ink-300 shrink-0">
+                      {p.category}
+                    </span>
                   </div>
 
-                  {/* Delete custom prompt */}
-                  {p.id.startsWith("p_") && (
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleDeletePrompt(p.id);
-                      }}
-                      className="opacity-0 group-hover:opacity-100 p-1 hover:text-rose-500 text-slate-400 transition-opacity"
-                      title="Delete prompt"
-                    >
-                      <Trash2 className="w-3 h-3" />
-                    </button>
-                  )}
+                  <div className="flex items-center justify-between mt-2">
+                    <div className="flex items-center gap-1.5 text-[10px] text-slate-500 dark:text-ink-400 font-mono">
+                      <Variable className="w-3 h-3 text-slate-400 dark:text-ink-500" />
+                      <span>{p.variables.length} variables</span>
+                    </div>
+
+                    {/* Delete custom prompt */}
+                    {p.id.startsWith("p_") && (
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleDeletePrompt(p.id);
+                        }}
+                        className="opacity-0 group-hover:opacity-100 p-1 hover:text-rose-600 text-slate-400 transition-opacity"
+                        title="Delete prompt"
+                      >
+                        <Trash2 className="w-3 h-3" />
+                      </button>
+                    )}
+                  </div>
                 </div>
-              </div>
-            ))
+              );
+            })
           )}
         </div>
       </div>
@@ -426,7 +432,7 @@ export const PromptsView: React.FC = () => {
       {/* Right Editor & Compiler */}
       <div
         className={cn(
-          "flex-1 overflow-y-auto p-4 sm:p-6 space-y-6 bg-slate-50 dark:bg-charcoal-950 min-w-0",
+          "flex-1 overflow-y-auto p-4 sm:p-6 space-y-6 bg-slate-50 dark:bg-ink-950 min-w-0",
           mobileShowList ? "hidden lg:block" : "block"
         )}
       >
@@ -437,19 +443,19 @@ export const PromptsView: React.FC = () => {
               {/* Tablet/Mobile Toggle Button to Open Prompt Template Selector */}
               <button
                 onClick={() => setMobileShowList(true)}
-                className="lg:hidden flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl border border-slate-200 dark:border-charcoal-800 bg-white dark:bg-charcoal-900 text-xs font-semibold text-sky-600 dark:text-sky-400 shadow-sm shrink-0"
+                className="lg:hidden flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-slate-200 dark:border-ink-800 bg-white dark:bg-ink-900 text-xs font-medium text-slate-800 dark:text-ink-200 shrink-0"
                 title="Switch Prompt Template"
               >
                 <FileCode className="w-3.5 h-3.5" />
                 <span>Templates ({prompts.length})</span>
               </button>
 
-              <h2 className="text-base font-bold text-slate-900 dark:text-white truncate">{selectedPrompt.title}</h2>
-              <span className="text-[10px] font-mono uppercase px-2 py-0.5 rounded bg-sky-100 text-sky-800 dark:bg-sky-500/20 dark:text-sky-300 shrink-0">
+              <h2 className="text-base font-semibold text-slate-900 dark:text-white truncate">{selectedPrompt.title}</h2>
+              <span className="text-[10px] font-mono uppercase px-2 py-0.5 rounded border border-slate-200 dark:border-ink-800 bg-slate-100 text-slate-600 dark:bg-ink-900 dark:text-ink-300 shrink-0">
                 {selectedPrompt.category}
               </span>
             </div>
-            <p className="text-xs text-slate-500 dark:text-charcoal-400 mt-0.5">
+            <p className="text-xs text-slate-500 dark:text-ink-400 mt-0.5">
               {selectedPrompt.description || "Template definition & live variable compiler preview"}
             </p>
           </div>
@@ -459,7 +465,7 @@ export const PromptsView: React.FC = () => {
             <button
               onClick={handleTestRun}
               disabled={isTesting}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold shadow-md shadow-indigo-600/30 transition-all disabled:opacity-50"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 dark:bg-ink-100 dark:hover:bg-white text-white dark:text-ink-950 text-xs font-medium transition-colors disabled:opacity-50"
               title="Execute this prompt with Gemini and inspect output"
             >
               {isTesting ? (
@@ -478,13 +484,13 @@ export const PromptsView: React.FC = () => {
             {/* Insert to Canvas */}
             <button
               onClick={handleInsertToCanvas}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-sky-200 dark:border-sky-500/30 bg-sky-50 dark:bg-sky-500/10 hover:bg-sky-100 dark:hover:bg-sky-500/20 text-sky-700 dark:text-sky-300 text-xs font-medium transition-colors shadow-sm"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-200 dark:border-ink-800 bg-white dark:bg-ink-900 hover:bg-slate-100 dark:hover:bg-ink-800 text-slate-700 dark:text-ink-300 text-xs font-medium transition-colors"
               title="Add this template as a Prompt node to the canvas"
             >
               {insertedToCanvas ? (
                 <>
                   <Check className="w-3.5 h-3.5 text-emerald-500" />
-                  <span>Inserted!</span>
+                  <span>Inserted</span>
                 </>
               ) : (
                 <>
@@ -497,7 +503,7 @@ export const PromptsView: React.FC = () => {
             {/* Copy Rendered Prompt */}
             <button
               onClick={handleCopy}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white hover:bg-slate-100 border border-slate-200 dark:bg-charcoal-900 dark:hover:bg-charcoal-800 dark:border-charcoal-700 text-xs text-slate-700 dark:text-charcoal-200 hover:text-slate-900 dark:hover:text-white transition-colors shadow-sm"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white hover:bg-slate-100 border border-slate-200 dark:bg-ink-900 dark:hover:bg-ink-800 dark:border-ink-800 text-xs text-slate-700 dark:text-ink-300 hover:text-slate-900 dark:hover:text-white transition-colors"
             >
               {copied ? <Check className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
               <span>{copied ? "Copied" : "Copy Prompt"}</span>
@@ -507,10 +513,10 @@ export const PromptsView: React.FC = () => {
 
         {/* Template Source */}
         <div className="space-y-2">
-          <label className="text-xs font-semibold text-slate-700 dark:text-charcoal-300">
+          <label className="text-xs font-medium text-slate-700 dark:text-ink-300">
             Raw Mustache Template
           </label>
-          <pre className="p-4 rounded-xl bg-white dark:bg-charcoal-900 border border-slate-200 dark:border-charcoal-800 text-xs font-mono text-sky-950 dark:text-sky-200 whitespace-pre-wrap leading-relaxed shadow-sm dark:shadow-lg">
+          <pre className="p-4 rounded-lg bg-slate-100/60 dark:bg-ink-950 border border-slate-200 dark:border-ink-800 text-xs font-mono text-slate-800 dark:text-ink-200 whitespace-pre-wrap leading-relaxed">
             {selectedPrompt.template}
           </pre>
         </div>
@@ -518,7 +524,7 @@ export const PromptsView: React.FC = () => {
         {/* Live Variable Bindings */}
         <div className="space-y-3">
           <div className="flex items-center justify-between">
-            <label className="text-xs font-semibold text-slate-700 dark:text-charcoal-300">
+            <label className="text-xs font-medium text-slate-700 dark:text-ink-300">
               Dynamic Variable Inputs ({selectedPrompt.variables.length} parameters)
             </label>
           </div>
@@ -526,14 +532,14 @@ export const PromptsView: React.FC = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             {selectedPrompt.variables.map((varName) => (
               <div key={varName} className="space-y-1">
-                <label className="text-[11px] font-mono text-sky-600 dark:text-sky-400">{`{{${varName}}}`}</label>
+                <label className="text-[11px] font-mono text-slate-600 dark:text-ink-400">{`{{${varName}}}`}</label>
                 <input
                   type="text"
                   value={variableValues[varName] || ""}
                   onChange={(e) =>
                     setVariableValues({ ...variableValues, [varName]: e.target.value })
                   }
-                  className="w-full bg-white dark:bg-charcoal-900 border border-slate-300 dark:border-charcoal-800 rounded-lg px-3 py-2 text-xs text-slate-900 dark:text-charcoal-100 focus:outline-none focus:border-indigo-500 font-mono shadow-sm"
+                  className="w-full bg-white dark:bg-ink-900 border border-slate-200 dark:border-ink-800 rounded-lg px-3 py-2 text-xs text-slate-900 dark:text-ink-100 focus:outline-none focus:border-slate-400 dark:focus:border-ink-600 font-mono"
                 />
               </div>
             ))}
@@ -542,35 +548,34 @@ export const PromptsView: React.FC = () => {
 
         {/* Live Output Preview */}
         <div className="space-y-2">
-          <label className="text-xs font-semibold text-slate-700 dark:text-charcoal-300 flex items-center gap-1.5">
-            <Sparkles className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
-            <span>Compiled Output (Ready for Gemini Inference)</span>
+          <label className="text-xs font-medium text-slate-700 dark:text-ink-300 flex items-center gap-1.5">
+            <span>Compiled Output (Ready for Inference)</span>
           </label>
-          <pre className="p-4 rounded-xl bg-white dark:bg-charcoal-900 border border-emerald-300 dark:border-emerald-500/30 text-xs font-mono text-emerald-950 dark:text-emerald-200 whitespace-pre-wrap leading-relaxed shadow-sm dark:shadow-lg">
+          <pre className="p-4 rounded-lg bg-white dark:bg-ink-900 border border-slate-200 dark:border-ink-800 text-xs font-mono text-slate-800 dark:text-ink-200 whitespace-pre-wrap leading-relaxed">
             {compiledPrompt}
           </pre>
         </div>
 
         {/* Test Run Execution Output Container */}
         {testResult && (
-          <div className="p-4 rounded-xl bg-slate-900 text-white border border-indigo-500/40 space-y-3 font-mono text-xs shadow-xl animate-in fade-in duration-200">
-            <div className="flex items-center justify-between border-b border-charcoal-700 pb-2">
+          <div className="p-4 rounded-lg bg-slate-950 text-white border border-slate-800 space-y-3 font-mono text-xs">
+            <div className="flex items-center justify-between border-b border-slate-800 pb-2">
               <div className="flex items-center gap-2">
-                <Zap className="w-4 h-4 text-amber-400" />
-                <span className="font-bold">Gemini Inference Test Result</span>
+                <Zap className="w-3.5 h-3.5 text-amber-400" />
+                <span className="font-medium">Inference Test Result</span>
               </div>
-              <div className="flex items-center gap-3 text-[11px] text-charcoal-400">
+              <div className="flex items-center gap-3 text-[11px] text-slate-400">
                 <span>{testResult.model}</span>
                 <span>•</span>
                 <span>{testResult.durationMs}ms</span>
                 <span>•</span>
-                <span>{formatTokens(testResult.tokens.total)} tokens</span>
+                <span>{formatTokens(testResult.tokens.total)} tk</span>
                 <span>•</span>
                 <span className="text-emerald-400">{formatCost(testResult.costUsd)}</span>
               </div>
             </div>
 
-            <pre className="whitespace-pre-wrap text-[11px] leading-relaxed text-charcoal-200 font-mono max-h-48 overflow-y-auto">
+            <pre className="whitespace-pre-wrap text-[11px] leading-relaxed text-slate-300 font-mono max-h-48 overflow-y-auto">
               {testResult.output}
             </pre>
           </div>
@@ -580,15 +585,15 @@ export const PromptsView: React.FC = () => {
       {/* New Prompt Modal */}
       {showCreateModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 dark:bg-black/70 backdrop-blur-sm p-4">
-          <div className="w-full max-w-lg bg-white dark:bg-charcoal-900 border border-slate-200 dark:border-charcoal-800 rounded-2xl shadow-2xl p-5 space-y-4">
-            <div className="flex items-center justify-between border-b border-slate-200 dark:border-charcoal-800 pb-3">
+          <div className="w-full max-w-lg bg-white dark:bg-ink-900 border border-slate-200 dark:border-ink-800 rounded-xl shadow-xl p-5 space-y-4">
+            <div className="flex items-center justify-between border-b border-slate-200 dark:border-ink-800 pb-3">
               <div className="flex items-center gap-2">
-                <FileCode className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
-                <h3 className="text-sm font-bold text-slate-900 dark:text-white">Create New Prompt Template</h3>
+                <FileCode className="w-4 h-4 text-slate-700 dark:text-ink-300" />
+                <h3 className="text-sm font-semibold text-slate-900 dark:text-white">Create New Prompt Template</h3>
               </div>
               <button
                 onClick={() => setShowCreateModal(false)}
-                className="p-1 hover:bg-slate-100 dark:hover:bg-charcoal-800 rounded text-slate-400"
+                className="p-1 hover:bg-slate-100 dark:hover:bg-ink-800 rounded text-slate-400"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -596,7 +601,7 @@ export const PromptsView: React.FC = () => {
 
             <form onSubmit={handleCreatePrompt} className="space-y-3 text-xs">
               <div>
-                <label className="font-medium text-slate-700 dark:text-charcoal-300 block mb-1">
+                <label className="font-medium text-slate-700 dark:text-ink-300 block mb-1">
                   Template Title
                 </label>
                 <input
@@ -604,19 +609,19 @@ export const PromptsView: React.FC = () => {
                   placeholder="e.g. Inbound Lead Classifier"
                   value={newTitle}
                   onChange={(e) => setNewTitle(e.target.value)}
-                  className="w-full p-2.5 rounded-lg border border-slate-200 dark:border-charcoal-800 bg-slate-50 dark:bg-charcoal-950 text-slate-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                  className="w-full p-2.5 rounded-lg border border-slate-200 dark:border-ink-800 bg-slate-50 dark:bg-ink-950 text-slate-900 dark:text-white focus:outline-none focus:border-slate-400 dark:focus:border-ink-600"
                   required
                 />
               </div>
 
               <div>
-                <label className="font-medium text-slate-700 dark:text-charcoal-300 block mb-1">
+                <label className="font-medium text-slate-700 dark:text-ink-300 block mb-1">
                   Category
                 </label>
                 <select
                   value={newCategory}
                   onChange={(e) => setNewCategory(e.target.value)}
-                  className="w-full p-2.5 rounded-lg border border-slate-200 dark:border-charcoal-800 bg-slate-50 dark:bg-charcoal-950 text-slate-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                  className="w-full p-2.5 rounded-lg border border-slate-200 dark:border-ink-800 bg-slate-50 dark:bg-ink-950 text-slate-900 dark:text-white focus:outline-none focus:border-slate-400 dark:focus:border-ink-600"
                 >
                   <option value="support">Support</option>
                   <option value="summarization">Summarization</option>
@@ -628,7 +633,7 @@ export const PromptsView: React.FC = () => {
               </div>
 
               <div>
-                <label className="font-medium text-slate-700 dark:text-charcoal-300 block mb-1">
+                <label className="font-medium text-slate-700 dark:text-ink-300 block mb-1">
                   Description
                 </label>
                 <input
@@ -636,12 +641,12 @@ export const PromptsView: React.FC = () => {
                   placeholder="Short description of what this prompt accomplishes"
                   value={newDescription}
                   onChange={(e) => setNewDescription(e.target.value)}
-                  className="w-full p-2.5 rounded-lg border border-slate-200 dark:border-charcoal-800 bg-slate-50 dark:bg-charcoal-950 text-slate-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                  className="w-full p-2.5 rounded-lg border border-slate-200 dark:border-ink-800 bg-slate-50 dark:bg-ink-950 text-slate-900 dark:text-white focus:outline-none focus:border-slate-400 dark:focus:border-ink-600"
                 />
               </div>
 
               <div>
-                <label className="font-medium text-slate-700 dark:text-charcoal-300 block mb-1">
+                <label className="font-medium text-slate-700 dark:text-ink-300 block mb-1">
                   Mustache Template (use {"{{variable_name}}"} for inputs)
                 </label>
                 <textarea
@@ -649,7 +654,7 @@ export const PromptsView: React.FC = () => {
                   placeholder="Analyze the following {{item_name}} and extract key metrics..."
                   value={newTemplate}
                   onChange={(e) => setNewTemplate(e.target.value)}
-                  className="w-full p-2.5 rounded-lg border border-slate-200 dark:border-charcoal-800 bg-slate-50 dark:bg-charcoal-950 text-slate-900 dark:text-white font-mono focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                  className="w-full p-2.5 rounded-lg border border-slate-200 dark:border-ink-800 bg-slate-50 dark:bg-ink-950 text-slate-900 dark:text-white font-mono focus:outline-none focus:border-slate-400 dark:focus:border-ink-600"
                   required
                 />
               </div>
@@ -658,13 +663,13 @@ export const PromptsView: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setShowCreateModal(false)}
-                  className="px-3 py-1.5 rounded-lg border border-slate-200 dark:border-charcoal-800 text-slate-600 dark:text-charcoal-400 text-xs font-medium"
+                  className="px-3 py-1.5 rounded-lg border border-slate-200 dark:border-ink-800 text-slate-600 dark:text-ink-400 text-xs font-medium"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold shadow-md shadow-indigo-600/30"
+                  className="px-4 py-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 dark:bg-ink-100 dark:hover:bg-white text-white dark:text-ink-950 text-xs font-medium transition-colors"
                 >
                   Create Prompt
                 </button>

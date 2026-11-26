@@ -1,6 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { Sparkles, ArrowRight, ShieldCheck, CheckCircle2, Zap } from "lucide-react";
+import { ArrowRight, ShieldCheck, CheckCircle2, Zap } from "lucide-react";
 import { authClient } from "../../lib/authClient";
 
 export const LandingCTA: React.FC = () => {
@@ -16,38 +16,27 @@ export const LandingCTA: React.FC = () => {
   };
 
   return (
-    <section id="cta" className="relative py-24 md:py-32 overflow-hidden">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="relative rounded-3xl p-10 sm:p-16 md:p-20 border border-indigo-200/90 dark:border-indigo-500/30 bg-gradient-to-b from-indigo-50/80 via-white to-slate-50/90 dark:bg-gradient-to-b dark:from-indigo-950/80 dark:via-charcoal-950 dark:to-charcoal-950 shadow-2xl shadow-indigo-500/10 dark:shadow-indigo-950/80 backdrop-blur-2xl text-center overflow-hidden">
-          {/* Ambient Lighting Gradients */}
-          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[550px] h-[350px] bg-gradient-to-tr from-indigo-300/35 via-cyan-200/25 to-purple-300/25 dark:from-indigo-500/20 dark:via-cyan-500/20 dark:to-purple-500/20 rounded-full blur-[100px] pointer-events-none" />
-
-          <div className="relative z-10 max-w-3xl mx-auto">
-            {/* Pill Badge */}
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-indigo-50/90 dark:bg-charcoal-900/90 border border-indigo-200 dark:border-indigo-500/30 text-indigo-700 dark:text-indigo-300 text-xs font-semibold mb-6 shadow-sm">
-              <Sparkles className="w-3.5 h-3.5 text-cyan-600 dark:text-cyan-300" />
-              <span>Get Started in Under 30 Seconds</span>
+    <section id="cta" className="relative py-20 md:py-28 bg-[#f5f7fa] dark:bg-[#0b0d14] border-t border-slate-200/70 dark:border-[rgba(238,240,245,0.06)]">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <div className="rounded-2xl p-8 sm:p-12 md:p-16 border border-slate-200 dark:border-[rgba(238,240,245,0.08)] bg-white dark:bg-[#11141c]">
+          <div className="max-w-2xl mx-auto">
+            <div className="text-xs font-mono text-slate-500 dark:text-[#7a8296] mb-3">
+              Get started in under 30 seconds
             </div>
 
-            {/* Headline */}
-            <h2 className="text-3xl sm:text-5xl md:text-6xl font-extrabold tracking-tight text-slate-900 dark:text-white mb-6 leading-tight font-sans">
-              Ready to Automate with{" "}
-              <span className="bg-gradient-to-r from-indigo-600 via-cyan-600 to-indigo-600 dark:from-indigo-400 dark:via-cyan-400 dark:to-indigo-400 bg-clip-text text-transparent">
-                Mathematical Precision?
-              </span>
+            <h2 className="text-3xl sm:text-4xl font-medium tracking-tight text-slate-900 dark:text-[#eef0f5] mb-4">
+              Automate multi-agent workflows with mathematical precision
             </h2>
 
-            {/* Subtitle */}
-            <p className="text-base sm:text-lg text-slate-600 dark:text-slate-300 max-w-2xl mx-auto mb-10 leading-relaxed font-normal">
-              Join thousands of engineers orchestrating autonomous multi-agent pipelines
-              with guaranteed cycle-free execution, zero-knowledge BYOK, and real-time telemetry.
+            <p className="text-sm sm:text-base text-slate-600 dark:text-[#a3a9b8] mb-8 leading-relaxed">
+              Join engineering teams deploying deterministic pipelines with zero-knowledge encryption,
+              formal Kahn cycle validation, and sub-15ms node telemetry.
             </p>
 
-            {/* Action Buttons */}
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-10">
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mb-8">
               <button
                 onClick={handleGoogleSignIn}
-                className="w-full sm:w-auto flex items-center justify-center gap-3 px-7 py-3.5 rounded-2xl bg-white hover:bg-slate-50 dark:bg-white dark:hover:bg-slate-100 text-slate-800 dark:text-slate-900 font-semibold text-xs sm:text-sm border border-slate-300/90 dark:border-transparent shadow-md hover:shadow-lg transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
+                className="w-full sm:w-auto h-11 px-5 rounded-lg bg-white hover:bg-slate-50 dark:bg-[#1a1e28] dark:hover:bg-[#232325] text-slate-800 dark:text-[#eef0f5] text-xs sm:text-sm font-medium border border-slate-300 dark:border-[rgba(238,240,245,0.08)] inline-flex items-center justify-center gap-2.5 transition-colors cursor-pointer"
               >
                 <svg className="w-4 h-4" viewBox="0 0 24 24">
                   <path
@@ -72,26 +61,25 @@ export const LandingCTA: React.FC = () => {
 
               <Link
                 to="/signup"
-                className="w-full sm:w-auto group flex items-center justify-center gap-2 px-7 py-3.5 rounded-2xl bg-gradient-to-r from-indigo-600 via-indigo-500 to-cyan-500 hover:from-indigo-500 hover:to-cyan-400 text-white font-semibold text-xs sm:text-sm shadow-xl shadow-indigo-600/25 hover:shadow-indigo-600/40 transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
+                className="w-full sm:w-auto h-11 px-5 rounded-lg bg-slate-900 hover:bg-slate-800 text-white dark:bg-[#eef0f5] dark:hover:bg-white dark:text-[#0b0d14] text-xs sm:text-sm font-medium inline-flex items-center justify-center gap-2 transition-colors"
               >
                 <span>Sign Up with Email</span>
-                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                <ArrowRight className="w-3.5 h-3.5" />
               </Link>
             </div>
 
-            {/* Reassurance pills */}
-            <div className="flex flex-wrap items-center justify-center gap-6 text-xs text-slate-600 dark:text-slate-400 font-medium">
+            <div className="flex flex-wrap items-center justify-center gap-6 text-xs text-slate-500 dark:text-[#7a8296]">
               <div className="flex items-center gap-1.5">
-                <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-                <span>No Credit Card Required</span>
+                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 dark:text-[#4cc38a]" />
+                <span>No credit card required</span>
               </div>
               <div className="flex items-center gap-1.5">
-                <ShieldCheck className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
-                <span>Zero-Knowledge BYOK Security</span>
+                <ShieldCheck className="w-3.5 h-3.5 text-indigo-600 dark:text-[#6366f1]" />
+                <span>Zero-knowledge BYOK security</span>
               </div>
               <div className="flex items-center gap-1.5">
-                <Zap className="w-4 h-4 text-cyan-600 dark:text-cyan-400" />
-                <span>Instant Workspace Provisioning</span>
+                <Zap className="w-3.5 h-3.5 text-amber-600 dark:text-[#d97706]" />
+                <span>Instant workspace provisioning</span>
               </div>
             </div>
           </div>

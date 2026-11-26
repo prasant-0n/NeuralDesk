@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Copy, Check, Code, ExternalLink, FileCode } from "lucide-react";
+import { Copy, Check, ExternalLink } from "lucide-react";
 
 export const LandingCodeShowcase: React.FC = () => {
   const [activeLang, setActiveLang] = useState<"ts" | "py" | "curl">("ts");
@@ -50,7 +50,7 @@ execution = client.workflows.execute(
 
 for event in execution.stream():
     print(f"[{event.node_name}] State: {event.status} (In-Degree: {event.in_degree})")`,
-    curl: `curl -X POST https://neuraldesk-lovat.vercel.app/api/v1/executions \\
+    curl: `curl -X POST https://neuraldesk.app/api/v1/executions \\
   -H "Authorization: Bearer nd_live_secret_key" \\
   -H "X-Workspace-Id: ws_enterprise_prod" \\
   -H "Content-Type: application/json" \\
@@ -58,15 +58,9 @@ for event in execution.stream():
     "workflowId": "wf_hitl_approval_v1",
     "inputs": {
       "ticketId": "ZD-9941",
-      "refundAmount": 1250.00
+      "priority": "P0"
     }
   }'`,
-  };
-
-  const fileNames = {
-    ts: "workflow_orchestrator.ts",
-    py: "agent_pipeline.py",
-    curl: "trigger_webhook.sh",
   };
 
   const handleCopy = () => {
@@ -75,145 +69,66 @@ for event in execution.stream():
     setTimeout(() => setCopied(false), 2000);
   };
 
-  const codeLines = snippets[activeLang].split("\n");
-
   return (
-    <section id="architecture" className="relative py-24 md:py-32 overflow-hidden">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-          {/* Left Column: Technical Narrative */}
-          <div className="lg:col-span-5 space-y-6">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-50 dark:bg-indigo-500/10 border border-indigo-200 dark:border-indigo-500/20 text-indigo-700 dark:text-indigo-400 text-xs font-semibold">
-              <Code className="w-3.5 h-3.5" />
-              <span>Developer-First Architecture</span>
+    <section id="code" className="py-20 md:py-28 bg-[#f5f7fa] dark:bg-[#0b0d14] border-b border-slate-200/70 dark:border-[rgba(238,240,245,0.06)]">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-2xl mb-12">
+          <div className="text-xs font-mono text-slate-500 dark:text-[#7a8296] mb-2">
+            Developer APIs & SDKs
+          </div>
+          <h2 className="text-2xl sm:text-3xl font-medium tracking-tight text-slate-900 dark:text-[#eef0f5] mb-3">
+            Programmatic DAG execution
+          </h2>
+          <p className="text-sm sm:text-base text-slate-600 dark:text-[#a3a9b8] leading-relaxed">
+            Trigger, stream, and introspect multi-agent graphs using typed TypeScript, Python, or standard HTTP REST.
+          </p>
+        </div>
+
+        <div className="rounded-xl border border-slate-200 dark:border-[rgba(238,240,245,0.08)] bg-white dark:bg-[#11141c] overflow-hidden">
+          {/* Header Bar */}
+          <div className="h-10 px-4 bg-slate-50 dark:bg-[#07080d] border-b border-slate-200 dark:border-[rgba(238,240,245,0.08)] flex items-center justify-between">
+            <div className="flex items-center gap-1 font-mono text-xs">
+              {(["ts", "py", "curl"] as const).map((lang) => (
+                <button
+                  key={lang}
+                  onClick={() => setActiveLang(lang)}
+                  className={`h-7 px-2.5 rounded transition-colors ${
+                    activeLang === lang
+                      ? "bg-slate-900 text-white dark:bg-[#eef0f5] dark:text-[#0b0d14] font-medium"
+                      : "text-slate-600 dark:text-[#7a8296] hover:text-slate-900 dark:hover:text-[#eef0f5]"
+                  }`}
+                >
+                  {lang === "ts" ? "TypeScript" : lang === "py" ? "Python" : "cURL"}
+                </button>
+              ))}
             </div>
 
-            <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-slate-900 dark:text-white leading-tight font-sans">
-              Code-First or Visual Canvas.{" "}
-              <span className="bg-gradient-to-r from-indigo-600 to-cyan-600 dark:from-indigo-400 dark:to-cyan-400 bg-clip-text text-transparent">
-                Bi-Directional Schema Sync.
-              </span>
-            </h2>
-
-            <p className="text-sm sm:text-base text-slate-600 dark:text-slate-400 leading-relaxed font-normal">
-              Every graph created in the ReactFlow visual studio exports as a clean, versionable
-              JSON schema. Trigger deterministic executions through typed SDKs, native Server-Sent Events,
-              or direct REST webhooks with RFC 7807 compliance.
-            </p>
-
-            <ul className="space-y-3.5 text-xs sm:text-sm text-slate-700 dark:text-slate-300 font-medium">
-              <li className="flex items-center gap-2.5">
-                <div className="w-2 h-2 rounded-full bg-cyan-500 dark:bg-cyan-400" />
-                <span>Typed TypeScript & Python SDKs with complete autocompletion</span>
-              </li>
-              <li className="flex items-center gap-2.5">
-                <div className="w-2 h-2 rounded-full bg-indigo-500 dark:bg-indigo-400" />
-                <span>Streaming SSE response bodies with sub-millisecond node timestamps</span>
-              </li>
-              <li className="flex items-center gap-2.5">
-                <div className="w-2 h-2 rounded-full bg-emerald-500 dark:bg-emerald-400" />
-                <span>HMAC-SHA256 signature verification on all ingress endpoints</span>
-              </li>
-            </ul>
-
-            <div className="pt-2">
+            <div className="flex items-center gap-3">
               <a
                 href="/docs"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 text-xs font-semibold text-indigo-600 dark:text-indigo-400 hover:text-cyan-600 dark:hover:text-cyan-300 transition-colors"
+                className="text-xs font-mono text-slate-500 dark:text-[#7a8296] hover:text-slate-900 dark:hover:text-[#eef0f5] inline-flex items-center gap-1 transition-colors"
               >
-                <span>Explore the OpenAPI 3.1 & SDK Reference</span>
-                <ExternalLink className="w-3.5 h-3.5" />
+                <span>Docs</span>
+                <ExternalLink className="w-3 h-3" />
               </a>
+
+              <button
+                onClick={handleCopy}
+                className="h-7 px-2.5 rounded bg-slate-100 hover:bg-slate-200 dark:bg-[#1a1e28] dark:hover:bg-[#232325] text-slate-700 dark:text-[#eef0f5] text-xs font-mono inline-flex items-center gap-1 transition-colors cursor-pointer"
+              >
+                {copied ? <Check className="w-3 h-3 text-emerald-500" /> : <Copy className="w-3 h-3" />}
+                <span>{copied ? "Copied" : "Copy"}</span>
+              </button>
             </div>
           </div>
 
-          {/* Right Column: Handcrafted Code Window */}
-          <div className="lg:col-span-7">
-            <div className="rounded-3xl border border-slate-800 bg-slate-950/95 shadow-2xl overflow-hidden">
-              {/* Window Header with Language Tabs */}
-              <div className="flex items-center justify-between px-4 py-3 border-b border-slate-800 bg-slate-900/60">
-                <div className="flex items-center gap-3">
-                  <div className="flex gap-1.5 mr-1">
-                    <div className="w-3 h-3 rounded-full bg-rose-500/80" />
-                    <div className="w-3 h-3 rounded-full bg-amber-500/80" />
-                    <div className="w-3 h-3 rounded-full bg-emerald-500/80" />
-                  </div>
-
-                  <span className="text-xs font-mono text-slate-400 flex items-center gap-1.5 hidden sm:flex">
-                    <FileCode className="w-3.5 h-3.5 text-indigo-400" />
-                    <span>{fileNames[activeLang]}</span>
-                  </span>
-                </div>
-
-                <div className="flex items-center gap-3">
-                  <div className="flex bg-slate-950 rounded-lg p-0.5 border border-slate-800 text-[11px] font-mono">
-                    <button
-                      onClick={() => setActiveLang("ts")}
-                      className={`px-3 py-1 rounded-md transition-colors ${
-                        activeLang === "ts"
-                          ? "bg-indigo-600 text-white font-semibold"
-                          : "text-slate-400 hover:text-white"
-                      }`}
-                    >
-                      TypeScript
-                    </button>
-                    <button
-                      onClick={() => setActiveLang("py")}
-                      className={`px-3 py-1 rounded-md transition-colors ${
-                        activeLang === "py"
-                          ? "bg-indigo-600 text-white font-semibold"
-                          : "text-slate-400 hover:text-white"
-                      }`}
-                    >
-                      Python
-                    </button>
-                    <button
-                      onClick={() => setActiveLang("curl")}
-                      className={`px-3 py-1 rounded-md transition-colors ${
-                        activeLang === "curl"
-                          ? "bg-indigo-600 text-white font-semibold"
-                          : "text-slate-400 hover:text-white"
-                      }`}
-                    >
-                      cURL
-                    </button>
-                  </div>
-
-                  <button
-                    onClick={handleCopy}
-                    className="flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-mono text-slate-400 hover:text-white hover:bg-slate-800 border border-slate-800 transition-colors"
-                  >
-                    {copied ? (
-                      <>
-                        <Check className="w-3.5 h-3.5 text-emerald-400" />
-                        <span className="text-emerald-400">Copied</span>
-                      </>
-                    ) : (
-                      <>
-                        <Copy className="w-3.5 h-3.5" />
-                        <span>Copy</span>
-                      </>
-                    )}
-                  </button>
-                </div>
-              </div>
-
-              {/* Code Pre Container with Line Numbers */}
-              <div className="p-5 font-mono text-xs overflow-x-auto text-slate-300 bg-slate-950/90 leading-relaxed flex">
-                <div className="pr-4 select-none text-slate-600 border-r border-slate-800/80 text-right font-mono">
-                  {codeLines.map((_, i) => (
-                    <div key={i}>{i + 1}</div>
-                  ))}
-                </div>
-                <div className="pl-4 font-mono overflow-x-auto">
-                  <pre>
-                    <code>{snippets[activeLang]}</code>
-                  </pre>
-                </div>
-              </div>
-            </div>
+          {/* Code Container */}
+          <div className="p-4 bg-slate-50/50 dark:bg-[#07080d]/80 overflow-x-auto">
+            <pre className="font-mono text-xs text-slate-800 dark:text-[#a3a9b8] leading-relaxed">
+              <code>{snippets[activeLang]}</code>
+            </pre>
           </div>
         </div>
       </div>

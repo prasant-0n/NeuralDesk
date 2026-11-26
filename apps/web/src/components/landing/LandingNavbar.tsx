@@ -7,7 +7,6 @@ import {
   X,
   Sun,
   Moon,
-  Sparkles,
   ExternalLink,
 } from "lucide-react";
 import { useSession } from "../../lib/authClient";
@@ -22,7 +21,7 @@ export const LandingNavbar: React.FC = () => {
 
   useEffect(() => {
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 20);
+      setIsScrolled(window.scrollY > 16);
     };
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
@@ -40,7 +39,6 @@ export const LandingNavbar: React.FC = () => {
 
   const navLinks = [
     { label: "Features", href: "#features" },
-    { label: "Interactive Demo", href: "#playground" },
     { label: "Architecture", href: "#architecture" },
     { label: "Security & BYOK", href: "#security" },
     { label: "Comparison", href: "#comparison" },
@@ -49,44 +47,36 @@ export const LandingNavbar: React.FC = () => {
 
   return (
     <header
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+      className={`fixed top-0 left-0 right-0 z-50 transition-colors duration-150 ${
         isScrolled
-          ? "bg-white/85 dark:bg-charcoal-950/85 backdrop-blur-xl border-b border-slate-200/80 dark:border-slate-800/80 shadow-lg shadow-slate-900/5 dark:shadow-2xl dark:shadow-indigo-950/20 py-3"
-          : "bg-transparent py-5"
+          ? "bg-white/90 dark:bg-[#0b0d14]/90 backdrop-blur-md border-b border-slate-200/80 dark:border-[rgba(238,240,245,0.08)] py-3"
+          : "bg-transparent py-4"
       }`}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between">
           {/* Brand Logo */}
-          <Link to="/" className="flex items-center gap-3 group">
-            <div className="relative flex items-center justify-center w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 via-indigo-500 to-cyan-400 p-[1px] shadow-lg shadow-indigo-500/25 transition-transform duration-300 group-hover:scale-105">
-              <div className="w-full h-full bg-white dark:bg-charcoal-950 rounded-[11px] flex items-center justify-center">
-                <Cpu className="w-5 h-5 text-indigo-600 dark:text-indigo-400 group-hover:text-cyan-500 transition-colors" />
-              </div>
-              <div className="absolute -inset-1 bg-gradient-to-r from-indigo-500 to-cyan-400 rounded-xl blur-sm opacity-30 group-hover:opacity-75 transition-opacity" />
+          <Link to="/" className="flex items-center gap-2.5">
+            <div className="w-8 h-8 rounded-lg bg-slate-900 dark:bg-[#eef0f5] text-white dark:text-[#0b0d14] flex items-center justify-center transition-opacity hover:opacity-90">
+              <Cpu className="w-4 h-4" />
             </div>
-            <div className="flex flex-col">
-              <div className="flex items-center gap-1.5">
-                <span className="font-bold text-lg tracking-tight text-slate-900 dark:text-white font-sans">
-                  NeuralDesk
-                </span>
-                <span className="text-[10px] font-mono px-1.5 py-0.5 rounded-full bg-indigo-500/10 border border-indigo-500/30 text-indigo-600 dark:text-indigo-400 font-semibold">
-                  v2.0
-                </span>
-              </div>
-              <span className="text-[10px] tracking-wider uppercase text-slate-500 dark:text-slate-400 font-mono">
-                Autonomous DAG Engine
+            <div className="flex items-baseline gap-2">
+              <span className="font-semibold text-base tracking-tight text-slate-900 dark:text-[#eef0f5]">
+                NeuralDesk
+              </span>
+              <span className="text-xs font-mono text-slate-500 dark:text-[#7a8296]">
+                dag.studio
               </span>
             </div>
           </Link>
 
           {/* Desktop Nav Links */}
-          <nav className="hidden md:flex items-center gap-1 bg-slate-100/90 dark:bg-charcoal-900/60 border border-slate-200/80 dark:border-slate-800/80 backdrop-blur-md px-3 py-1.5 rounded-full shadow-sm">
+          <nav className="hidden md:flex items-center gap-6">
             {navLinks.map((link) => (
               <a
                 key={link.label}
                 href={link.href}
-                className="px-3.5 py-1.5 text-xs font-medium text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white rounded-full hover:bg-slate-200/70 dark:hover:bg-slate-800/70 transition-colors"
+                className="text-xs font-medium text-slate-600 hover:text-slate-900 dark:text-[#a3a9b8] dark:hover:text-[#eef0f5] transition-colors"
               >
                 {link.label}
               </a>
@@ -95,9 +85,9 @@ export const LandingNavbar: React.FC = () => {
               href="/docs"
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-1 px-3.5 py-1.5 text-xs font-medium text-slate-500 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-300 rounded-full hover:bg-slate-200/70 dark:hover:bg-slate-800/70 transition-colors"
+              className="inline-flex items-center gap-1 text-xs font-medium text-slate-500 hover:text-slate-900 dark:text-[#7a8296] dark:hover:text-[#eef0f5] transition-colors"
             >
-              API Docs
+              <span>API Docs</span>
               <ExternalLink className="w-3 h-3" />
             </a>
           </nav>
@@ -107,48 +97,44 @@ export const LandingNavbar: React.FC = () => {
             {/* Theme Toggle */}
             <button
               onClick={toggleTheme}
-              className="p-2 rounded-xl text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800/80 border border-slate-200 dark:border-slate-800/60 transition-colors shadow-sm"
+              className="w-8 h-8 rounded-lg flex items-center justify-center text-slate-500 hover:text-slate-900 hover:bg-slate-100 dark:text-[#7a8296] dark:hover:text-[#eef0f5] dark:hover:bg-[#1a1e28] transition-colors"
               aria-label="Toggle Theme"
+              title={theme === "dark" ? "Switch to Light Mode" : "Switch to Dark Mode"}
             >
               {theme === "dark" ? (
                 <Sun className="w-4 h-4 text-amber-400" />
               ) : (
-                <Moon className="w-4 h-4 text-indigo-600" />
+                <Moon className="w-4 h-4 text-slate-700" />
               )}
             </button>
 
             {session?.user ? (
               <div className="flex items-center gap-3">
-                <div className="flex items-center gap-2 pl-2 pr-3 py-1 rounded-full bg-slate-100 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 text-xs text-slate-700 dark:text-slate-300">
-                  <div className="w-2 h-2 rounded-full bg-emerald-500 dark:bg-emerald-400 animate-pulse" />
-                  <span className="font-mono text-slate-800 dark:text-slate-200">
-                    {session.user.name || session.user.email}
-                  </span>
-                </div>
+                <span className="text-xs font-mono text-slate-600 dark:text-[#a3a9b8]">
+                  {session.user.name || session.user.email}
+                </span>
                 <button
                   onClick={() => navigate("/studio")}
-                  className="flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 text-white text-xs font-semibold shadow-lg shadow-indigo-600/30 transition-all hover:shadow-indigo-600/50 hover:scale-[1.02]"
+                  className="inline-flex items-center gap-1.5 h-8 px-3.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-white dark:bg-[#eef0f5] dark:hover:bg-white dark:text-[#0b0d14] text-xs font-medium transition-colors"
                 >
                   <span>Launch Studio</span>
                   <ArrowRight className="w-3.5 h-3.5" />
                 </button>
               </div>
             ) : (
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-3">
                 <Link
                   to="/signin"
-                  className="px-4 py-2 text-xs font-medium text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800/80 rounded-xl transition-colors"
+                  className="text-xs font-medium text-slate-600 hover:text-slate-900 dark:text-[#a3a9b8] dark:hover:text-[#eef0f5] transition-colors px-2 py-1"
                 >
                   Sign In
                 </Link>
                 <Link
                   to="/signup"
-                  className="relative group overflow-hidden flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-indigo-600 via-indigo-500 to-cyan-500 hover:from-indigo-500 hover:to-cyan-400 text-white text-xs font-semibold shadow-lg shadow-indigo-600/25 transition-all hover:shadow-indigo-600/40 hover:scale-[1.02]"
+                  className="inline-flex items-center gap-1.5 h-8 px-3.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-white dark:bg-[#eef0f5] dark:hover:bg-white dark:text-[#0b0d14] text-xs font-medium transition-colors"
                 >
-                  <Sparkles className="w-3.5 h-3.5 text-cyan-200" />
-                  <span>Start Free</span>
-                  <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
-                  <div className="absolute inset-0 bg-white/20 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700" />
+                  <span>Get Started</span>
+                  <ArrowRight className="w-3 h-3" />
                 </Link>
               </div>
             )}
@@ -158,18 +144,18 @@ export const LandingNavbar: React.FC = () => {
           <div className="flex md:hidden items-center gap-2">
             <button
               onClick={toggleTheme}
-              className="p-2 rounded-xl text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800"
+              className="p-1.5 rounded-lg text-slate-600 dark:text-[#a3a9b8] hover:bg-slate-100 dark:hover:bg-[#1a1e28]"
               aria-label="Toggle Theme"
             >
               {theme === "dark" ? (
                 <Sun className="w-4 h-4 text-amber-400" />
               ) : (
-                <Moon className="w-4 h-4 text-indigo-600" />
+                <Moon className="w-4 h-4 text-slate-700" />
               )}
             </button>
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="p-2 rounded-xl text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-800"
+              className="p-1.5 rounded-lg text-slate-700 dark:text-[#eef0f5] hover:bg-slate-100 dark:hover:bg-[#1a1e28]"
               aria-label="Toggle Mobile Menu"
             >
               {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
@@ -180,14 +166,14 @@ export const LandingNavbar: React.FC = () => {
 
       {/* Mobile Drawer */}
       {mobileMenuOpen && (
-        <div className="md:hidden bg-white/95 dark:bg-charcoal-950/95 border-b border-slate-200 dark:border-slate-800/80 px-4 pt-4 pb-6 mt-3 space-y-3 backdrop-blur-2xl shadow-xl">
+        <div className="md:hidden bg-white dark:bg-[#0b0d14] border-b border-slate-200 dark:border-[rgba(238,240,245,0.08)] px-4 pt-3 pb-5 mt-2 space-y-3">
           <div className="flex flex-col space-y-1">
             {navLinks.map((link) => (
               <a
                 key={link.label}
                 href={link.href}
                 onClick={() => setMobileMenuOpen(false)}
-                className="px-3 py-2 text-sm font-medium text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800/70"
+                className="px-3 py-2 text-sm font-medium text-slate-700 dark:text-[#a3a9b8] hover:text-slate-900 dark:hover:text-[#eef0f5] rounded-lg hover:bg-slate-100 dark:hover:bg-[#1a1e28]"
               >
                 {link.label}
               </a>
@@ -196,21 +182,21 @@ export const LandingNavbar: React.FC = () => {
               href="/docs"
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center justify-between px-3 py-2 text-sm font-medium text-indigo-600 dark:text-indigo-400 hover:text-indigo-500 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800/70"
+              className="flex items-center justify-between px-3 py-2 text-sm font-medium text-slate-600 dark:text-[#a3a9b8] hover:text-slate-900 dark:hover:text-[#eef0f5] rounded-lg"
             >
               <span>API Documentation</span>
               <ExternalLink className="w-4 h-4" />
             </a>
           </div>
 
-          <div className="pt-3 border-t border-slate-200 dark:border-slate-800 flex flex-col gap-2">
+          <div className="pt-3 border-t border-slate-200 dark:border-[rgba(238,240,245,0.08)] flex flex-col gap-2">
             {session?.user ? (
               <button
                 onClick={() => {
                   setMobileMenuOpen(false);
                   navigate("/studio");
                 }}
-                className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl bg-indigo-600 text-white font-medium text-sm shadow-lg shadow-indigo-600/30"
+                className="w-full h-10 flex items-center justify-center gap-2 rounded-lg bg-slate-900 text-white dark:bg-[#eef0f5] dark:text-[#0b0d14] font-medium text-sm"
               >
                 <span>Open Studio Canvas</span>
                 <ArrowRight className="w-4 h-4" />
@@ -220,17 +206,17 @@ export const LandingNavbar: React.FC = () => {
                 <Link
                   to="/signin"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="w-full text-center py-2 text-sm font-medium text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white rounded-xl border border-slate-200 dark:border-slate-800"
+                  className="w-full text-center py-2 text-sm font-medium text-slate-700 dark:text-[#a3a9b8] hover:text-slate-900 dark:hover:text-[#eef0f5]"
                 >
                   Sign In
                 </Link>
                 <Link
                   to="/signup"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl bg-gradient-to-r from-indigo-600 to-cyan-600 text-white font-medium text-sm shadow-lg shadow-indigo-600/30"
+                  className="w-full h-10 flex items-center justify-center gap-2 rounded-lg bg-slate-900 text-white dark:bg-[#eef0f5] dark:text-[#0b0d14] font-medium text-sm"
                 >
-                  <Sparkles className="w-4 h-4 text-cyan-200" />
-                  <span>Get Started Free</span>
+                  <span>Get Started</span>
+                  <ArrowRight className="w-4 h-4" />
                 </Link>
               </>
             )}

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { ChevronDown, HelpCircle } from "lucide-react";
+import { ChevronDown } from "lucide-react";
 
 export const LandingFAQ: React.FC = () => {
   const [openIndex, setOpenIndex] = useState<number | null>(0);
@@ -7,7 +7,7 @@ export const LandingFAQ: React.FC = () => {
   const faqs = [
     {
       q: "What makes Kahn's topological sort better than standard agent loops?",
-      a: "Traditional agent systems suffer from infinite recursive loops, deadlocks, and unpredictable execution costs when agents cross-call each other. NeuralDesk represents workflows as a Directed Acyclic Graph (DAG) and runs Kahn's algorithm before execution to mathematically prove there are zero cycles, establishing a clean execution order in O(V + E) time.",
+      a: "Traditional agent systems suffer from infinite recursive loops, deadlocks, and unpredictable execution costs when agents cross-call each other. NeuralDesk represents workflows as a Directed Acyclic Graph (DAG) and runs Kahn's algorithm before execution to prove there are zero cycles, establishing a clean execution order in O(V + E) time.",
     },
     {
       q: "How does Zero-Knowledge BYOK encryption protect our API keys and data?",
@@ -19,15 +19,11 @@ export const LandingFAQ: React.FC = () => {
     },
     {
       q: "How does Human-in-the-Loop (HITL) policy enforcement work during graph execution?",
-      a: "When a node encounters a high-stakes decision (e.g., executing a refund, deploying code, or deleting data), it evaluates custom threshold rules. If a rule triggers, graph traversal safely pauses, saving state to PostgreSQL and dispatching a webhook or Slack notification. The graph resumes only after an authorized user signs off.",
+      a: "When a node encounters a high-stakes decision, it evaluates custom threshold rules. If a rule triggers, graph traversal safely pauses, saving state to PostgreSQL and dispatching a webhook or Slack notification. The graph resumes only after an authorized user signs off.",
     },
     {
       q: "Can NeuralDesk be deployed self-hosted or in a private cloud VPC?",
       a: "Yes. The entire platform (Hono API backend, PostgreSQL database, and Vite React frontend) is 100% containerized with Docker and Kubernetes manifests. Self-hosted deployments support private VPC configurations, air-gapped on-prem installations, and custom SAML SSO.",
-    },
-    {
-      q: "How do I get started with NeuralDesk?",
-      a: "You can launch the visual studio and build immediately for free with your own model API keys (BYOK). The core Kahn topological DAG engine, zero-knowledge encryption, and multi-agent orchestration features are accessible directly without credit cards or surprise token markups.",
     },
     {
       q: "Which LLM model providers are supported out-of-the-box?",
@@ -40,48 +36,45 @@ export const LandingFAQ: React.FC = () => {
   };
 
   return (
-    <section id="faq" className="relative py-24 md:py-32 overflow-hidden">
+    <section id="faq" className="py-20 md:py-28 bg-[#f5f7fa] dark:bg-[#0b0d14] border-b border-slate-200/70 dark:border-[rgba(238,240,245,0.06)]">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-16">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-50 dark:bg-indigo-500/10 border border-indigo-200 dark:border-indigo-500/20 text-indigo-700 dark:text-indigo-400 text-xs font-semibold mb-4">
-            <HelpCircle className="w-3.5 h-3.5" />
-            <span>Frequently Asked Questions</span>
+        <div className="max-w-2xl mb-12">
+          <div className="text-xs font-mono text-slate-500 dark:text-[#7a8296] mb-2">
+            Frequently Asked Questions
           </div>
-          <h2 className="text-3xl sm:text-5xl font-extrabold tracking-tight text-slate-900 dark:text-white mb-4">
-            Got Questions? We Have Answers.
+          <h2 className="text-2xl sm:text-3xl font-medium tracking-tight text-slate-900 dark:text-[#eef0f5] mb-3">
+            Common questions on deterministic orchestration
           </h2>
-          <p className="text-base sm:text-lg text-slate-600 dark:text-slate-400">
-            Everything you need to know about deterministic DAG execution, BYOK security, and deployment.
+          <p className="text-sm sm:text-base text-slate-600 dark:text-[#a3a9b8] leading-relaxed">
+            Everything you need to know about DAG cycle validation, BYOK encryption, and deployment.
           </p>
         </div>
 
         {/* Accordion */}
-        <div className="space-y-4">
+        <div className="space-y-3">
           {faqs.map((faq, idx) => {
             const isOpen = openIndex === idx;
             return (
               <div
                 key={faq.q}
-                className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950/80 overflow-hidden shadow-sm dark:shadow-none transition-all duration-200"
+                className="rounded-xl border border-slate-200 dark:border-[rgba(238,240,245,0.08)] bg-white dark:bg-[#11141c] overflow-hidden"
               >
                 <button
                   onClick={() => toggle(idx)}
-                  className="w-full flex items-center justify-between p-6 text-left hover:bg-slate-50 dark:hover:bg-slate-900/40 transition-colors"
+                  className="w-full flex items-center justify-between p-4 sm:p-5 text-left hover:bg-slate-50 dark:hover:bg-[#1a1e28] transition-colors cursor-pointer"
                 >
-                  <span className="text-base font-semibold text-slate-900 dark:text-slate-200">
+                  <span className="text-sm font-medium text-slate-900 dark:text-[#eef0f5]">
                     {faq.q}
                   </span>
-                  <div
-                    className={`w-7 h-7 rounded-lg bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 flex items-center justify-center text-slate-500 dark:text-slate-400 shrink-0 ml-4 transition-transform duration-200 ${
-                      isOpen ? "rotate-180 text-indigo-600 dark:text-indigo-400 border-indigo-500/40" : ""
+                  <ChevronDown
+                    className={`w-4 h-4 text-slate-400 dark:text-[#7a8296] shrink-0 ml-3 transition-transform duration-150 ${
+                      isOpen ? "rotate-180" : ""
                     }`}
-                  >
-                    <ChevronDown className="w-4 h-4" />
-                  </div>
+                  />
                 </button>
 
                 {isOpen && (
-                  <div className="px-6 pb-6 pt-1 text-sm text-slate-600 dark:text-slate-400 leading-relaxed border-t border-slate-100 dark:border-slate-800/80 bg-slate-50/50 dark:bg-slate-900/20 font-normal">
+                  <div className="px-4 pb-4 sm:px-5 sm:pb-5 pt-1 text-xs sm:text-sm text-slate-600 dark:text-[#a3a9b8] leading-relaxed border-t border-slate-100 dark:border-[rgba(238,240,245,0.06)]">
                     {faq.a}
                   </div>
                 )}

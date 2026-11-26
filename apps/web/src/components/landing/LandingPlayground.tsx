@@ -6,8 +6,6 @@ import {
   Play,
   Terminal,
   CheckCircle,
-  Clock,
-  Zap,
   Copy,
   Check,
 } from "lucide-react";
@@ -22,7 +20,6 @@ interface WorkflowTemplate {
     role: string;
     status: string;
     time: string;
-    color: string;
   }[];
   streamLog: string[];
 }
@@ -38,15 +35,15 @@ export const LandingPlayground: React.FC = () => {
   const templates: Record<string, WorkflowTemplate> = {
     "lead-scoring": {
       id: "lead-scoring",
-      title: "Autonomous B2B Lead Qualification",
+      title: "Autonomous B2B lead qualification",
       tag: "Revenue AI",
       description:
         "Ingests incoming webhook leads, enriches domain metrics with external APIs, routes to Gemini 2.0 Flash for enterprise qualification, and alerts sales executives on Slack.",
       nodes: [
-        { name: "Webhook Lead Ingress", role: "Trigger", status: "200 OK", time: "4ms", color: "border-sky-500/50 text-sky-700 dark:text-sky-400 bg-sky-50 dark:bg-sky-500/10" },
-        { name: "Domain Enrichment", role: "Tool Node", status: "Enriched", time: "82ms", color: "border-indigo-500/50 text-indigo-700 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-500/10" },
-        { name: "Gemini 2.0 Lead Scorer", role: "LLM Agent", status: "Score: 94/100", time: "164ms", color: "border-purple-500/50 text-purple-700 dark:text-purple-400 bg-purple-50 dark:bg-purple-500/10" },
-        { name: "Salesforce / Slack Sync", role: "Integration", status: "Dispatched", time: "38ms", color: "border-emerald-500/50 text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-500/10" },
+        { name: "Webhook Lead Ingress", role: "Trigger", status: "200 OK", time: "4ms" },
+        { name: "Domain Enrichment", role: "Tool Node", status: "Enriched", time: "82ms" },
+        { name: "Gemini 2.0 Lead Scorer", role: "LLM Agent", status: "Score: 94/100", time: "164ms" },
+        { name: "Salesforce / Slack Sync", role: "Integration", status: "Dispatched", time: "38ms" },
       ],
       streamLog: [
         "[00:00:04] INGRESS: Inbound payload parsed: acme-corp.com (Revenue: $45M, 280 Employees)",
@@ -57,15 +54,15 @@ export const LandingPlayground: React.FC = () => {
     },
     "secops-triage": {
       id: "secops-triage",
-      title: "Real-Time SOC-2 Threat Incident Response",
-      tag: "Security Operations",
+      title: "Real-time SOC-2 threat incident response",
+      tag: "Security Ops",
       description:
         "Monitors CloudTrail & Auth events. Scans prompts for injection vectors with dual AES-256 safeguards. Automatically quarantines compromised tokens and alerts on-call engineers.",
       nodes: [
-        { name: "Auth Log Stream", role: "Ingress", status: "Streaming", time: "2ms", color: "border-rose-500/50 text-rose-700 dark:text-rose-400 bg-rose-50 dark:bg-rose-500/10" },
-        { name: "Injection Vector Audit", role: "Guardrail", status: "Safe (0.01)", time: "14ms", color: "border-emerald-500/50 text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-500/10" },
-        { name: "Anomalous IP Detector", role: "Agent Node", status: "High Risk", time: "112ms", color: "border-amber-500/50 text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-500/10" },
-        { name: "Session Revocation", role: "Remediation", status: "Revoked", time: "18ms", color: "border-rose-500/50 text-rose-700 dark:text-rose-400 bg-rose-50 dark:bg-rose-500/10" },
+        { name: "Auth Log Stream", role: "Ingress", status: "Streaming", time: "2ms" },
+        { name: "Injection Vector Audit", role: "Guardrail", status: "Safe (0.01)", time: "14ms" },
+        { name: "Anomalous IP Detector", role: "Agent Node", status: "High Risk", time: "112ms" },
+        { name: "Session Revocation", role: "Remediation", status: "Revoked", time: "18ms" },
       ],
       streamLog: [
         "[00:00:02] CLOUDTRAIL: Multiple failed authentications from subnet 185.220.101.0/24",
@@ -76,15 +73,15 @@ export const LandingPlayground: React.FC = () => {
     },
     "hitl-refund": {
       id: "hitl-refund",
-      title: "Customer Dispute with Executive Sign-Off Gate",
-      tag: "Human-in-the-Loop",
+      title: "Customer dispute with sign-off gate",
+      tag: "Governance",
       description:
         "Triage high-value dispute tickets. For refund requests over $500, execution safely pauses at a Human-in-the-Loop policy gate, awaiting manager sign-off before Stripe execution.",
       nodes: [
-        { name: "Zendesk Webhook", role: "Trigger", status: "Ticket #4102", time: "6ms", color: "border-sky-500/50 text-sky-700 dark:text-sky-400 bg-sky-50 dark:bg-sky-500/10" },
-        { name: "Dispute Analyzer", role: "LLM Agent", status: "Amount: $1,250", time: "148ms", color: "border-indigo-500/50 text-indigo-700 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-500/10" },
-        { name: "Human Approval Gate", role: "Policy Gate", status: "Pending Manager", time: "Paused", color: "border-amber-500/50 text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-500/10" },
-        { name: "Stripe Refund Dispatch", role: "Payment", status: "Awaiting Sign-off", time: "--", color: "border-slate-500/50 text-slate-700 dark:text-slate-400 bg-slate-50 dark:bg-slate-500/10" },
+        { name: "Zendesk Webhook", role: "Trigger", status: "Ticket #4102", time: "6ms" },
+        { name: "Dispute Analyzer", role: "LLM Agent", status: "Amount: $1,250", time: "148ms" },
+        { name: "Human Approval Gate", role: "Policy Gate", status: "Pending Manager", time: "Paused" },
+        { name: "Stripe Refund Dispatch", role: "Payment", status: "Awaiting Sign-off", time: "--" },
       ],
       streamLog: [
         "[00:00:06] ZENDESK: Inbound ticket: Enterprise yearly renewal refund request.",
@@ -120,24 +117,22 @@ export const LandingPlayground: React.FC = () => {
   };
 
   return (
-    <section id="playground" className="relative py-24 md:py-32 bg-slate-50/50 dark:bg-charcoal-950/80 border-t border-slate-200 dark:border-slate-800/80">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Section Header */}
-        <div className="text-center max-w-3xl mx-auto mb-14">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-50 dark:bg-cyan-500/10 border border-cyan-200 dark:border-cyan-500/20 text-cyan-700 dark:text-cyan-400 text-xs font-semibold mb-4">
-            <Zap className="w-3.5 h-3.5" />
-            <span>Interactive Workflow Sandbox</span>
+    <section id="playground" className="py-20 md:py-28 bg-[#fafafa] dark:bg-[#07080d] border-b border-slate-200/70 dark:border-[rgba(238,240,245,0.06)]">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-2xl mb-12">
+          <div className="text-xs font-mono text-slate-500 dark:text-[#7a8296] mb-2">
+            Interactive Sandbox
           </div>
-          <h2 className="text-3xl sm:text-5xl font-extrabold tracking-tight text-slate-900 dark:text-white mb-4">
-            Test Production Multi-Agent Graphs
+          <h2 className="text-2xl sm:text-3xl font-medium tracking-tight text-slate-900 dark:text-[#eef0f5] mb-3">
+            Simulate production agent graphs
           </h2>
-          <p className="text-base sm:text-lg text-slate-600 dark:text-slate-400">
-            Select a real-world enterprise pipeline and simulate deterministic topological execution right in your browser.
+          <p className="text-sm sm:text-base text-slate-600 dark:text-[#a3a9b8] leading-relaxed">
+            Select a verified enterprise pipeline template and test deterministic topological execution directly in the browser.
           </p>
         </div>
 
         {/* Template Selector Tabs */}
-        <div className="flex flex-wrap items-center justify-center gap-3 mb-10">
+        <div className="flex flex-wrap items-center gap-2 mb-8">
           {Object.values(templates).map((tpl) => (
             <button
               key={tpl.id}
@@ -146,129 +141,101 @@ export const LandingPlayground: React.FC = () => {
                 setSimulatedLogs([]);
                 setActiveStepIndex(-1);
               }}
-              className={`flex items-center gap-2 px-5 py-3 rounded-2xl text-xs sm:text-sm font-semibold transition-all duration-200 ${
+              className={`h-9 px-3.5 rounded-lg text-xs font-medium inline-flex items-center gap-2 transition-colors cursor-pointer ${
                 selectedTemplate === tpl.id
-                  ? "bg-indigo-600 text-white shadow-lg shadow-indigo-600/30 scale-[1.02]"
-                  : "bg-white dark:bg-slate-900/80 text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-800 shadow-sm"
+                  ? "bg-slate-900 text-white dark:bg-[#eef0f5] dark:text-[#0b0d14]"
+                  : "bg-white dark:bg-[#11141c] text-slate-600 dark:text-[#a3a9b8] hover:text-slate-900 dark:hover:text-[#eef0f5] border border-slate-200 dark:border-[rgba(238,240,245,0.08)]"
               }`}
             >
-              <GitBranch className="w-4 h-4 text-cyan-600 dark:text-cyan-300" />
+              <GitBranch className="w-3.5 h-3.5" />
               <span>{tpl.title}</span>
-              <span className="text-[10px] px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-950/50 text-slate-600 dark:text-slate-300 font-mono">
-                {tpl.tag}
+              <span className="text-[10px] font-mono text-slate-400 dark:text-[#7a8296]">
+                [{tpl.tag}]
               </span>
             </button>
           ))}
         </div>
 
         {/* Playground Interactive Container */}
-        <div className="rounded-3xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950/90 shadow-xl dark:shadow-2xl p-6 sm:p-8">
-          <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between pb-6 border-b border-slate-200 dark:border-slate-800/80 mb-8 gap-4">
+        <div className="rounded-xl border border-slate-200 dark:border-[rgba(238,240,245,0.08)] bg-white dark:bg-[#11141c] p-6">
+          <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between pb-4 border-b border-slate-200 dark:border-[rgba(238,240,245,0.08)] mb-6 gap-3">
             <div>
-              <div className="flex items-center gap-2">
-                <span className="text-xs font-mono text-cyan-600 dark:text-cyan-400 uppercase tracking-wider font-semibold">
-                  TEMPLATE: {current.tag}
-                </span>
-                <span className="text-xs font-mono text-slate-400 dark:text-slate-600">•</span>
-                <span className="text-xs font-mono text-slate-600 dark:text-slate-400 font-medium">KAHN TOPOSORT: ACTIVE</span>
+              <div className="text-xs font-mono text-slate-500 dark:text-[#7a8296]">
+                TEMPLATE: {current.tag.toUpperCase()} • TOPOSORT ACTIVE
               </div>
-              <h3 className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white mt-1">
+              <h3 className="text-base font-medium text-slate-900 dark:text-[#eef0f5] mt-0.5">
                 {current.title}
               </h3>
-              <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 max-w-2xl mt-1">
-                {current.description}
-              </p>
             </div>
 
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2">
               <button
                 onClick={runSimulation}
                 disabled={isPlaying}
-                className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-indigo-600 to-cyan-500 hover:from-indigo-500 hover:to-cyan-400 text-white text-xs font-semibold shadow-lg shadow-indigo-600/25 transition-all disabled:opacity-50"
+                className="h-8 px-3 rounded-lg bg-slate-900 hover:bg-slate-800 text-white dark:bg-[#eef0f5] dark:hover:bg-white dark:text-[#0b0d14] text-xs font-mono inline-flex items-center gap-1.5 transition-colors disabled:opacity-50"
               >
-                <Play className="w-3.5 h-3.5 fill-white" />
-                <span>{isPlaying ? "Executing Graph..." : "Simulate Live Run"}</span>
+                <Play className="w-3 h-3 fill-current" />
+                <span>{isPlaying ? "Executing..." : "Run Simulation"}</span>
               </button>
 
               <button
                 onClick={() => navigate("/studio")}
-                className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 text-xs font-medium border border-slate-300 dark:border-slate-700 transition-colors shadow-sm"
+                className="h-8 px-3 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-[#1a1e28] dark:hover:bg-[#232325] text-slate-700 dark:text-[#eef0f5] text-xs font-mono inline-flex items-center gap-1.5 transition-colors"
               >
-                <span>Open in Canvas</span>
-                <ArrowRight className="w-3.5 h-3.5" />
+                <span>Studio</span>
+                <ArrowRight className="w-3 h-3" />
               </button>
             </div>
           </div>
 
-          {/* Node Flow Representation with Active Step Animation */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+          {/* Node Progression Cards */}
+          <div className="grid grid-cols-1 sm:grid-cols-4 gap-3 mb-6">
             {current.nodes.map((node, index) => {
-              const isExecutingThisStep = isPlaying && activeStepIndex === index;
+              const isFinished = activeStepIndex >= index;
               return (
                 <div
                   key={node.name}
-                  className={`relative p-4 rounded-2xl border transition-all duration-300 ${node.color} ${
-                    isExecutingThisStep
-                      ? "ring-2 ring-indigo-500 scale-[1.03] shadow-lg shadow-indigo-500/20"
-                      : "shadow-sm dark:shadow-none"
+                  className={`p-3.5 rounded-lg border transition-colors ${
+                    isFinished
+                      ? "border-slate-900 bg-white dark:border-[#eef0f5] dark:bg-[#1a1e28]"
+                      : "border-slate-200 bg-slate-50/50 dark:border-[rgba(238,240,245,0.06)] dark:bg-[#07080d]"
                   }`}
                 >
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-[10px] font-mono uppercase text-slate-600 dark:text-slate-400 font-semibold">
-                      Step 0{index + 1} // {node.role}
-                    </span>
-                    <span className="text-[11px] font-mono text-slate-600 dark:text-slate-400 flex items-center gap-1 font-medium">
-                      <Clock className="w-3 h-3" />
-                      <span>{node.time}</span>
-                    </span>
+                  <div className="flex items-center justify-between text-[10px] font-mono text-slate-500 dark:text-[#7a8296] mb-1.5">
+                    <span>{node.role}</span>
+                    <span className="tabular-nums">{node.time}</span>
                   </div>
-                  <h4 className="text-sm font-semibold text-slate-900 dark:text-white mb-2 truncate">
+                  <div className="text-xs font-medium text-slate-900 dark:text-[#eef0f5] truncate mb-2">
                     {node.name}
-                  </h4>
-                  <div className="flex items-center gap-1.5 text-xs">
-                    <CheckCircle className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
-                    <span className="text-slate-800 dark:text-slate-200 font-mono text-[11px] font-semibold">{node.status}</span>
                   </div>
-
-                  {isExecutingThisStep && (
-                    <div className="absolute -top-1.5 -right-1.5 flex h-3.5 w-3.5">
-                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75" />
-                      <span className="relative inline-flex rounded-full h-3.5 w-3.5 bg-indigo-600 shadow-md" />
-                    </div>
-                  )}
+                  <div className="flex items-center gap-1 text-[11px] font-mono text-emerald-600 dark:text-[#4cc38a]">
+                    <CheckCircle className="w-3 h-3" />
+                    <span>{node.status}</span>
+                  </div>
                 </div>
               );
             })}
           </div>
 
-          {/* Simulated Terminal Console with Copy and Active Status */}
-          <div className="rounded-2xl border border-slate-800 bg-slate-950 p-4 font-mono text-xs shadow-inner">
-            <div className="flex items-center justify-between pb-2 border-b border-slate-800 mb-3 text-slate-400">
-              <span className="flex items-center gap-2 text-cyan-400 font-semibold">
-                <Terminal className="w-4 h-4" />
-                <span>EXECUTION STREAM // SSE TELEMETRY LOG</span>
+          {/* Stream Logs */}
+          <div className="rounded-lg border border-slate-200 dark:border-[rgba(238,240,245,0.08)] bg-slate-50 dark:bg-[#07080d] p-3 font-mono text-xs">
+            <div className="flex items-center justify-between pb-2 border-b border-slate-200 dark:border-[rgba(238,240,245,0.06)] mb-2 text-slate-500 dark:text-[#7a8296]">
+              <span className="flex items-center gap-1.5 text-slate-700 dark:text-[#a3a9b8]">
+                <Terminal className="w-3.5 h-3.5" />
+                <span>STREAM_TELEMETRY // SSE_DISPATCH</span>
               </span>
-
-              <div className="flex items-center gap-3">
-                <span className="text-[11px] text-slate-400 hidden sm:inline font-mono">
-                  {isPlaying ? "STATUS: STREAMING..." : "STATUS: READY"}
-                </span>
-
-                <button
-                  onClick={copyTelemetry}
-                  className="flex items-center gap-1 text-[11px] text-slate-400 hover:text-white transition-colors"
-                  title="Copy telemetry log"
-                >
-                  {copiedLog ? <Check className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3" />}
-                  <span>{copiedLog ? "Copied" : "Copy"}</span>
-                </button>
-              </div>
+              <button
+                onClick={copyTelemetry}
+                className="hover:text-slate-900 dark:hover:text-[#eef0f5] transition-colors inline-flex items-center gap-1 text-[11px]"
+              >
+                {copiedLog ? <Check className="w-3 h-3 text-emerald-500" /> : <Copy className="w-3 h-3" />}
+                <span>{copiedLog ? "Copied" : "Copy Log"}</span>
+              </button>
             </div>
-
-            <div className="space-y-1.5 min-h-[90px]">
+            <div className="space-y-1 text-slate-700 dark:text-[#a3a9b8] leading-relaxed">
               {(simulatedLogs.length > 0 ? simulatedLogs : current.streamLog).map((line, idx) => (
-                <div key={idx} className="text-slate-300 leading-relaxed font-mono">
-                  <span className="text-indigo-400 font-bold">&gt;</span> {line}
+                <div key={idx} className="truncate">
+                  {line}
                 </div>
               ))}
             </div>
