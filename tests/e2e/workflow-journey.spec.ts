@@ -13,8 +13,8 @@ import { test, expect } from "@playwright/test";
 
 test.describe("NeuralDesk E2E Workflow Journeys", () => {
   test.beforeEach(async ({ page }) => {
-    // Navigate to local web client
-    await page.goto("/");
+    // Navigate to local studio workspace
+    await page.goto("/studio");
     // Wait for initial render and React Flow canvas mounting
     await page.waitForSelector(".react-flow__renderer", { state: "visible" });
   });
@@ -347,5 +347,22 @@ test.describe("NeuralDesk E2E Workflow Journeys", () => {
     // Verify Canvas view is restored
     await expect(page.locator(".react-flow__renderer")).toBeVisible();
     await expect(page.locator('input[title="Click to edit workflow name"]')).toBeVisible();
+  });
+
+  // ============================================================================
+  // Journey 6: Marketing Landing Page & Studio Navigation
+  // ============================================================================
+  test("Journey 6: Marketing Landing Page & Studio Navigation", async ({ page }) => {
+    // 1. Visit root marketing landing page
+    await page.goto("/");
+    await expect(page.locator("h1")).toBeVisible();
+    await expect(page.locator("text=Explore Live Workspace").first()).toBeVisible();
+
+    // 2. Click Explore Live Workspace to navigate to Studio
+    await page.locator('button:has-text("Explore Live Workspace")').first().click();
+
+    // 3. Verify seamless routing to Studio canvas
+    await expect(page).toHaveURL(/.*\/studio/);
+    await expect(page.locator(".react-flow__renderer")).toBeVisible();
   });
 });
